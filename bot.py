@@ -24,20 +24,18 @@ async def on_member_join(member):
 
 def question_personality():
     out_message = ""
+    conn = connect_to_database()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM personalities")
+    rows = cursor.fetchall()
 
-    try:
-        conn = connect_to_database()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM personalities")
-        rows = cursor.fetchall()
-
-        print('Total Row(s):', cursor.rowcount)
-        for row in rows:
-            print(row)
-            out_message = "{0}\n".format(row)
-        cursor.close()
-        conn.close()
-        return outmessage
+    print('Total Row(s):', cursor.rowcount)
+    for row in rows:
+        print(row)
+        out_message = "{0}\n".format(row)
+    cursor.close()
+    conn.close()
+    return outmessage
 
 def connect_to_database():
     """ Connect to MySQL database """
