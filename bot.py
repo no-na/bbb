@@ -35,14 +35,9 @@ def question_personality():
         for row in rows:
             print(row)
             out_message = "{0}\n".format(row)
-
-    except Error as e:
-        print(e)
-
-    finally:
         cursor.close()
         conn.close()
-    return outmessage
+        return outmessage
 
 def connect_to_database():
     """ Connect to MySQL database """
