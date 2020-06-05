@@ -6,7 +6,7 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-	connect()
+    connect()
     print('We have logged in as {0.user}'.format(client))
 
 @client.event
@@ -21,12 +21,12 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
-	print('{0} has joined server.'.format(member))
+    print('{0} has joined server.'.format(member))
 
 def question_personality():
-	out_message = "";
+    out_message = "";
 
-	try:
+    try:
         conn = connect()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM personalities")
@@ -43,10 +43,10 @@ def question_personality():
     finally:
         cursor.close()
         conn.close()
-	return outmessage
+    return outmessage
 
 def connect_to_database():
-	""" Connect to MySQL database """
+    """ Connect to MySQL database """
     conn = None
     try:
         conn = mysql.connector.connect(host='localhost',
