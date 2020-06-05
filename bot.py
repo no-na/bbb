@@ -1,6 +1,6 @@
 import discord
 import os
-import mysql.conenctor
+import mysql.connector
 
 client = discord.Client()
 
