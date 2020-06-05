@@ -47,14 +47,12 @@ def connect_to_database():
                                        password=os.environ['SQL_PASS'])
         if conn.is_connected():
             print('Connected to MySQL database')
-            return conn
 
     except mysql.connector.Error as e:
         print(e)
 
     finally:
-        if conn is not None and conn.is_connected():
-            conn.close()
+        return conn;
 
 
 client.run(os.environ['BBB_TOK'])
