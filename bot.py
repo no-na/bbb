@@ -28,11 +28,10 @@ async def on_member_join(member):
 
 def question_personality():
     out_message = ""
-    conn = mysql.connector.connect(host='localhost',
-                                   database='BBB',
+    conn = mysql.connector.connect(database='BBB',
                                    user='root',
                                    password=os.environ['SQL_PASS'])
-    
+
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM personalities")
     rows = cursor.fetchall()
@@ -44,5 +43,6 @@ def question_personality():
     cursor.close()
     conn.close()
     return out_message
+
 
 client.run(os.environ['BBB_TOK'])
