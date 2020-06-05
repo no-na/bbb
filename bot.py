@@ -23,10 +23,10 @@ async def on_member_join(member):
     print('{0} has joined server.'.format(member))
 
 def question_personality():
-    out_message = "";
+    out_message = ""
 
     try:
-        conn = connect()
+        conn = connect_to_database()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM personalities")
         rows = cursor.fetchall()
@@ -34,7 +34,7 @@ def question_personality():
         print('Total Row(s):', cursor.rowcount)
         for row in rows:
             print(row)
-            out_message ="{0}\n".format(row)
+            out_message = "{0}\n".format(row)
 
     except Error as e:
         print(e)
