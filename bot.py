@@ -49,7 +49,7 @@ def connect_to_database():
             print('Connected to MySQL database')
             return conn
 
-    except Error as e:
+    except mysql.connector.Error as e:
         print(e)
 
     finally:
