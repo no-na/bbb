@@ -17,7 +17,7 @@ async def on_message(message):
 
     splitMessage = message.content.split()
 
-    if message.content.startswith('/personality'):
+    if message.content.startswith('!personality'):
         await message.channel.send(question_personality())
 
 
@@ -27,7 +27,7 @@ async def on_member_join(member):
 
 
 def question_personality():
-    out_message = ""
+    out_message = "To select a new personality, enter `!personality _`, replacing the underscore with the number of the personality.\n"
     conn = mysql.connector.connect(database='bbb',
                                    user='root',
                                    password=os.environ['SQL_PASS'])
@@ -35,11 +35,9 @@ def question_personality():
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM personalities")
     rows = cursor.fetchall()
-
-    print('Total Row(s):', cursor.rowcount)
     for row in rows:
         print(row)
-        out_message = "{0}\n".format(row)
+        out_message += "{0}. **{1}:** {2}\n".format(row[0],row[1],row[2])
     cursor.close()
     conn.close()
     return out_message
