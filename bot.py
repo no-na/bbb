@@ -28,7 +28,7 @@ async def on_member_join(member):
 
 def question_personality():
     out_message = ""
-    conn = mysql.connector.connect(database='BBB',
+    conn = mysql.connector.connect(database='bbb',
                                    user='root',
                                    password=os.environ['SQL_PASS'])
 
