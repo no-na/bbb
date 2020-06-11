@@ -29,6 +29,7 @@ def join(message):
         conn = connect()
         cursor = conn.cursor()
         cursor.execute("INSERT INTO users (user_id) VALUES ({0})".format(message.author.id))
+        conn.commit()
         cursor.close()
         conn.close()
         return "You joined."
@@ -47,6 +48,7 @@ def personality(message):
         row = cursor.fetchone()
         if(row == 1):
             cursor.execute("UPDATE users SET user_personality = {0} WHERE user_id = {1}".format(personality_id, message.author.id))
+            conn.commit()
             out_message += "Personality has been changed.."
         else:
             out_message += "That personality doesn't exist. Nothing has been changed."
