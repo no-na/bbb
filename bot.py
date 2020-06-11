@@ -19,7 +19,7 @@ def checkJoin(member):
     row = cursor.fetchone()
     cursor.close()
     conn.close()
-    if(row == 1):
+    if(row[0] == 1):
         return True
     return False
 
@@ -46,7 +46,7 @@ def personality(message):
         personality_id = split_message[1]
         cursor.execute("SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = {0})".format(personality_id))
         row = cursor.fetchone()
-        if(row == 1):
+        if(row[0] == 1):
             cursor.execute("UPDATE users SET user_personality = {0} WHERE user_id = {1}".format(personality_id, message.author.id))
             conn.commit()
             out_message += "Personality has been changed.."
