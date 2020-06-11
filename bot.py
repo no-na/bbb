@@ -42,7 +42,7 @@ def personality(message):
     out_message = ""
     conn = connect()
     cursor = conn.cursor()
-    if split_message.len() >= 2:
+    if len(split_message) >= 2:
         personality_id = split_message[1]
         cursor.execute("SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = {0})".format(personality_id))
         row = cursor.fetchone()
