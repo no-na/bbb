@@ -79,7 +79,7 @@ async def on_message(message):
     if split_message[0] == "!join":
         await message.channel.send(join(message))
     elif split_message[0] in response_options:
-        if checkJoin(message.author):
+        if checkJoin(message.author) is True:
             await message.channel.send(response_options[split_message[0]](message))
         else:
             await message.channel.send("Please subscribe to bot first by typing \"!join\"")
