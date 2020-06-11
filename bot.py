@@ -1,7 +1,9 @@
 import discord
 import os
 import mysql.connector
+import subprocess
 
+rc = subprocess.call("../access")
 client = discord.Client()
 
 
