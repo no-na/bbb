@@ -14,9 +14,8 @@ def connect():
 
 def checkJoin(member):
     conn = connect()
-    cursor = conn.cursor
-    cursor.execute(
-        "SELECT EXISTS(SELECT * FROM users WHERE user_id = {0})".format(member.id))
+    cursor = conn.cursor()
+    cursor.execute("SELECT EXISTS(SELECT * FROM users WHERE user_id = {0})".format(member.id))
     row = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -28,7 +27,7 @@ def checkJoin(member):
 def join(message):
     if(checkJoin(message.author) is False):
         conn = connect()
-        cursor = conn.cursor
+        cursor = conn.cursor()
         cursor.execute("INSERT INTO users (user_id) VALUES ({0})".format(message.author.id))
         cursor.close()
         conn.close()
@@ -41,7 +40,7 @@ def personality(message):
     split_message = message.content.split()
     out_message = ""
     conn = connect()
-    cursor = conn.cursor
+    cursor = conn.cursor()
     if split_message.len() >= 2:
         personality_id = split_message[1]
         cursor.execute("SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = {0})".format(personality_id))
