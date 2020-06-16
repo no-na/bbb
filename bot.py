@@ -71,7 +71,7 @@ def personality(message):
             out_message += "That personality doesn't exist. Nothing has been changed."
     else:
         out_message += "To select a new personality, enter !personality _, replacing the underscore with the number of the personality.\n"
-        out_message += "{0:^40}".format("# personality [NUMBER] #")
+        out_message += "{0:^40}".format("# personality [NUMBER] #\n")
         query = ("SELECT * FROM personalities")
         cursor.execute(query)
         rows = cursor.fetchall()
