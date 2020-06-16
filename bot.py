@@ -130,7 +130,7 @@ def personality(message):
     if len(split_message) >= 2:
         new_personality_id = split_message[1]
         query = (
-            "SELECT EXISTS(SELECT * FROM personalities WHERE new_personality_id = %s)"
+            "SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = %s)"
         )
         data = (new_personality_id, )
         cursor.execute(query, data)
@@ -165,7 +165,7 @@ def personality(message):
         cursor.execute(query, data)
         row = cursor.fetchone()
         out_message += "{0}\n".format(row[0])
-        out_message += "\n{0}".format("# personality [NUMBER]")
+        out_message += "\n{0}".format("# personality [NUMBER]\n")
         query = ("SELECT * FROM personalities")
         cursor.execute(query)
         rows = cursor.fetchall()
