@@ -4,6 +4,8 @@ import mysql.connector
 
 client = discord.Client()
 
+response_options = {}
+
 
 def connect():
     conn = mysql.connector.connect(database='bbb',
@@ -46,6 +48,34 @@ def join(message):
         return "You already joined."
 
 
+def helpp(message):
+    split_message = message.content.split()
+    out_message = "```stan\n"
+    conn = connect()
+    cursor = conn.cursor()
+    query = (
+        "SELECT user_personality FROM users WHERE user_id = %s"
+    )
+    data = (message.author.id, )
+    cursor.execute(query, data)
+    row = cursor.fetchone()
+    personality_id = row[0]
+    query = (
+        "SELECT response_text FROM responses WHERE response_name = help AND response_personality = %s"
+    )
+    data = (personality_id, )
+    cursor.execute(query, data)
+    row = cursor.fetchone()
+    out_message += "{0}\n".format(row[0])
+    for key in response_options:
+        out_message += "{0:<20} {1:>20}\n".format(key, response_options[key][1])
+
+    cursor.close()
+    conn.close()
+    out_message += "```"
+    return out_message
+
+
 def personality(message):
     split_message = message.content.split()
     out_message = "```stan\n"
@@ -70,8 +100,8 @@ def personality(message):
         else:
             out_message += "That personality doesn't exist. Nothing has been changed."
     else:
-        out_message += "To select a new personality, enter !personality _, replacing the underscore with the number of the personality.\n"
-        out_message += "{0}".format("# personality [NUMBER]\n")
+        out_message += "To select a new personality, enter !personality _, replacing the underscore with the number of the personality."
+        out_message += "\n{0}".format("# personality [NUMBER]")
         query = ("SELECT * FROM personalities")
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -84,7 +114,8 @@ def personality(message):
 
 
 response_options = {
-    "!personality": personality
+    "!help": ("List commands.", helpp),
+    "!personality": ("Change bot personality.", personality)
 }
 
 
@@ -102,7 +133,7 @@ async def on_message(message):
         await message.channel.send(join(message))
     elif split_message[0] in response_options:
         if checkJoin(message.author) is True:
-            await message.channel.send(response_options[split_message[0]](message))
+            await message.channel.send(response_options[split_message[0]][1](message))
         else:
             await message.channel.send("Please subscribe to bot first by typing \"!join\"")
     elif split_message[0][0] == '!':
