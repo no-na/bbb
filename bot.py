@@ -18,7 +18,7 @@ def checkJoin(member):
     query = (
         "SELECT EXISTS(SELECT * FROM users WHERE user_id = %s)"
     )
-    data = (member.id)
+    data = (member.id, )
     cursor.execute(query, data)
     row = cursor.fetchone()
     cursor.close()
@@ -36,7 +36,7 @@ def join(message):
             "INSERT INTO users(user_id)"
             "VALUES (%s)"
         )
-        data = (message.author.id)
+        data = (message.author.id, )
         cursor.execute(query, data)
         conn.commit()
         cursor.close()
@@ -56,7 +56,7 @@ def personality(message):
         query = (
             "SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = %s)"
         )
-        data = (personality_id)
+        data = (personality_id, )
         cursor.execute(query, data)
         row = cursor.fetchone()
         if(row[0] == 1):
