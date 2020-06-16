@@ -48,7 +48,7 @@ def join(message):
 
 def personality(message):
     split_message = message.content.split()
-    out_message = ""
+    out_message = "```stan\n"
     conn = connect()
     cursor = conn.cursor()
     if len(split_message) >= 2:
@@ -75,9 +75,10 @@ def personality(message):
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            out_message += "{0}. **{1}:** {2}\n".format(row[0], row[1], row[2])
+            out_message += "{0} {1}: {2}\n".format(row[0], row[1], row[2])
     cursor.close()
     conn.close()
+    out_message += "```"
     return out_message
 
 
