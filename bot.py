@@ -61,7 +61,7 @@ def helpp(message):
     row = cursor.fetchone()
     personality_id = row[0]
     query = (
-        "SELECT response_text FROM responses WHERE response_name = help AND response_personality = %s"
+        "SELECT response_text FROM responses WHERE response_name = 'help' AND response_personality = %s"
     )
     data = (personality_id, )
     cursor.execute(query, data)
