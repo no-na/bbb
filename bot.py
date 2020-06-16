@@ -31,9 +31,17 @@ def checkJoin(member):
 
 
 def join(message):
+    out_message = "```stan\n"
+    conn = connect()
+    cursor = conn.cursor()
+    query = (
+        "SELECT user_personality FROM users WHERE user_id = %s"
+    )
+    data = (message.author.id, )
+    cursor.execute(query, data)
+    row = cursor.fetchone()
+    personality_id = row[0]
     if(checkJoin(message.author) is False):
-        conn = connect()
-        cursor = conn.cursor()
         query = (
             "INSERT INTO users(user_id)"
             "VALUES (%s)"
@@ -41,11 +49,43 @@ def join(message):
         data = (message.author.id, )
         cursor.execute(query, data)
         conn.commit()
-        cursor.close()
-        conn.close()
-        return "You joined."
+        out_message += "User joined.\n"
     else:
-        return "You already joined."
+        query = (
+            "SELECT response_text FROM responses WHERE response_name = 'joined_true' AND response_personality = %s"
+        )
+        data = (personality_id, )
+        cursor.execute(query, data)
+        row = cursor.fetchone()
+        out_message += "{0}\n".format(row[0])
+    cursor.close()
+    conn.close()
+    out_message += "```"
+    return out_message
+
+
+def command_bad(message):
+    out_message = "```stan\n"
+    conn = connect()
+    cursor = conn.cursor()
+    query = (
+        "SELECT user_personality FROM users WHERE user_id = %s"
+    )
+    data = (message.author.id, )
+    cursor.execute(query, data)
+    row = cursor.fetchone()
+    personality_id = row[0]
+    query = (
+        "SELECT response_text FROM responses WHERE response_name = 'command_bad' AND response_personality = %s"
+    )
+    data = (personality_id, )
+    cursor.execute(query, data)
+    row = cursor.fetchone()
+    out_message += "{0}\n".format(row[0])
+    cursor.close()
+    conn.close()
+    out_message += "```"
+    return out_message
 
 
 def helpp(message):
@@ -67,7 +107,7 @@ def helpp(message):
     row = cursor.fetchone()
     out_message += "{0}\n".format(row[0])
     for key in response_options:
-        out_message += "{0:<20} {1:>20}\n".format(key, response_options[key][0])
+        out_message += "{0:<20} {1}\n".format(key, response_options[key][0])
 
     cursor.close()
     conn.close()
@@ -80,26 +120,51 @@ def personality(message):
     out_message = "```stan\n"
     conn = connect()
     cursor = conn.cursor()
+    query = (
+        "SELECT user_personality FROM users WHERE user_id = %s"
+    )
+    data = (message.author.id, )
+    cursor.execute(query, data)
+    row = cursor.fetchone()
+    personality_id = row[0]
     if len(split_message) >= 2:
-        personality_id = split_message[1]
+        new_personality_id = split_message[1]
         query = (
-            "SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = %s)"
+            "SELECT EXISTS(SELECT * FROM personalities WHERE new_personality_id = %s)"
         )
-        data = (personality_id, )
+        data = (new_personality_id, )
         cursor.execute(query, data)
         row = cursor.fetchone()
         if(row[0] == 1):
             query = (
                 "UPDATE users SET user_personality = %s WHERE user_id = %s"
             )
-            data = (personality_id, message.author.id)
+            data = (new_personality_id, message.author.id)
             cursor.execute(query, data)
             conn.commit()
-            out_message += "Personality has been changed."
+            query = (
+                "SELECT response_text FROM responses WHERE response_name = 'personality_changed' AND response_personality = %s"
+            )
+            data = (new_personality_id, )
+            cursor.execute(query, data)
+            row = cursor.fetchone()
+            out_message += "{0}\n".format(row[0])
         else:
-            out_message += "That personality doesn't exist. Nothing has been changed."
+            query = (
+                "SELECT response_text FROM responses WHERE response_name = 'personality_invalid' AND response_personality = %s"
+            )
+            data = (personality_id, )
+            cursor.execute(query, data)
+            row = cursor.fetchone()
+            out_message += "{0}\n".format(row[0])
     else:
-        out_message += "To select a new personality, enter !personality _, replacing the underscore with the number of the personality."
+        query = (
+            "SELECT response_text FROM responses WHERE response_name = 'personality' AND response_personality = %s"
+        )
+        data = (personality_id, )
+        cursor.execute(query, data)
+        row = cursor.fetchone()
+        out_message += "{0}\n".format(row[0])
         out_message += "\n{0}".format("# personality [NUMBER]")
         query = ("SELECT * FROM personalities")
         cursor.execute(query)
@@ -136,7 +201,7 @@ async def on_message(message):
         else:
             await message.channel.send("Please subscribe to bot first by typing \"!join\"")
     elif split_message[0][0] == '!':
-        await message.channel.send("Unrecognized command.")
+        await message.channel.send(command_bad(message))
 
 
 @client.event
