@@ -49,7 +49,6 @@ def join(message):
 
 
 def helpp(message):
-    split_message = message.content.split()
     out_message = "```stan\n"
     conn = connect()
     cursor = conn.cursor()
@@ -68,7 +67,7 @@ def helpp(message):
     row = cursor.fetchone()
     out_message += "{0}\n".format(row[0])
     for key in response_options:
-        out_message += "{0:<20} {1:>20}\n".format(key, response_options[key][1])
+        out_message += "{0:<20} {1:>20}\n".format(key, response_options[key][0])
 
     cursor.close()
     conn.close()
