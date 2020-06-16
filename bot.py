@@ -76,7 +76,7 @@ def personality(message):
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            out_message += "{0:<20} {1:>20}\n".format(row[0] + " " + row[1], row[2])
+            out_message += "{0:<20} {1:>20}\n".format("{0} {1}".format(row[0], row[1]), row[2])
     cursor.close()
     conn.close()
     out_message += "```"
