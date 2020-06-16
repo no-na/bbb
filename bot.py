@@ -15,7 +15,11 @@ def connect():
 def checkJoin(member):
     conn = connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT EXISTS(SELECT * FROM users WHERE user_id = {0})".format(member.id))
+    query = (
+        "SELECT EXISTS(SELECT * FROM users WHERE user_id = %s)"
+    )
+    data = (member.id)
+    cursor.execute(query, data)
     row = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -28,7 +32,12 @@ def join(message):
     if(checkJoin(message.author) is False):
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (user_id) VALUES ({0})".format(message.author.id))
+        query = (
+            "INSERT INTO users(user_id)"
+            "VALUES (%s)"
+        )
+        data = (message.author.id)
+        cursor.execute(query, data)
         conn.commit()
         cursor.close()
         conn.close()
@@ -44,17 +53,26 @@ def personality(message):
     cursor = conn.cursor()
     if len(split_message) >= 2:
         personality_id = split_message[1]
-        cursor.execute("SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = {0})".format(personality_id))
+        query = (
+            "SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = %s)"
+        )
+        data = (personality_id)
+        cursor.execute(query, data)
         row = cursor.fetchone()
         if(row[0] == 1):
-            cursor.execute("UPDATE users SET user_personality = {0} WHERE user_id = {1}".format(personality_id, message.author.id))
+            query = (
+                "UPDATE users SET user_personality = %s WHERE user_id = %s"
+            )
+            data = (personality_id, message.author.id)
+            cursor.execute(query, data)
             conn.commit()
-            out_message += "Personality has been changed.."
+            out_message += "Personality has been changed."
         else:
             out_message += "That personality doesn't exist. Nothing has been changed."
     else:
         out_message += "To select a new personality, enter `!personality _`, replacing the underscore with the number of the personality.\n"
-        cursor.execute("SELECT * FROM personalities")
+        query = ("SELECT * FROM personalities")
+        cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
             out_message += "{0}. **{1}:** {2}\n".format(row[0], row[1], row[2])
