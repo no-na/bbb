@@ -34,13 +34,6 @@ def join(message):
     out_message = "```stan\n"
     conn = connect()
     cursor = conn.cursor()
-    query = (
-        "SELECT user_personality FROM users WHERE user_id = %s"
-    )
-    data = (message.author.id, )
-    cursor.execute(query, data)
-    row = cursor.fetchone()
-    personality_id = row[0]
     if(checkJoin(message.author) is False):
         query = (
             "INSERT INTO users(user_id)"
@@ -51,6 +44,13 @@ def join(message):
         conn.commit()
         out_message += "User joined.\n"
     else:
+        query = (
+            "SELECT user_personality FROM users WHERE user_id = %s"
+        )
+        data = (message.author.id, )
+        cursor.execute(query, data)
+        row = cursor.fetchone()
+        personality_id = row[0]
         query = (
             "SELECT response_text FROM responses WHERE response_name = 'joined_true' AND response_personality = %s"
         )
@@ -170,7 +170,7 @@ def personality(message):
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            out_message += "{0:<20} {1:>20}\n".format("{0} {1}".format(row[0], row[1]), row[2])
+            out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[1]), row[2])
     cursor.close()
     conn.close()
     out_message += "```"
