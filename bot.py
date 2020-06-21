@@ -177,7 +177,7 @@ def bounty(message):
             )
             now = datetime.utcnow()
             later = now + timedelta(days=7)
-            description = " ".join(split_message[2:len(split_message) - 1])
+            description = " ".join(split_message[2:])
             data = (now.strftime('%Y-%m-%d %H:%M:%S'), later.strftime('%Y-%m-%d %H:%M:%S'), description, message.author.id)
             cursor.execute(query, data)
             conn.commit()
@@ -195,7 +195,7 @@ def bounty(message):
                 query = (
                     "UPDATE bounties SET bounty_text = %s WHERE bounty_id = %s"
                 )
-                description = " ".join(split_message[3:len(split_message) - 1])
+                description = " ".join(split_message[3:])
                 data = (description, split_message[2])
                 cursor.execute(query, data)
                 conn.commit()
@@ -232,7 +232,7 @@ def bounty(message):
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[5]), row[4])
+            out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], client.get_user(row[4]), row[3]))
 
     return (end_response(out_message, conn, cursor), )
 
