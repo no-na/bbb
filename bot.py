@@ -177,7 +177,8 @@ def bounty(message):
             )
             now = datetime.utcnow()
             later = now + timedelta(days=7)
-            data = (now.strftime('%Y-%m-%d %H:%M:%S'), later.strftime('%Y-%m-%d %H:%M:%S'), split_message[2], message.author.id)
+            description = " ".join(split_message[2:len(split_message) - 1])
+            data = (now.strftime('%Y-%m-%d %H:%M:%S'), later.strftime('%Y-%m-%d %H:%M:%S'), description, message.author.id)
             cursor.execute(query, data)
             conn.commit()
             out_message += "{0}\n".format(get_response(cursor, "bounty_new_valid", personality_id))
@@ -194,7 +195,8 @@ def bounty(message):
                 query = (
                     "UPDATE bounties SET bounty_text = %s WHERE bounty_id = %s"
                 )
-                data = (split_message[3], split_message[2])
+                description = " ".join(split_message[3:len(split_message) - 1])
+                data = (description, split_message[2])
                 cursor.execute(query, data)
                 conn.commit()
                 out_message += "{0}\n".format(get_response(cursor, "bounty_edit_valid", personality_id))
@@ -223,10 +225,10 @@ def bounty(message):
     else:
         # Display help and existing bounties.
         out_message += "{0}\n".format(get_response(cursor, "bounty", personality_id))
-        out_message += "\n{0}".format("# !bounty -new [BOUNTY DESCRIPTION]\n")
-        out_message += "\n{0}".format("# !bounty -edit [BOUNTY ID] [BOUNTY DESCRIPTION]\n")
-        out_message += "\n{0}".format("# !bounty -delete [BOUNTY ID]\n")
-        query = ("SELECT * FROM bounties")
+        out_message += "{0}".format("# !bounty -new [BOUNTY DESCRIPTION]\n")
+        out_message += "{0}".format("# !bounty -edit [BOUNTY ID] [BOUNTY DESCRIPTION]\n")
+        out_message += "{0}".format("# !bounty -delete [BOUNTY ID]\n")
+        query = ("SELECT * FROM bounties WHERE bounty_active = TRUE")
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
@@ -304,10 +306,10 @@ def claim(message):
     else:
         # Display help and existing claims that the user has authority over, or made.
         out_message += "{0}\n".format(get_response(cursor, "claim", personality_id))
-        out_message += "\n{0}".format("# !claim -new [BOUNTY ID]\n")
-        out_message += "\n{0}".format("# !claim -new [BOUNTY ID] [PILLAR NAME]\n")
-        out_message += "\n{0}".format("# !claim -new [BOUNTY ID] [PILLAR NAME] [PILLAR NAME] ...\n")
-        out_message += "\n{0}".format("# !claim -delete [CLAIM ID]\n")
+        out_message += "{0}".format("# !claim -new [BOUNTY ID]\n")
+        out_message += "{0}".format("# !claim -new [BOUNTY ID] [PILLAR NAME]\n")
+        out_message += "{0}".format("# !claim -new [BOUNTY ID] [PILLAR NAME] [PILLAR NAME] ...\n")
+        out_message += "{0}".format("# !claim -delete [CLAIM ID]\n")
 
         query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s")
         data = (message.author.id, )
@@ -452,7 +454,7 @@ async def on_message(message):
         else:
             await message.channel.send("Please subscribe to bot first by typing \"!join\"")
     elif split_message[0][0] == '!':
-        await message.channel.send(command_bad(message))
+        await message.channel.send(command_bad(message)[0])
 
 
 @client.event
