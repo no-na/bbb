@@ -91,7 +91,7 @@ def join(message):
         row = cursor.fetchone()
         personality_id = row[0]
         out_message += "{0}\n".format(get_response(cursor, "joined_true", personality_id))
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def command_bad(message):
@@ -103,7 +103,7 @@ def command_bad(message):
 
     out_message += "{0}\n".format(get_response(cursor, "command_invalid", personality_id))
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def helpp(message):
@@ -117,7 +117,7 @@ def helpp(message):
     for key in response_options:
         out_message += "{0:<20} {1}\n".format(key, response_options[key][0])
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def personality(message):
@@ -157,7 +157,7 @@ def personality(message):
         for row in rows:
             out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[1]), row[2])
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def bounty(message):
@@ -232,7 +232,7 @@ def bounty(message):
         for row in rows:
             out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[5]), row[4])
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def claim(message):
@@ -343,7 +343,7 @@ def accept(message):
         # Display help.
         pass
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def refuse(message):
@@ -361,7 +361,7 @@ def refuse(message):
         # Display help.
         pass
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def pillar(message):
@@ -387,7 +387,7 @@ def pillar(message):
         # Display help and the user's existing pillars.
         pass
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def leaderboard(message):
@@ -400,7 +400,7 @@ def leaderboard(message):
 
     # Display leaderboard.
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 def stats(message):
@@ -413,7 +413,7 @@ def stats(message):
 
     # Display personal statistics.
 
-    return (end_response(out_message, conn, cursor))
+    return (end_response(out_message, conn, cursor), )
 
 
 response_options = {
@@ -440,7 +440,7 @@ async def on_message(message):
         return
     split_message = message.content.split()
     if split_message[0] == "!join":
-        await message.channel.send(join(message))
+        await message.channel.send(join(message)[0])
     elif split_message[0] in response_options:
         if checkJoin(message.author) is True:
             response = response_options[split_message[0]][1](message)
