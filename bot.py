@@ -43,9 +43,9 @@ def end_response(out_message, conn, cursor):
 # Returns string of requested response with personality.
 def get_response(cursor, response_name, personality_id):
     query = (
-        "SELECT response_text FROM responses WHERE response_name = {0} AND response_personality = %s".format(response_name)
+        "SELECT response_text FROM responses WHERE response_name = %s AND response_personality = %s"
     )
-    data = (personality_id, )
+    data = (response_name, personality_id)
     cursor.execute(query, data)
     row = cursor.fetchone()
     return row[0]
