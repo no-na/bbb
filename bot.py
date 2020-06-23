@@ -251,7 +251,7 @@ def claim(message):
             # Create new claim if the bounty exists, the user is not the creator, and the bounty has not expired.
             # And the user hasn't already made a claim on this bounty, and the user hasn't already been accepted.
             query = (
-                "SELECT EXISTS(SELECT * FROM bounties WHERE bounty_creator != %s AND bounty_id = %s AND JSON_CONTAINS(bounty_accepted,%s) = 0 AND bounty_expiration > NOW())"
+                "SELECT EXISTS(SELECT * FROM bounties WHERE bounty_creator != %s AND bounty_id = %s AND JSON_CONTAINS(bounty_accepted,'%s') = 0 AND bounty_expiration > NOW())"
             )
             data = (message.author.id, split_message[2], message.author.id)
             cursor.execute(query, data)
