@@ -232,7 +232,7 @@ def bounty(message):
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC".format(row[0], client.get_user(row[4]).name), row[3], row[2])
+            out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC".format(row[0], client.get_user(row[4]).name, row[2])), row[3]
 
     return (end_response(out_message, conn, cursor), )
 
