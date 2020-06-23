@@ -232,7 +232,7 @@ def bounty(message):
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), row[3])
+            out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC".format(row[0], client.get_user(row[4]).name), row[3], row[2])
 
     return (end_response(out_message, conn, cursor), )
 
@@ -423,7 +423,7 @@ response_options = {
     "!bounty": ("Create or view bounties.", bounty),
     "!claim": ("Create or view claims on bounties.", claim),
     "!accept": ("Accept a claim on a bounty you made.", accept),
-    "!refuse": ("Refuse a claim on a bounty you made.", refuse),
+    "!reject": ("Reject a claim on a bounty you made.", refuse),
     "!pillar": ("Edit or view your pillars.", pillar),
     "!leaderboard": ("View leaderboard.", leaderboard),
     "!stats": ("View your personal stats.", stats),
