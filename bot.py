@@ -7,6 +7,9 @@ client = discord.Client()
 
 response_options = {}
 
+claimee_point_increment = 2
+bounty_owner_point_increment = 1
+
 
 def connect():
     conn = mysql.connector.connect(database='bbb',
@@ -167,6 +170,7 @@ def bounty(message):
     conn = setup[1]
     cursor = setup[2]
     personality_id = setup[3]
+    dms = []
 
     if len(split_message) >= 2:
         # Create new bounty.
@@ -211,12 +215,32 @@ def bounty(message):
             cursor.execute(query, data)
             row = cursor.fetchone()
             if(row[0] == 1):
+                # Send DM to claimees.
+                query = (
+                    "SELECT * FROM claims WHERE claim_bounty_id = %s"
+                )
+                data = (split_message[2], )
+                cursor.execute(query, data)
+                rows = cursor.fetchall()
+                for row in rows:
+                    dms.append(row[4], "{0} deleted a bounty you had a claim on. Your claim has also been removed. The bounty was: {1}".format(row[5], "PUT DESCRIPTION HERE"))
+
+                # Delete claims on bounty.
+                query = (
+                    "DELETE FROM claims WHERE claim_bounty_id = %s"
+                )
+                data = (split_message[2], )
+                cursor.execute(query, data)
+                conn.commit()
+
+                # Delete bounty.
                 query = (
                     "DELETE FROM bounties WHERE bounty_id = %s"
                 )
                 data = (split_message[2], )
                 cursor.execute(query, data)
                 conn.commit()
+
                 out_message += "{0}\n".format(get_response(cursor, "bounty_delete_valid", personality_id))
             else:
                 out_message += "{0}\n".format(get_response(cursor, "bounty_delete_invalid", personality_id))
@@ -234,7 +258,7 @@ def bounty(message):
         for row in rows:
             out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC".format(row[0], client.get_user(row[4]).name, row[2]), row[3])
 
-    return (end_response(out_message, conn, cursor), )
+    return (end_response(out_message, conn, cursor), dms)
 
 
 def claim(message):
@@ -337,33 +361,119 @@ def accept(message):
     conn = setup[1]
     cursor = setup[2]
     personality_id = setup[3]
+    dms = []
 
     if len(split_message) >= 2:
         # Attempt to accept a claim.
-        pass
+
+        # If bounty belongs to user, and the claim hasn't expired,
+        # award 1 point to user, and 2 points to claimee.
+        # Send DM to claimee.
+
+        query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s AND claim_expiration > NOW()")
+        data = (message.author.id, split_message[1])
+        cursor.execute(query, data)
+        row = cursor.fetchone()
+        if(row is not None):
+            query = (
+                "UPDATE users SET user_points = user_points+%s WHERE user_id = %s"
+            )
+            data = (claimee_point_increment, row[4])
+            cursor.execute(query, data)
+            conn.commit()
+
+            query = (
+                "UPDATE users SET user_points = user_points+%s WHERE user_id = %s"
+            )
+            data = (bounty_owner_point_increment, row[5])
+            cursor.execute(query, data)
+            conn.commit()
+
+            # Send DM to bounty creator.
+            query = (
+                "SELECT user_personality FROM users WHERE user_id = %s"
+            )
+            data = (row[4], )
+            cursor.execute(query, data)
+            row_p = cursor.fetchone()
+            claimee_personality = row_p[0]
+            dms.append((row[4], get_response(cursor, "accept_claimee_valid", claimee_personality).format(message.author.name, claimee_point_increment)))
+
+            # Delete claim.
+            query = (
+                "DELETE FROM claims WHERE claim_id = %s"
+            )
+            data = (row[0], )
+            cursor.execute(query, data)
+            conn.commit()
+
+            # Add claimee to bounty's list of completed users.
+            query = (
+                "UPDATE bounties SET bounty_accepted = JSON_ARRAY_APPEND(bounty_accepted, '$', %s) WHERE bounty_id = %s"
+            )
+            data = (row[4], row[1])
+            cursor.execute(query, data)
+            conn.commit()
+
+            out_message += "{0}\n".format(get_response(cursor, "accept_valid", personality_id))
+        else:
+            out_message += "{0}\n".format(get_response(cursor, "accept_invalid", personality_id))
     else:
         # Display help.
-        pass
+        out_message += "{0}\n".format(get_response(cursor, "accept", personality_id))
+        out_message += "{0}".format("# !accept [CLAIM ID]\n")
 
-    return (end_response(out_message, conn, cursor), )
+    return (end_response(out_message, conn, cursor), dms)
 
 
-def refuse(message):
+def reject(message):
     split_message = message.content.split()
     setup = setup_response(message.author.id)
     out_message = setup[0]
     conn = setup[1]
     cursor = setup[2]
     personality_id = setup[3]
+    dms = []
 
     if len(split_message) >= 2:
-        # Attempt to refuse a claim.
-        pass
+        # Attempt to reject a claim.
+
+        # If bounty belongs to user, and the claim hasn't expired,
+        # delete claim.
+        # Send DM to claimee.
+
+        query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s AND claim_expiration > NOW()")
+        data = (message.author.id, split_message[1])
+        cursor.execute(query, data)
+        row = cursor.fetchone()
+        if(row is not None):
+            # Delete claim.
+            query = (
+                "DELETE FROM claims WHERE claim_id = %s"
+            )
+            data = (row[0], )
+            cursor.execute(query, data)
+            conn.commit()
+
+            # Send DM to bounty creator.
+            query = (
+                "SELECT user_personality FROM users WHERE user_id = %s"
+            )
+            data = (row[4], )
+            cursor.execute(query, data)
+            row_p = cursor.fetchone()
+            claimee_personality = row_p[0]
+            dms.append((row[4], get_response(cursor, "reject_claimee_valid", claimee_personality).format(message.author.name)))
+
+            out_message += "{0}\n".format(get_response(cursor, "reject_valid", personality_id))
+        else:
+            out_message += "{0}\n".format(get_response(cursor, "reject_invalid", personality_id))
     else:
         # Display help.
-        pass
+        out_message += "{0}\n".format(get_response(cursor, "reject", personality_id))
+        out_message += "{0}".format("# !reject [CLAIM ID]\n")
 
-    return (end_response(out_message, conn, cursor), )
+    return (end_response(out_message, conn, cursor), dms)
 
 
 def pillar(message):
@@ -423,10 +533,10 @@ response_options = {
     "!bounty": ("Create or view bounties.", bounty),
     "!claim": ("Create or view claims on bounties.", claim),
     "!accept": ("Accept a claim on a bounty you made.", accept),
-    "!reject": ("Reject a claim on a bounty you made.", refuse),
-    "!pillar": ("Edit or view your pillars.", pillar),
-    "!leaderboard": ("View leaderboard.", leaderboard),
-    "!stats": ("View your personal stats.", stats),
+    "!reject": ("Reject a claim on a bounty you made.", reject),
+    #"!pillar": ("Edit or view your pillars.", pillar),
+    #"!leaderboard": ("View leaderboard.", leaderboard),
+    #"!stats": ("View your personal stats.", stats),
     "!personality": ("Change bot personality.", personality)
 }
 
