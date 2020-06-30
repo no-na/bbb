@@ -341,7 +341,7 @@ def claim(message):
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED TO YOU\n")
         for row in rows:
-            out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[5]), row[4])
+            out_message += "{0:<20} Expires {1} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), row[3])
 
         query = ("SELECT * FROM claims WHERE claim_claimee = %s")
         data = (message.author.id, )
@@ -349,7 +349,7 @@ def claim(message):
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED BY YOU\n")
         for row in rows:
-            out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[5]), row[4])
+            out_message += "{0:<20} Expires {1} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), row[3])
 
     return (end_response(out_message, conn, cursor), dms)
 
