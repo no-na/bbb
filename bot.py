@@ -31,7 +31,10 @@ def setup_response(user_id=None):
         data = (user_id, )
         cursor.execute(query, data)
         row = cursor.fetchone()
-        personality_id = row[0]
+        if row is not None:
+            personality_id = row[0]
+        else:
+            personality_id = 1
     return (out_message, conn, cursor, personality_id)
 
 
@@ -551,6 +554,8 @@ async def on_message(message):
     if message.author == client.user:
         return
     split_message = message.content.split()
+    if len(split_message) == 0:
+        return
     if split_message[0] == "!join":
         await message.channel.send(join(message)[0])
     elif split_message[0] in response_options:
