@@ -223,7 +223,7 @@ def bounty(message):
                 cursor.execute(query, data)
                 rows = cursor.fetchall()
                 for row in rows:
-                    dms.append(row[4], "{0} deleted a bounty you had a claim on. Your claim has also been removed. The bounty was: {1}".format(row[5], "PUT DESCRIPTION HERE"))
+                    dms.append((row[4], "{0} deleted a bounty you had a claim on. Your claim has also been removed. The bounty was: {1}".format(row[5], "PUT DESCRIPTION HERE")))
 
                 # Delete claims on bounty.
                 query = (
@@ -349,7 +349,7 @@ def claim(message):
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED BY YOU\n")
         for row in rows:
-            out_message += "{0:<20} Expires {1} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), row[3])
+            out_message += "{0:<20} Expires {1} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), row[3])
 
     return (end_response(out_message, conn, cursor), dms)
 
