@@ -385,14 +385,7 @@ def accept(message):
             cursor.execute(query, data)
             conn.commit()
 
-            query = (
-                "UPDATE users SET user_points = user_points+%s WHERE user_id = %s"
-            )
-            data = (bounty_owner_point_increment, row[5])
-            cursor.execute(query, data)
-            conn.commit()
-
-            # Send DM to bounty creator.
+            # Send DM to claimee.
             query = (
                 "SELECT user_personality FROM users WHERE user_id = %s"
             )
@@ -418,7 +411,31 @@ def accept(message):
             cursor.execute(query, data)
             conn.commit()
 
-            out_message += "{0}\n".format(get_response(cursor, "accept_valid", personality_id))
+            # If bounty creator hasn't received a bounty yet, award bonus to them.
+            query = (
+                "SELECT * FROM bounties WHERE bounty_id = %s AND bounty_bonus_received = FALSE"
+            )
+            data = (row[1], )
+            cursor.execute(query, data)
+            row_br = cursor.fetchone()
+            if row_br is not None:
+                query = (
+                    "UPDATE users SET user_points = user_points+%s WHERE user_id = %s"
+                )
+                data = (bounty_owner_point_increment, row[5])
+                cursor.execute(query, data)
+                conn.commit()
+
+                query = (
+                    "UPDATE bounties SET bounty_bonus_received = TRUE WHERE bounty_id = %s"
+                )
+                data = (row[1], )
+                cursor.execute(query, data)
+                conn.commit()
+                
+                out_message += "{0}\n".format(get_response(cursor, "accept_valid", personality_id))
+            else:
+                out_message += "{0}\n".format(get_response(cursor, "accept_valid_no_bonus", personality_id))
         else:
             out_message += "{0}\n".format(get_response(cursor, "accept_invalid", personality_id))
     else:
