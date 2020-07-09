@@ -518,7 +518,8 @@ def points(message):
     out_message += "{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
     out_message += "{0}".format("# !points\n")
 
-    out_message += "{0:<20}{1:<20}{2:<20}\n".format("POSITION", "NAME", "POINTS")
+    points_user_message = ""
+    points_board_message = ""
 
     query = ("SELECT * FROM users ORDER BY user_points DESC")
     cursor.execute(query)
@@ -537,7 +538,15 @@ def points(message):
         elif place == 3:
             place_suffix = "rd"
         previous_points = row[3]
-        out_message += "{0:<20}{1:<20}{2:<20}\n".format("{0}{1}".format(i + 1, place_suffix), client.get_user(row[0]).name, row[3])
+        if row[0] == message.author.id:
+            points_user_message += "{0:<20}{1:<20}{2:<20}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3])
+        points_board_message += "{0:<20}{1:<20}{2:<20}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3])
+
+    out_message += "\n{0}\n".format(get_response(cursor, "points_user", personality_id))
+    out_message += points_user_message
+    out_message += "\n{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
+    out_message += "{0:<20}{1:<20}{2:<20}\n".format("POSITION", "NAME", "POINTS")
+    out_message += points_board_message
     return (end_response(out_message, conn, cursor), )
 
 
