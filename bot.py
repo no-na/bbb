@@ -518,25 +518,25 @@ def points(message):
     out_message += "{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
     out_message += "{0}".format("# !points\n")
 
-    out_message += "{0:<20}{1:<20}{2:<20}".format("POSITION", "NAME", "POINTS")
+    out_message += "{0:<20}{1:<20}{2:<20}\n".format("POSITION", "NAME", "POINTS")
 
     query = ("SELECT * FROM users ORDER BY user_points DESC")
     cursor.execute(query)
     rows = cursor.fetchall()
 
-    place = 1
+    place = 0
     previous_points = -1
     for i, row in enumerate(rows):
         place_suffix = "th"
         if row[3] != previous_points:
             place = i + 1
-        if place == 1:
+        if place == 0:
             place_suffix = "st"
-        elif place == 2:
+        elif place == 1:
             place_suffix = "nd"
-        elif place == 3:
+        elif place == 2:
             place_suffix = "rd"
-        out_message += "{0:<20}{1:<20}{2:<20}".format("{0}{1}".format(i, place_suffix), client.get_user(row[0]).name, row[3])
+        out_message += "{0:<20}{1:<20}{2:<20}\n".format("{0}{1}".format(i + 1, place_suffix), client.get_user(row[0]).name, row[3])
     return (end_response(out_message, conn, cursor), )
 
 
