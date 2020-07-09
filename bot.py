@@ -530,12 +530,13 @@ def points(message):
         place_suffix = "th"
         if row[3] != previous_points:
             place = i + 1
-        if place == 0:
+        if place == 1:
             place_suffix = "st"
-        elif place == 1:
-            place_suffix = "nd"
         elif place == 2:
+            place_suffix = "nd"
+        elif place == 3:
             place_suffix = "rd"
+        previous_points = row[3]
         out_message += "{0:<20}{1:<20}{2:<20}\n".format("{0}{1}".format(i + 1, place_suffix), client.get_user(row[0]).name, row[3])
     return (end_response(out_message, conn, cursor), )
 
