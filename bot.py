@@ -521,8 +521,7 @@ def points(message):
     out_message += "{0:<20}{1:<20}{2:<20}".format("POSITION", "NAME", "POINTS")
 
     query = ("SELECT * FROM users ORDER BY user_points DESC")
-    data = (message.author.id, )
-    cursor.execute(query, data)
+    cursor.execute(query)
     rows = cursor.fetchall()
 
     place = 1
