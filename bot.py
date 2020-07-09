@@ -515,7 +515,7 @@ def points(message):
 
     # Display leaderboard.
 
-    out_message += "{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
+    out_message += "{0}\n".format(get_response(cursor, "points", personality_id))
     out_message += "{0}".format("# !points\n")
 
     points_user_message = ""
