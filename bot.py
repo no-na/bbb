@@ -505,7 +505,7 @@ def pillar(message):
     return (end_response(out_message, conn, cursor), )
 
 
-def leaderboard(message):
+def points(message):
     split_message = message.content.split()
     setup = setup_response(message.author.id)
     out_message = setup[0]
@@ -515,19 +515,29 @@ def leaderboard(message):
 
     # Display leaderboard.
 
-    return (end_response(out_message, conn, cursor), )
+    out_message += "{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
+    out_message += "{0}".format("# !points\n")
 
+    out_message += "{0:<20}{1:<20}{2:<20}".format("POSITION", "NAME", "POINTS")
 
-def stats(message):
-    split_message = message.content.split()
-    setup = setup_response(message.author.id)
-    out_message = setup[0]
-    conn = setup[1]
-    cursor = setup[2]
-    personality_id = setup[3]
+    query = ("SELECT * FROM users ORDER BY user_points DESC")
+    data = (message.author.id, )
+    cursor.execute(query, data)
+    rows = cursor.fetchall()
 
-    # Display personal statistics.
-
+    place = 1
+    previous_points = -1
+    for i, row in enumerate(rows):
+        place_suffix = "th"
+        if row[3] != previous_points:
+            place = i + 1
+        if place == 1:
+            place_suffix = "st"
+        elif place == 2:
+            place_suffix = "nd"
+        elif place == 3:
+            place_suffix = "rd"
+        out_message += "{0:<20}{1:<20}{2:<20}".format("{0}{1}".format(i, place_suffix), client.get_user(row[0]).name, row[3])
     return (end_response(out_message, conn, cursor), )
 
 
@@ -538,8 +548,7 @@ response_options = {
     "!accept": ("Accept a claim on a bounty you made.", accept),
     "!reject": ("Reject a claim on a bounty you made.", reject),
     #"!pillar": ("Edit or view your pillars.", pillar),
-    #"!leaderboard": ("View leaderboard.", leaderboard),
-    #"!stats": ("View your personal stats.", stats),
+    "!points": ("View your points and the leaderboard.", points),
     "!personality": ("Change bot personality.", personality)
 }
 
