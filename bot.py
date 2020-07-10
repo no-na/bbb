@@ -537,7 +537,7 @@ def pillar(message):
                 )
                 data = (message.author.id, split_message[2])
                 cursor.execute(query, data)
-                cursor.commit()
+                conn.commit()
                 out_message += "{0}\n".format(get_response(cursor, "pillar_new_valid", personality_id))
             else:
                 out_message += "{0}\n".format(get_response(cursor, "pillar_new_invalid", personality_id))
@@ -569,7 +569,7 @@ def pillar(message):
                 )
                 data = (split_message[3], split_message[2], message.author.id)
                 cursor.execute(query, data)
-                cursor.commit()
+                conn.commit()
                 out_message += "{0}\n".format(get_response(cursor, "pillar_rename_valid", personality_id))
 
         elif split_message[1] == "-delete":
@@ -587,7 +587,7 @@ def pillar(message):
                 )
                 data = (split_message[2], message.author.id)
                 cursor.execute(query, data)
-                cursor.commit()
+                conn.commit()
                 out_message += "{0}\n".format(get_response(cursor, "pillar_delete_valid", personality_id))
             else:
                 out_message += "{0}\n".format(get_response(cursor, "pillar_delete_invalid", personality_id))
@@ -606,7 +606,7 @@ def pillar(message):
                 )
                 data = (message.author.id, )
                 cursor.execute(query, data)
-                cursor.commit()
+                conn.commit()
 
                 # Favorite the pillar.
                 query = (
@@ -614,7 +614,7 @@ def pillar(message):
                 )
                 data = (split_message[2], message.author.id)
                 cursor.execute(query, data)
-                cursor.commit()
+                conn.commit()
 
                 out_message += "{0}\n".format(get_response(cursor, "pillar_favorite_valid", personality_id))
             else:
