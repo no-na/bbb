@@ -537,6 +537,7 @@ def pillar(message):
                 )
                 data = (message.author.id, split_message[2])
                 cursor.execute(query, data)
+                cursor.commit()
                 out_message += "{0}\n".format(get_response(cursor, "pillar_new_valid", personality_id))
             else:
                 out_message += "{0}\n".format(get_response(cursor, "pillar_new_invalid", personality_id))
