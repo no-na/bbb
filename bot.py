@@ -498,16 +498,58 @@ def claim(message):
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED TO YOU\n")
+        out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format("ID", "CLAIMANT"), "DESCRIPTION", "EXPIRATION DATE")
         for row in rows:
-            out_message += "{0:<20} Expires {1} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), row[3])
+            query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
+            data = (row[1], )
+            cursor.execute(query, data)
+            row_bo = cursor.fetchone()
+            desc = row_bo[0]
+            desc = (desc[:18] + '..') if len(desc) > 20 else desc
+            out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, row[3])
+
+            query = ("SELECT claim_pillars FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s")
+            data = (row[4], row[0])
+            cursor.execute(query, data)
+            row_pi = cursor.fetchone()
+            pillars = json.load(row_pi[0])
+            for pillar in pillars:
+                query = (
+                    "SELECT pillar_name FROM pillars where pillar_id = %s"
+                )
+                data = (pillar, )
+                cursor.execute(query, data)
+                row_pina = cursor.fetchone()
+                out_message += "{0:<5}{1}\n".format("", row_pina[0])
 
         query = ("SELECT * FROM claims WHERE claim_claimee = %s")
         data = (message.author.id, )
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED BY YOU\n")
+        out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION", "EXPIRATION DATE")
         for row in rows:
-            out_message += "{0:<20} Expires {1} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), row[3])
+            query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
+            data = (row[1], )
+            cursor.execute(query, data)
+            row_bo = cursor.fetchone()
+            desc = row_bo[0]
+            desc = (desc[:18] + '..') if len(desc) > 20 else desc
+            out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, row[3])
+
+            query = ("SELECT claim_pillars FROM claims WHERE claim_claimee = %s AND claim_id = %s")
+            data = (row[5], row[0])
+            cursor.execute(query, data)
+            row_pi = cursor.fetchone()
+            pillars = json.load(row_pi[0])
+            for pillar in pillars:
+                query = (
+                    "SELECT pillar_name FROM pillars where pillar_id = %s"
+                )
+                data = (pillar, )
+                cursor.execute(query, data)
+                row_pina = cursor.fetchone()
+                out_message += "{0:<5}{1}\n".format("", row_pina[0])
 
     return (end_response(out_message, conn, cursor), dms)
 
@@ -678,7 +720,7 @@ def points(message):
             place_suffix = "rd"
         previous_points = row[3]
         if row[0] == message.author.id:
-            points_user_message += "{0:<20}{1:<20}{2:<20}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3])
+            points_user_message += "{0:<20}{1:<20}\n".format("{0}{1}".format(place, place_suffix), row[3])
         points_board_message += "{0:<20}{1:<20}{2:<20}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3])
 
     query = ("SELECT * FROM pillars WHERE pillar_user = %s ORDER BY pillar_points DESC")
@@ -689,7 +731,7 @@ def points(message):
         points_pillars_message += "{0:<20}{1:<20}\n".format(row[2], row[4])
 
     out_message += "\n{0}\n".format(get_response(cursor, "points_user", personality_id))
-    out_message += "{0:<20}{1:<20}{2:<20}\n".format("POSITION", "NAME", "POINTS")
+    out_message += "{0:<20}{1:<20}\n".format("POSITION", "POINTS")
     out_message += points_user_message
     out_message += "{0:<20}{1:<20}\n".format("PILLAR", "SUCCESSFUL CLAIMS")
     out_message += points_pillars_message
