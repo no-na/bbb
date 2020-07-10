@@ -498,7 +498,7 @@ def claim(message):
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED TO YOU\n")
-        out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format("ID", "CLAIMANT"), "DESCRIPTION", "EXPIRATION DATE")
+        out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "CLAIMANT"), "DESCRIPTION", "EXPIRATION DATE")
         for row in rows:
             query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
             data = (row[1], )
@@ -506,7 +506,7 @@ def claim(message):
             row_bo = cursor.fetchone()
             desc = row_bo[0]
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
-            out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, row[3])
+            out_message += "{0:<20} {1:<20} {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, row[3])
 
             query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
             data = (row[0], )
@@ -520,14 +520,14 @@ def claim(message):
                 data = (pillar, )
                 cursor.execute(query, data)
                 row_pina = cursor.fetchone()
-                out_message += "{0:<5}{1}\n".format("", row_pina[0])
+                out_message += "{0:<5}-{1}\n".format("", row_pina[0])
 
         query = ("SELECT * FROM claims WHERE claim_claimee = %s")
         data = (message.author.id, )
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED BY YOU\n")
-        out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION", "EXPIRATION DATE")
+        out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION", "EXPIRATION DATE")
         for row in rows:
             query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
             data = (row[1], )
@@ -535,7 +535,7 @@ def claim(message):
             row_bo = cursor.fetchone()
             desc = row_bo[0]
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
-            out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, row[3])
+            out_message += "{0:<20} {1:<20} {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, row[3])
 
             query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
             data = (row[0], )
@@ -549,7 +549,7 @@ def claim(message):
                 data = (pillar, )
                 cursor.execute(query, data)
                 row_pina = cursor.fetchone()
-                out_message += "{0:<5}{1}\n".format("", row_pina[0])
+                out_message += "{0:<5}-{1}\n".format("", row_pina[0])
 
     return (end_response(out_message, conn, cursor), dms)
 
