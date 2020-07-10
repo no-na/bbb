@@ -321,10 +321,10 @@ def claim(message):
                 pillar_string = pillar_string[:-2]
                 query = (
                     "INSERT INTO claims(claim_bounty_id, claim_creation, claim_expiration, claim_claimee, claim_bounty_creator, claim_pillars)"
-                    "VALUES (%s,%s,%s,%s,%s,JSON_ARRAY(%s))"
+                    "VALUES (%s,%s,%s,%s,%s,JSON_ARRAY({0}))".format(pillar_string)
                 )
                 now = datetime.utcnow()
-                data = (split_message[2], now.strftime('%Y-%m-%d %H:%M:%S'), bounty_info[0], message.author.id, bounty_info[1], pillar_string)
+                data = (split_message[2], now.strftime('%Y-%m-%d %H:%M:%S'), bounty_info[0], message.author.id, bounty_info[1])
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -508,8 +508,8 @@ def claim(message):
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
             out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, row[3])
 
-            query = ("SELECT claim_pillars FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s")
-            data = (row[4], row[0])
+            query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
+            data = (row[0], )
             cursor.execute(query, data)
             row_pi = cursor.fetchone()
             pillars = json.load(row_pi[0])
@@ -537,8 +537,8 @@ def claim(message):
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
             out_message += "{0:<20} {1:<20} Expires {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, row[3])
 
-            query = ("SELECT claim_pillars FROM claims WHERE claim_claimee = %s AND claim_id = %s")
-            data = (row[5], row[0])
+            query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
+            data = (row[0], )
             cursor.execute(query, data)
             row_pi = cursor.fetchone()
             pillars = json.load(row_pi[0])
