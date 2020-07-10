@@ -512,7 +512,7 @@ def claim(message):
             data = (row[0], )
             cursor.execute(query, data)
             row_pi = cursor.fetchone()
-            pillars = json.load(row_pi[0])
+            pillars = json.loads(row_pi[0])
             for pillar in pillars:
                 query = (
                     "SELECT pillar_name FROM pillars where pillar_id = %s"
@@ -541,7 +541,7 @@ def claim(message):
             data = (row[0], )
             cursor.execute(query, data)
             row_pi = cursor.fetchone()
-            pillars = json.load(row_pi[0])
+            pillars = json.loads(row_pi[0])
             for pillar in pillars:
                 query = (
                     "SELECT pillar_name FROM pillars where pillar_id = %s"
