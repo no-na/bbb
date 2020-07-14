@@ -360,7 +360,7 @@ def claim(message):
             # Send DM to claimee.
 
             query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s AND claim_expiration > NOW()")
-            data = (message.author.id, split_message[1])
+            data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
             if(row is not None):
@@ -455,7 +455,7 @@ def claim(message):
             # Send DM to claimee.
 
             query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s AND claim_expiration > NOW()")
-            data = (message.author.id, split_message[1])
+            data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
             if(row is not None):
