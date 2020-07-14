@@ -370,7 +370,7 @@ def claim(message):
                 data = (row[4], )
                 cursor.execute(query, data)
                 row_pi = cursor.fetchone()
-                pillars = json.load(row_pi[0])
+                pillars = json.loads(row_pi[0])
 
                 for pillar in pillars:
                     query = (
