@@ -367,7 +367,7 @@ def claim(message):
                 # Award point to claimee. Check for pillar bonus too.
                 claimee_point_reward = claimee_point_increment
                 query = ("SELECT claim_pillars FROM claims WHERE claim_claimee = %s")
-                data = (message.author.id, row[4])
+                data = (row[4], )
                 cursor.execute(query, data)
                 row_pi = cursor.fetchone()
                 pillars = json.load(row_pi[0])
