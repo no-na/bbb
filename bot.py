@@ -74,7 +74,7 @@ def apply_time_offset(cursor, time, user_id):
     if row_ti is not None:
         hours = int(row_ti[0][:-2])
         minutes = int(row_ti[0][-2:])
-    return (datetime(time.year, time.month, time.day, time.hour, time.minute, time.second, 0, datetime.timezone(timedelta(hours=hours, minutes=minutes))), row_ti[0][:-2], row_ti[0][-2:])
+    return (datetime(time.year, time.month, time.day, time.hour, time.minute, time.second, 0, timezone(timedelta(hours=hours, minutes=minutes))), row_ti[0][:-2], row_ti[0][-2:])
 
 
 def checkJoin(member):
@@ -784,7 +784,7 @@ def practice(message):
     return (end_response(out_message, conn, cursor), )
 
 
-def timezone(message):
+def timeoffset(message):
     split_message = message.content.split()
     setup = setup_response(message.author.id)
     out_message = setup[0]
@@ -834,7 +834,7 @@ response_options = {
     "!pillar": ("Create and view your pillars.", pillar),
     "!points": ("View your points and the leaderboard.", points),
     "!personality": ("Change bot personality.", personality),
-    "!timezone": ("Change displayed timezone.", timezone)
+    "!timezone": ("Change displayed timezone.", timeoffset)
 }
 
 
