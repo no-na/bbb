@@ -784,9 +784,9 @@ def timezone(message):
                 minutes = int(split_time[1])
             if (OFFSET_MIN_HOUR <= hours <= OFFSET_MAX_HOUR) and (OFFSET_MIN_MIN <= minutes <= OFFSET_MAX_MIN):
                 if hours < 0:
-                    offset = int("{:03d}".format(hours) + "{:02d}".format(minutes))
+                    offset = "{:03d}".format(hours) + "{:02d}".format(minutes)
                 else:
-                    offset = int("{:02d}".format(hours) + "{:02d}".format(minutes))
+                    offset = "{:02d}".format(hours) + "{:02d}".format(minutes)
                 query = (
                     "UPDATE users SET user_time_offset = %s WHERE user_id = %s"
                 )
