@@ -3,7 +3,7 @@ import os
 import mysql.connector
 import json
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 client = discord.Client()
 
@@ -61,6 +61,19 @@ def get_response(cursor, response_name, personality_id):
     cursor.execute(query, data)
     row = cursor.fetchone()
     return row[0]
+
+
+def apply_time_offset(cursor, time, user_id):
+    query = ("SELECT user_time_offset FROM users WHERE user_id = %s")
+    data = (user_id, )
+    cursor.execute(query, data)
+    row_ti = cursor.fetchone()
+    hours = 0
+    minutes = 0
+    if row_ti is not None:
+        hours = int(row_ti[0][:-2])
+        minutes = int(row_ti[0][-2:])
+    return (datetime(time.year, time.month, time.day, time.hour, time.minute, time.second, 0, timezone(timedelta(hours=hours, minutes=minutes))), row_ti[0][:-2], row_ti[0][-2:])
 
 
 def checkJoin(member):
@@ -265,7 +278,8 @@ def bounty(message):
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC".format(row[0], client.get_user(row[4]).name, row[2]), row[3])
+            offset_expiration = apply_time_offset(datetime.strptime(row[3]))
+            out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC {3}:{4}".format(row[0], client.get_user(row[4]).name, row[2]), offset_expiration[0], offset_expiration[1], offset_expiration[2])
 
     return (end_response(out_message, conn, cursor), dms)
 
@@ -511,7 +525,9 @@ def claim(message):
             row_bo = cursor.fetchone()
             desc = row_bo[0]
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
-            out_message += "{0:<20} {1:<20} {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, row[3])
+
+            offset_expiration = apply_time_offset(datetime.strptime(row[3]))
+            out_message += "{0:<20} {1:<20} {2} UTC {3}:{4}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, offset_expiration[0], offset_expiration[1], offset_expiration[2])
 
             query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
             data = (row[0], )
@@ -540,7 +556,9 @@ def claim(message):
             row_bo = cursor.fetchone()
             desc = row_bo[0]
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
-            out_message += "{0:<20} {1:<20} {2} UTC\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, row[3])
+
+            offset_expiration = apply_time_offset(datetime.strptime(row[3]))
+            out_message += "{0:<20} {1:<20} {2} UTC {3}:{4}\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, offset_expiration[0], offset_expiration[1], offset_expiration[2])
 
             query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
             data = (row[0], )
