@@ -64,7 +64,7 @@ def get_response(cursor, response_name, personality_id):
 
 
 def apply_time_offset(cursor, time, user_id):
-    time = datetime.strptime(time,"%y-%m-%d %H:%M:%S")
+    time = datetime.strptime(time,"%Y-%m-%d %H:%M:%S")
     query = ("SELECT user_time_offset FROM users WHERE user_id = %s")
     data = (user_id, )
     cursor.execute(query, data)
