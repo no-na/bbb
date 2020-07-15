@@ -779,9 +779,9 @@ def timezone(message):
         rex = re.compile("(^[-+]\\d{1,2}$)|(^0$)|(^[-+]\\d{1,2}:\\d{2}$)|(^0{1,2}:0{2}$)")
         if rex.match(split_message[1]):
             split_time = split_message[1].split()
-            hours = split_time[0]
+            hours = int(split_time[0])
             if len(split_time) == 2:
-                minutes = split_time[1]
+                minutes = int(split_time[1])
             if (OFFSET_MIN_HOUR < hours < OFFSET_MAX_HOUR) and (OFFSET_MIN_MIN < minutes < OFFSET_MAX_MIN):
                 if hours < 0:
                     offset = int("{:03d}".format(hours) + "{:02d}".format(minutes))
