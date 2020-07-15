@@ -3,7 +3,7 @@ import os
 import mysql.connector
 import json
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 client = discord.Client()
 
@@ -74,7 +74,7 @@ def apply_time_offset(cursor, time, user_id):
     if row_ti is not None:
         hours = int(row_ti[0][:-2])
         minutes = int(row_ti[0][-2:])
-    return (datetime(time.year, time.month, time.day, time.hour, time.minute, time.second, 0, timezone(timedelta(hours=hours, minutes=minutes))), row_ti[0][:-2], row_ti[0][-2:])
+    return (time + timedelta(hours=hours, minutes=minutes), row_ti[0][:-2], row_ti[0][-2:])
 
 
 def checkJoin(member):
