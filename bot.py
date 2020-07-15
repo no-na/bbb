@@ -279,8 +279,8 @@ def bounty(message):
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
-            offset_expiration = apply_time_offset(cursor, row[3], message.author.id)
-            out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC {3}:{4}".format(row[0], client.get_user(row[4]).name, row[2]), offset_expiration[0], offset_expiration[1], offset_expiration[2])
+            offset_expiration = apply_time_offset(cursor, row[2], message.author.id)
+            out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC {3}:{4}".format(row[0], client.get_user(row[4]).name, offset_expiration[0], offset_expiration[1], offset_expiration[2]), row[3])
 
     return (end_response(out_message, conn, cursor), dms)
 
