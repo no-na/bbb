@@ -2,14 +2,19 @@ import discord
 import os
 import mysql.connector
 import json
+import re
 from datetime import datetime, timedelta
 
 client = discord.Client()
 
 response_options = {}
 
-claimee_point_increment = 2
-bounty_owner_point_increment = 1
+CLAIMEE_POINT_INCREMENT = 2
+BOUNTY_OWNER_POINT_INCREMENT = 1
+OFFSET_MAX_HOUR = 14
+OFFSET_MIN_HOUR = -12
+OFFSET_MAX_MIN = 59
+OFFSET_MIN_MIN = 0
 
 
 def connect():
@@ -365,7 +370,7 @@ def claim(message):
             row = cursor.fetchone()
             if(row is not None):
                 # Award point to claimee. Check for pillar bonus too.
-                claimee_point_reward = claimee_point_increment
+                claimee_point_reward = CLAIMEE_POINT_INCREMENT
                 query = ("SELECT claim_pillars FROM claims WHERE claim_claimee = %s")
                 data = (row[4], )
                 cursor.execute(query, data)
@@ -431,7 +436,7 @@ def claim(message):
                     query = (
                         "UPDATE users SET user_points = user_points+%s WHERE user_id = %s"
                     )
-                    data = (bounty_owner_point_increment, row[5])
+                    data = (BOUNTY_OWNER_POINT_INCREMENT, row[5])
                     cursor.execute(query, data)
                     conn.commit()
 
@@ -741,14 +746,76 @@ def points(message):
     return (end_response(out_message, conn, cursor), )
 
 
+def practice(message):
+    split_message = message.content.split()
+    setup = setup_response(message.author.id)
+    out_message = setup[0]
+    conn = setup[1]
+    cursor = setup[2]
+    personality_id = setup[3]
+
+    if len(split_message) >= 2:
+        pass
+    else:
+        # Display help and the user's existing pillars.
+        out_message += "{0}\n".format(get_response(cursor, "practice", personality_id))
+        out_message += "{0}".format("# !practice [PILLAR NAME]\n")
+        out_message += "{0}".format("# !practice [PILLAR NAME] [PILLAR NAME] ...\n")
+
+    return (end_response(out_message, conn, cursor), )
+
+
+def timezone(message):
+    split_message = message.content.split()
+    setup = setup_response(message.author.id)
+    out_message = setup[0]
+    conn = setup[1]
+    cursor = setup[2]
+    personality_id = setup[3]
+
+    if len(split_message) >= 2:
+        hours = 0
+        minutes = 0
+        rex = re.compile("(^[-+]\\d{1,2}$)|(^0$)|(^[-+]\\d{1,2}:\\d{2}$)|(^0{1,2}:0{2}$)")
+        if rex.match(split_message[2]):
+            split_time = split_message[2].split()
+            hours = split_time[0]
+            if len(split_time == 2):
+                minutes = split_time[1]
+            if (OFFSET_MIN_HOUR < hours < OFFSET_MAX_HOUR) and (OFFSET_MIN_MIN < minutes < OFFSET_MAX_MIN):
+                if hours < 0:
+                    offset = int("{:03d}".format(hours) + "{:02d}".format(minutes))
+                else:
+                    offset = int("{:02d}".format(hours) + "{:02d}".format(minutes))
+                query = (
+                    "UPDATE users SET user_time_offset = %s WHERE user_id = %s"
+                )
+                data = (offset, message.author.id)
+                cursor.execute(query, data)
+                conn.commit()
+                out_message += "{0}\n".format(get_response(cursor, "timezone_valid", personality_id))
+            else:
+                out_message += "{0}\n".format(get_response(cursor, "timezone_invalid_bounds", personality_id))
+        else:
+            out_message += "{0}\n".format(get_response(cursor, "timezone_invalid_syntax", personality_id))
+
+    else:
+        # Display help and the user's existing pillars.
+        out_message += "{0}\n".format(get_response(cursor, "timezone", personality_id))
+        out_message += "{0}".format("# !timezone [NEW TIME ZONE OFFSET] (!timezone -9) (!timezone -09:00)\n")
+
+    return (end_response(out_message, conn, cursor), )
+
+
 response_options = {
     "!help": ("List commands.", helpp),
-    "!bounty": ("Create or view bounties.", bounty),
-    "!claim": ("Create, accept, reject, or view claims on bounties.", claim),
-    "!pillar": ("Edit or view your pillars.", pillar),
+    "!bounty": ("Create and view bounties.", bounty),
+    "!claim": ("Create, accept, reject, and view claims on bounties.", claim),
+    #"!practice": ("Record that you've practiced a pillar.", practice),
+    "!pillar": ("Create and view your pillars.", pillar),
     "!points": ("View your points and the leaderboard.", points),
     "!personality": ("Change bot personality.", personality),
-    #"!timezone": ("Change displayed timezone.",timezone)
+    "!timezone": ("Change displayed timezone.", timezone)
 }
 
 
