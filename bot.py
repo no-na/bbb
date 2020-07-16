@@ -282,7 +282,11 @@ def bounty(message):
         out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "OWNER"), "EXPIRATION DATE", "DESCRIPTION")
         for row in rows:
             offset_expiration = apply_time_offset(cursor, row[2], message.author.id)
-            out_message += "{0:<20} {1:<20} UTC{3}:{4} {2}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), row[3], offset_expiration[0], offset_expiration[1], offset_expiration[2])
+            out_message += "{0:<20} {1:<20} {2}\n".format(
+                "{0} {1}".format(row[0], client.get_user(row[4]).name),
+                "{0}{1}:{2}".format(offset_expiration[0], offset_expiration[1], offset_expiration[2]),
+                row[3]
+            )
 
     return (end_response(out_message, conn, cursor), dms)
 
