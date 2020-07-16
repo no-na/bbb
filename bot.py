@@ -278,9 +278,11 @@ def bounty(message):
         query = ("SELECT * FROM bounties WHERE bounty_active = TRUE")
         cursor.execute(query)
         rows = cursor.fetchall()
+
+        out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "OWNER"), "EXPIRATION DATE", "DESCRIPTION")
         for row in rows:
-            offset_expiration = apply_time_offset(cursor, row[2], message.author.id)
-            out_message += "{0:<20} {1}\n".format("{0} {1} Expires {2} UTC {3}:{4}".format(row[0], client.get_user(row[4]).name, offset_expiration[0], offset_expiration[1], offset_expiration[2]), row[3])
+            offset_expiration = apply_time_offset(cursor, row[3], message.author.id)
+            out_message += "{0:<20} {1:<20} UTC{3}:{4} {2}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), row[3], offset_expiration[0], offset_expiration[1], offset_expiration[2])
 
     return (end_response(out_message, conn, cursor), dms)
 
@@ -528,7 +530,7 @@ def claim(message):
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
 
             offset_expiration = apply_time_offset(cursor, row[3], message.author.id)
-            out_message += "{0:<20} {1:<20} {2} UTC {3}:{4}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, offset_expiration[0], offset_expiration[1], offset_expiration[2])
+            out_message += "{0:<20} {1:<20} {2} UTC{3}:{4}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, offset_expiration[0], offset_expiration[1], offset_expiration[2])
 
             query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
             data = (row[0], )
@@ -559,7 +561,7 @@ def claim(message):
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
 
             offset_expiration = apply_time_offset(cursor, row[3], message.author.id)
-            out_message += "{0:<20} {1:<20} {2} UTC {3}:{4}\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, offset_expiration[0], offset_expiration[1], offset_expiration[2])
+            out_message += "{0:<20} {1:<20} {2} UTC{3}:{4}\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, offset_expiration[0], offset_expiration[1], offset_expiration[2])
 
             query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
             data = (row[0], )
@@ -757,7 +759,7 @@ def points(message):
     out_message += "\n{0}\n".format(get_response(cursor, "points_user", personality_id))
     out_message += "{0:<20}{1:<20}\n".format("POSITION", "POINTS")
     out_message += points_user_message
-    out_message += "{0:<20}{1:<20}\n".format("PILLAR", "SUCCESSFUL CLAIMS")
+    out_message += "{0:<20}{1:<20}\n".format("PILLAR", "HEIGHT (Activity)")
     out_message += points_pillars_message
     out_message += "\n{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
     out_message += "{0:<20}{1:<20}{2:<20}\n".format("POSITION", "NAME", "POINTS")
@@ -774,7 +776,32 @@ def practice(message):
     personality_id = setup[3]
 
     if len(split_message) >= 2:
-        pass
+        # Get pillars if present.
+        pillars = []
+        for i, pillar in enumerate(split_message):
+            if i < 1:
+                pass
+            else:
+                query = (
+                    "SELECT pillar_id FROM pillars WHERE pillar_name = %s and pillar_user = %s"
+                )
+                data = (pillar, message.author.id)
+                cursor.execute(query, data)
+                row_p = cursor.fetchone()
+                if row_p is not None:
+                    pillars.append(row_p[0])
+                else:
+                    out_message += "{0}\n".format(get_response(cursor, "practice_invalid_pillar", personality_id))
+                    return (end_response(out_message, conn, cursor), )
+        for pillar in pillars:
+            query = (
+                "UPDATE pillars SET pillar_points = pillar_points+%s WHERE pillar_id = %s"
+            )
+            data = (1, pillar)
+            cursor.execute(query, data)
+            conn.commit()
+        out_message += "{0}\n".format(get_response(cursor, "practice_valid", personality_id))
+
     else:
         # Display help and the user's existing pillars.
         out_message += "{0}\n".format(get_response(cursor, "practice", personality_id))
@@ -823,6 +850,13 @@ def timeoffset(message):
         out_message += "{0}\n".format(get_response(cursor, "timezone", personality_id))
         out_message += "{0}".format("# !timezone [NEW TIME ZONE OFFSET] (!timezone -9) (!timezone -09:00)\n")
 
+        query = ("SELECT user_time_offset FROM users WHERE user_id = %s")
+        data = (message.author.id, )
+        cursor.execute(query, data)
+        row = cursor.fetchone()
+        if row is not None:
+            out_message += "YOUR OFFSET: {0}\n".format(row[0])
+
     return (end_response(out_message, conn, cursor), )
 
 
@@ -830,7 +864,7 @@ response_options = {
     "!help": ("List commands.", helpp),
     "!bounty": ("Create and view bounties.", bounty),
     "!claim": ("Create, accept, reject, and view claims on bounties.", claim),
-    #"!practice": ("Record that you've practiced a pillar.", practice),
+    "!practice": ("Record that you've practiced a pillar.", practice),
     "!pillar": ("Create and view your pillars.", pillar),
     "!points": ("View your points and the leaderboard.", points),
     "!personality": ("Change bot personality.", personality),
