@@ -415,7 +415,7 @@ def claim(message):
                 out_message += "{0}\n".format(get_response(cursor, "claim_new_valid", personality_id))
 
                 # Send DM to bounty creator.
-                dms.append((bounty_info[1], "{0} submitted a claim to a bounty you created. Please respond to it before the bounty period ends.".format(message.author.name)))
+                dms.append((bounty_creator, "{0} submitted a claim to a bounty you created. Please respond to it before the bounty period ends.".format(message.author.name)))
             else:
                 out_message += "{0}\n".format(get_response(cursor, "claim_new_invalid", personality_id))
         elif split_message[1] == "-cancel":
@@ -614,7 +614,7 @@ def claim(message):
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED BY YOU\n")
-        out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION")
+        out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION")
         for row in rows:
             query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
             data = (row[1], )
