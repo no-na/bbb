@@ -64,7 +64,6 @@ def get_response(cursor, response_name, personality_id):
 
 
 def apply_time_offset(cursor, time, user_id):
-    #time = datetime.strptime(time,"%Y-%m-%d %H:%M:%S")
     query = ("SELECT user_time_offset FROM users WHERE user_id = %s")
     data = (user_id, )
     cursor.execute(query, data)
@@ -75,6 +74,10 @@ def apply_time_offset(cursor, time, user_id):
         hours = int(row_ti[0][:-2])
         minutes = int(row_ti[0][-2:])
     return (time + timedelta(hours=hours, minutes=minutes), row_ti[0][:-2], row_ti[0][-2:])
+
+
+def format_command(command, description):
+    return "{0:<60} {1}\n".format(command, description)
 
 
 def checkJoin(member):
@@ -176,7 +179,7 @@ def personality(message):
     else:
         # Display help and available personalities.
         out_message += "{0}\n".format(get_response(cursor, "personality", personality_id))
-        out_message += "\n{0}".format("# !personality [NUMBER]\n")
+        out_message += format_command("# !personality [PERSONALITY ID]", "Sets your assistant's personality.")
         query = ("SELECT * FROM personalities")
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -199,17 +202,15 @@ def bounty(message):
         # Create new bounty.
         if split_message[1] == "-new":
             query = (
-                "INSERT INTO bounties(bounty_creation, bounty_expiration, bounty_text, bounty_creator, bounty_accepted)"
+                "INSERT INTO bounties(bounty_creation, bounty_text, bounty_creator, bounty_accepted)"
                 "VALUES (%s,%s,%s,%s,JSON_ARRAY())"
             )
             now = datetime.utcnow()
-            later = now + timedelta(days=7)
             description = " ".join(split_message[2:])
-            data = (now.strftime('%Y-%m-%d %H:%M:%S'), later.strftime('%Y-%m-%d %H:%M:%S'), description, message.author.id)
+            data = (now.strftime('%Y-%m-%d %H:%M:%S'), description, message.author.id)
             cursor.execute(query, data)
             conn.commit()
             out_message += "{0}\n".format(get_response(cursor, "bounty_new_valid", personality_id))
-            out_message += "It expires on {0} UTC.\n".format(later.strftime('%Y-%m-%d %H:%M:%S'))
         elif split_message[1] == "-edit":
             # If the bounty exists under the user's id, replace description with new text.
             query = (
@@ -246,7 +247,7 @@ def bounty(message):
                 cursor.execute(query, data)
                 rows = cursor.fetchall()
                 for row in rows:
-                    dms.append((row[4], "{0} deleted a bounty you had a claim on. Your claim has also been removed. The bounty was: {1}".format(row[5], "PUT DESCRIPTION HERE")))
+                    dms.append((row[3], "{0} deleted a bounty you had a claim on. Your claim has also been removed. The bounty was: {1}".format(row[4], "PUT DESCRIPTION HERE")))
 
                 # Delete claims on bounty.
                 query = (
@@ -267,25 +268,82 @@ def bounty(message):
                 out_message += "{0}\n".format(get_response(cursor, "bounty_delete_valid", personality_id))
             else:
                 out_message += "{0}\n".format(get_response(cursor, "bounty_delete_invalid", personality_id))
+        elif split_message[1] == "-close":
+            # If the bounty exists under the user's id, close the bounty. Also delete any claims on it first.
+            query = (
+                "SELECT EXISTS(SELECT * FROM bounties WHERE bounty_creator = %s AND bounty_id = %s)"
+            )
+            data = (message.author.id, split_message[2])
+            cursor.execute(query, data)
+            row = cursor.fetchone()
+            if(row[0] == 1):
+                # Send DM to claimees.
+                query = (
+                    "SELECT * FROM claims WHERE claim_bounty_id = %s"
+                )
+                data = (split_message[2], )
+                cursor.execute(query, data)
+                rows = cursor.fetchall()
+                for row in rows:
+                    dms.append((row[3], "{0} closed a bounty you had a claim on. Your claim has also been removed. The bounty was: {1}".format(row[4], "PUT DESCRIPTION HERE")))
+
+                # Delete claims on bounty.
+                query = (
+                    "DELETE FROM claims WHERE claim_bounty_id = %s"
+                )
+                data = (split_message[2], )
+                cursor.execute(query, data)
+                conn.commit()
+
+                # Close bounty.
+                query = (
+                    "UPDATE bounties SET bounty_active = 0 WHERE bounty_id = %s"
+                )
+                data = (split_message[2], )
+                cursor.execute(query, data)
+                conn.commit()
+
+                out_message += "{0}\n".format(get_response(cursor, "bounty_close_valid", personality_id))
+            else:
+                out_message += "{0}\n".format(get_response(cursor, "bounty_close_invalid", personality_id))
+        elif split_message[1] == "-v":
+            query = ("SELECT * FROM bounties ORDER BY bounty_creation DESC")
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+            out_message += "{0:<20} {1:<30} {2}\n".format("{0} {1}".format("ID", "OWNER"), "CREATION DATE", "DESCRIPTION")
+            for row in rows:
+                offset_creation = apply_time_offset(cursor, row[1], message.author.id)
+                is_inactive = ""
+                if(row[4] == 0):
+                    is_inactive = " (INACTIVE)"
+                out_message += "{0:<20} {1:<30} {2}{3}\n".format(
+                    "{0} {1}".format(row[0], client.get_user(row[3]).name),
+                    "{0}{1}:{2}".format(offset_creation[0], offset_creation[1], offset_creation[2]),
+                    row[2],
+                    is_inactive
+                )
         else:
             out_message += "{0}\n".format(get_response(cursor, "bounty_invalid", personality_id))
     else:
         # Display help and existing bounties.
         out_message += "{0}\n".format(get_response(cursor, "bounty", personality_id))
-        out_message += "{0}".format("# !bounty -new [BOUNTY DESCRIPTION]\n")
-        out_message += "{0}".format("# !bounty -edit [BOUNTY ID] [BOUNTY DESCRIPTION]\n")
-        out_message += "{0}".format("# !bounty -delete [BOUNTY ID]\n")
-        query = ("SELECT * FROM bounties WHERE bounty_active = TRUE")
+        out_message += format_command("# !bounty -new [BOUNTY DESCRIPTION]", "Creates a new bounty.")
+        out_message += format_command("# !bounty -close [BOUNTY ID]", "Rejects any pending claims on a bounty and removes it from the bounty list.")
+        out_message += format_command("# !bounty -edit [BOUNTY ID] [BOUNTY DESCRIPTION]", "Rewrites the description of a bounty.")
+        out_message += format_command("# !bounty -delete [BOUNTY ID]", "Rejects any pending claims on a bounty and obliterates it from memory.")
+        out_message += format_command("# !bounty -v", "\"Verbose\" bounty listing, displays bounties that have closed too.")
+        query = ("SELECT * FROM bounties WHERE bounty_active = TRUE ORDER BY bounty_creation DESC")
         cursor.execute(query)
         rows = cursor.fetchall()
 
-        out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "OWNER"), "EXPIRATION DATE", "DESCRIPTION")
+        out_message += "{0:<20} {1:<30} {2}\n".format("{0} {1}".format("ID", "OWNER"), "CREATION DATE", "DESCRIPTION")
         for row in rows:
-            offset_expiration = apply_time_offset(cursor, row[2], message.author.id)
-            out_message += "{0:<20} {1:<20} {2}\n".format(
-                "{0} {1}".format(row[0], client.get_user(row[4]).name),
-                "{0}{1}:{2}".format(offset_expiration[0], offset_expiration[1], offset_expiration[2]),
-                row[3]
+            offset_creation = apply_time_offset(cursor, row[1], message.author.id)
+            out_message += "{0:<20} {1:<30} {2}\n".format(
+                "{0} {1}".format(row[0], client.get_user(row[3]).name),
+                "{0}{1}:{2}".format(offset_creation[0], offset_creation[1], offset_creation[2]),
+                row[2]
             )
 
     return (end_response(out_message, conn, cursor), dms)
@@ -302,10 +360,10 @@ def claim(message):
 
     if len(split_message) >= 2:
         if split_message[1] == "-new":
-            # Create new claim if the bounty exists, the user is not the creator, and the bounty has not expired.
+            # Create new claim if the bounty exists, the user is not the creator, and the bounty is active.
             # And the user hasn't already made a claim on this bounty, and the user hasn't already been accepted.
             query = (
-                "SELECT EXISTS(SELECT * FROM bounties WHERE bounty_creator != %s AND bounty_id = %s AND JSON_CONTAINS(bounty_accepted,'%s') = 0 AND bounty_expiration > NOW())"
+                "SELECT EXISTS(SELECT * FROM bounties WHERE bounty_creator != %s AND bounty_id = %s AND JSON_CONTAINS(bounty_accepted,'%s') = 0 AND bounty_active = 1)"
             )
             data = (message.author.id, split_message[2], message.author.id)
             cursor.execute(query, data)
@@ -318,10 +376,10 @@ def claim(message):
             cursor.execute(query, data)
             roww = cursor.fetchone()
             if(row[0] == 1 and roww[0] == 0):
-                query = ("SELECT bounty_expiration, bounty_creator FROM bounties WHERE bounty_id = %s")
+                query = ("SELECT bounty_creator FROM bounties WHERE bounty_id = %s")
                 data = (split_message[2], )
                 cursor.execute(query, data)
-                bounty_info = cursor.fetchone()
+                bounty_creator = cursor.fetchone()[0]
 
                 # Get pillars if present.
                 pillars = []
@@ -346,11 +404,11 @@ def claim(message):
                     pillar_string += "{0}, ".format(pillar)
                 pillar_string = pillar_string[:-2]
                 query = (
-                    "INSERT INTO claims(claim_bounty_id, claim_creation, claim_expiration, claim_claimee, claim_bounty_creator, claim_pillars)"
+                    "INSERT INTO claims(claim_bounty_id, claim_creation, claim_claimee, claim_bounty_creator, claim_pillars)"
                     "VALUES (%s,%s,%s,%s,%s,JSON_ARRAY({0}))".format(pillar_string)
                 )
                 now = datetime.utcnow()
-                data = (split_message[2], now.strftime('%Y-%m-%d %H:%M:%S'), bounty_info[0], message.author.id, bounty_info[1])
+                data = (split_message[2], now.strftime('%Y-%m-%d %H:%M:%S'), message.author.id, bounty_creator)
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -360,7 +418,7 @@ def claim(message):
                 dms.append((bounty_info[1], "{0} submitted a claim to a bounty you created. Please respond to it before the bounty period ends.".format(message.author.name)))
             else:
                 out_message += "{0}\n".format(get_response(cursor, "claim_new_invalid", personality_id))
-        elif split_message[1] == "-delete":
+        elif split_message[1] == "-cancel":
             # If the claim exists and is owned by the user, delete the claim.
             query = (
                 "SELECT EXISTS(SELECT * FROM claims WHERE claim_id = %s AND claim_claimee = %s)"
@@ -381,11 +439,11 @@ def claim(message):
         elif split_message[1] == "-accept":
             # Attempt to accept a claim.
 
-            # If bounty belongs to user, and the claim hasn't expired,
+            # If bounty belongs to user,
             # award 1 point to user, and 2 points to claimee.
             # Send DM to claimee.
 
-            query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s AND claim_expiration > NOW()")
+            query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s")
             data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
@@ -393,7 +451,7 @@ def claim(message):
                 # Award point to claimee. Check for pillar bonus too.
                 claimee_point_reward = CLAIMEE_POINT_INCREMENT
                 query = ("SELECT claim_pillars FROM claims WHERE claim_claimee = %s")
-                data = (row[4], )
+                data = (row[3], )
                 cursor.execute(query, data)
                 row_pi = cursor.fetchone()
                 pillars = json.loads(row_pi[0])
@@ -416,7 +474,7 @@ def claim(message):
                 query = (
                     "UPDATE users SET user_points = user_points+%s WHERE user_id = %s"
                 )
-                data = (claimee_point_reward, row[4])
+                data = (claimee_point_reward, row[3])
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -424,11 +482,11 @@ def claim(message):
                 query = (
                     "SELECT user_personality FROM users WHERE user_id = %s"
                 )
-                data = (row[4], )
+                data = (row[3], )
                 cursor.execute(query, data)
                 row_p = cursor.fetchone()
                 claimee_personality = row_p[0]
-                dms.append((row[4], get_response(cursor, "accept_claimee_valid", claimee_personality).format(message.author.name, claimee_point_reward)))
+                dms.append((row[3], get_response(cursor, "accept_claimee_valid", claimee_personality).format(message.author.name, claimee_point_reward)))
 
                 # Delete claim.
                 query = (
@@ -442,7 +500,7 @@ def claim(message):
                 query = (
                     "UPDATE bounties SET bounty_accepted = JSON_ARRAY_APPEND(bounty_accepted, '$', %s) WHERE bounty_id = %s"
                 )
-                data = (row[4], row[1])
+                data = (row[3], row[1])
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -457,7 +515,7 @@ def claim(message):
                     query = (
                         "UPDATE users SET user_points = user_points+%s WHERE user_id = %s"
                     )
-                    data = (BOUNTY_OWNER_POINT_INCREMENT, row[5])
+                    data = (BOUNTY_OWNER_POINT_INCREMENT, row[4])
                     cursor.execute(query, data)
                     conn.commit()
 
@@ -476,11 +534,11 @@ def claim(message):
         elif split_message[1] == "-reject":
             # Attempt to reject a claim.
 
-            # If bounty belongs to user, and the claim hasn't expired,
+            # If bounty belongs to user,
             # delete claim.
             # Send DM to claimee.
 
-            query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s AND claim_expiration > NOW()")
+            query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s")
             data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
@@ -497,11 +555,11 @@ def claim(message):
                 query = (
                     "SELECT user_personality FROM users WHERE user_id = %s"
                 )
-                data = (row[4], )
+                data = (row[3], )
                 cursor.execute(query, data)
                 row_p = cursor.fetchone()
                 claimee_personality = row_p[0]
-                dms.append((row[4], get_response(cursor, "reject_claimee_valid", claimee_personality).format(message.author.name)))
+                dms.append((row[3], get_response(cursor, "reject_claimee_valid", claimee_personality).format(message.author.name)))
 
                 out_message += "{0}\n".format(get_response(cursor, "reject_valid", personality_id))
             else:
@@ -512,19 +570,21 @@ def claim(message):
     else:
         # Display help and existing claims that the user has authority over, or made.
         out_message += "{0}\n".format(get_response(cursor, "claim", personality_id))
-        out_message += "{0}".format("# !claim -new [BOUNTY ID]\n")
-        out_message += "{0}".format("# !claim -new [BOUNTY ID] [PILLAR NAME]\n")
-        out_message += "{0}".format("# !claim -new [BOUNTY ID] [PILLAR NAME] [PILLAR NAME] ...\n")
-        out_message += "{0}".format("# !claim -accept [CLAIM ID]\n")
-        out_message += "{0}".format("# !claim -reject [CLAIM ID]\n")
-        out_message += "{0}".format("# !claim -delete [CLAIM ID]\n")
+        out_message += "# BOUNTY HUNTER\n"
+        out_message += format_command("# !claim -new [BOUNTY ID]", "Creates a new claim on a bounty.")
+        out_message += format_command("# !claim -new [BOUNTY ID] [PILLAR NAME]", "Creates a new claim on a bounty, with a pillar.")
+        out_message += format_command("# !claim -new [BOUNTY ID] [PILLAR NAME] [PILLAR NAME] ...", "Creates a new claim on a bounty, with multiple pillars. Add as many pillars as appropriate.")
+        out_message += format_command("# !claim -cancel [CLAIM ID]", "Rescinds a claim you've created.")
+        out_message += "\n# BOUNTY CREATOR\n"
+        out_message += format_command("# !claim -accept [CLAIM ID]", "Accepts a pending claim on a bounty you've created.")
+        out_message += format_command("# !claim -reject [CLAIM ID]", "Rejects a pending claim on a bounty you've created.")
 
         query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s")
         data = (message.author.id, )
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED TO YOU\n")
-        out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "CLAIMANT"), "DESCRIPTION", "EXPIRATION DATE")
+        out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format("ID", "CLAIMANT"), "DESCRIPTION")
         for row in rows:
             query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
             data = (row[1], )
@@ -533,8 +593,7 @@ def claim(message):
             desc = row_bo[0]
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
 
-            offset_expiration = apply_time_offset(cursor, row[3], message.author.id)
-            out_message += "{0:<20} {1:<20} {2} UTC{3}:{4}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc, offset_expiration[0], offset_expiration[1], offset_expiration[2])
+            out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], client.get_user(row[3]).name), desc)
 
             query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
             data = (row[0], )
@@ -555,7 +614,7 @@ def claim(message):
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED BY YOU\n")
-        out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION", "EXPIRATION DATE")
+        out_message += "{0:<20} {1:<20} {2}\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION")
         for row in rows:
             query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
             data = (row[1], )
@@ -564,8 +623,7 @@ def claim(message):
             desc = row_bo[0]
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
 
-            offset_expiration = apply_time_offset(cursor, row[3], message.author.id)
-            out_message += "{0:<20} {1:<20} {2} UTC{3}:{4}\n".format("{0} {1}".format(row[0], client.get_user(row[5]).name), desc, offset_expiration[0], offset_expiration[1], offset_expiration[2])
+            out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc)
 
             query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
             data = (row[0], )
@@ -696,10 +754,10 @@ def pillar(message):
     else:
         # Display help and the user's existing pillars.
         out_message += "{0}\n".format(get_response(cursor, "pillar", personality_id))
-        out_message += "{0}".format("# !pillar -new [PILLAR NAME]\n")
-        out_message += "{0}".format("# !pillar -rename [OLD PILLAR NAME] [NEW PILLAR NAME]\n")
-        out_message += "{0}".format("# !pillar -delete [PILLAR NAME]\n")
-        out_message += "{0}".format("# !pillar -favorite [PILLAR NAME]\n")
+        out_message += format_command("# !pillar -new [PILLAR NAME]", "Creates a new pillar.")
+        out_message += format_command("# !pillar -rename [OLD PILLAR NAME] [NEW PILLAR NAME]", "Renames a pillar. The pillar's height won't change.")
+        out_message += format_command("# !pillar -delete [PILLAR NAME]", "Deletes a pillar. Does not affect your points, but the pillar height will be lost forever.")
+        out_message += format_command("# !pillar -favorite [PILLAR NAME]", "Favorites a pillar. Completing bounties using your favorite pillar will earn you extra points.")
 
         query = ("SELECT * FROM pillars WHERE pillar_user = %s")
         data = (message.author.id, )
@@ -726,7 +784,7 @@ def points(message):
     # Display leaderboard.
 
     out_message += "{0}\n".format(get_response(cursor, "points", personality_id))
-    out_message += "{0}".format("# !points\n")
+    out_message += format_command("# !points", "Displays your points, pillar heights, and leaderboard.")
 
     points_user_message = ""
     points_pillars_message = ""
@@ -809,8 +867,8 @@ def practice(message):
     else:
         # Display help and the user's existing pillars.
         out_message += "{0}\n".format(get_response(cursor, "practice", personality_id))
-        out_message += "{0}".format("# !practice [PILLAR NAME]\n")
-        out_message += "{0}".format("# !practice [PILLAR NAME] [PILLAR NAME] ...\n")
+        out_message += format_command("# !practice [PILLAR NAME]", "Increases the height of one pillar.")
+        out_message += format_command("# !practice [PILLAR NAME] [PILLAR NAME] ...", "Increases the heights of multiple pillars. Add as many pillars as are pertinent.")
 
     return (end_response(out_message, conn, cursor), )
 
@@ -852,7 +910,7 @@ def timeoffset(message):
     else:
         # Display help and the user's existing pillars.
         out_message += "{0}\n".format(get_response(cursor, "timezone", personality_id))
-        out_message += "{0}".format("# !timezone [NEW TIME ZONE OFFSET] (!timezone -9) (!timezone -09:00)\n")
+        out_message += format_command("# !timezone [NEW TIME ZONE OFFSET] (!timezone -9) (!timezone -09:00)", "Adjusts the UTC offset displayed for commands you write. Does not affect the UTC offset displayed for commands others write.")
 
         query = ("SELECT user_time_offset FROM users WHERE user_id = %s")
         data = (message.author.id, )
