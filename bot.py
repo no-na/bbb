@@ -104,7 +104,7 @@ def join(message):
 
     if(checkJoin(message.author) is False):
         query = (
-            "INSERT INTO users(user_id,user_personality)"
+            "INSERT INTO users(user_id, user_personality)"
             "VALUES (%s,%s)"
         )
         data = (message.author.id, 1)
@@ -203,7 +203,7 @@ def bounty(message):
         if split_message[1] == "-new":
             query = (
                 "INSERT INTO bounties(bounty_creation, bounty_text, bounty_creator, bounty_accepted)"
-                "VALUES (%s,%s,%s,%s,JSON_ARRAY())"
+                "VALUES (%s,%s,%s,JSON_ARRAY())"
             )
             now = datetime.utcnow()
             description = " ".join(split_message[2:])
@@ -405,7 +405,7 @@ def claim(message):
                 pillar_string = pillar_string[:-2]
                 query = (
                     "INSERT INTO claims(claim_bounty_id, claim_creation, claim_claimee, claim_bounty_creator, claim_pillars)"
-                    "VALUES (%s,%s,%s,%s,%s,JSON_ARRAY({0}))".format(pillar_string)
+                    "VALUES (%s,%s,%s,%s,JSON_ARRAY({0}))".format(pillar_string)
                 )
                 now = datetime.utcnow()
                 data = (split_message[2], now.strftime('%Y-%m-%d %H:%M:%S'), message.author.id, bounty_creator)
