@@ -457,6 +457,7 @@ def claim(message):
                 pillars = json.loads(row_pi[0])
 
                 for pillar in pillars:
+                    cursor.fetchall()
                     query = (
                         "UPDATE pillars SET pillar_points = pillar_points+%s WHERE pillar_id = %s"
                     )
@@ -464,6 +465,7 @@ def claim(message):
                     cursor.execute(query, data)
                     conn.commit()
 
+                    cursor.fetchall()
                     query = ("SELECT * FROM pillars WHERE pillar_is_favorite = TRUE AND pillar_id = %s")
                     data = (pillar, )
                     cursor.execute(query, data)
