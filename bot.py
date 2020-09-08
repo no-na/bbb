@@ -63,6 +63,17 @@ def get_response(cursor, response_name, personality_id):
     return row[0]
 
 
+def clean_cursor(cursor):
+    try:
+        cursor.fetchall()  # fetch (and discard) remaining rows
+    except mysql.connector.errors.InterfaceError as ie:
+        if ie.msg == 'No result set to fetch from.':
+            # no problem, we were just at the end of the result set
+            pass
+        else:
+            raise
+
+
 def apply_time_offset(cursor, time, user_id):
     query = ("SELECT user_time_offset FROM users WHERE user_id = %s")
     data = (user_id, )
@@ -455,7 +466,7 @@ def claim(message):
                 cursor.execute(query, data)
                 row_pi = cursor.fetchone()
                 pillars = json.loads(row_pi[0])
-                cursor.fetchall()
+                clean_cursor(cursor)
 
                 for pillar in pillars:
                     query = (
@@ -471,7 +482,7 @@ def claim(message):
                     row_pibo = cursor.fetchone()
                     if row_pibo is not None:
                         claimee_point_reward += 1
-                    cursor.fetchall()
+                    clean_cursor(cursor)
 
                 query = (
                     "UPDATE users SET user_points = user_points+%s WHERE user_id = %s"
