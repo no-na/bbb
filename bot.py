@@ -971,13 +971,9 @@ def timeoffset(message):
 
 
 def block_test(message):
-    setup = setup_response(message.author.id)
-    out_message = setup[0]
-    conn = setup[1]
-    cursor = setup[2]
-
-    out_message+="\n\n⠀　⠀⠀⠀　:hatched_chick:\n⠀　⠀⠀ʙɪɢ cʜɪcκ ɪs\n⠀　𝗪𝗔𝗧𝗖𝗛𝗜𝗡𝗚 𝗬𝗢𝗨\n\n"
-    return (end_response(out_message, conn, cursor), )
+    out_message = ""
+    out_message+="\u2800\n\u2800\n⠀　⠀⠀⠀　:hatched_chick:\n⠀　⠀⠀ʙɪɢ cʜɪcκ ɪs\n⠀　𝗪𝗔𝗧𝗖𝗛𝗜𝗡𝗚 𝗬𝗢𝗨\n\u2800"
+    return (out_message, )
 
 
 response_options = {
@@ -989,7 +985,7 @@ response_options = {
     "!points": ("View your points and the leaderboard.", points),
     "!personality": ("Change bot personality.", personality),
     "!timezone": ("Change displayed timezone.", timeoffset),
-    "!blocktest": ("test appearance of unicode blocks in discord.", block_test)
+    "!bigchick": ("BIG CHICK.", block_test)
 }
 
 
