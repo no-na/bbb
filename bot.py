@@ -972,7 +972,7 @@ def timeoffset(message):
 
 def block_test(message):
     out_message = ""
-    out_message+="\u2800\n\u2800\n⠀　⠀⠀⠀　:hatched_chick:\n⠀　⠀⠀ʙɪɢ cʜɪcκ ɪs\n⠀　𝗪𝗔𝗧𝗖𝗛𝗜𝗡𝗚 𝗬𝗢𝗨\n\u2800"
+    out_message += "\u2800\n\u2800\n⠀　⠀⠀⠀　:hatched_chick:\n⠀　⠀⠀ʙɪɢ cʜɪcκ ɪs\n⠀　𝗪𝗔𝗧𝗖𝗛𝗜𝗡𝗚 𝗬𝗢𝗨\n\u2800"
     return (out_message, )
 
 
@@ -985,7 +985,7 @@ response_options = {
     "!points": ("View your points and the leaderboard.", points),
     "!personality": ("Change bot personality.", personality),
     "!timezone": ("Change displayed timezone.", timeoffset),
-    "!bigchick": ("BIG CHICK.", block_test)
+    "!big": ("BIG CHICK", block_test)
 }
 
 
