@@ -839,7 +839,7 @@ def points(message):
     rows = cursor.fetchall()
     for row in rows:
         pp = int(row[4])
-        full_blocks = pp / 8
+        full_blocks = pp // 8
         partial_block = pp % 8
         string_blocks = ""
         for i in range(0, full_blocks):
