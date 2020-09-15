@@ -838,7 +838,27 @@ def points(message):
     cursor.execute(query, data)
     rows = cursor.fetchall()
     for row in rows:
-        points_pillars_message += "{0:<20}{1:<20}\n".format(row[2], row[4])
+        pp = int(row[4])
+        full_blocks = pp / 8
+        partial_block = pp % 8
+        string_blocks = ""
+        for i in range(0, full_blocks):
+            string_blocks += eightEight
+        if partial_block is 1:
+            string_blocks += oneEight
+        elif partial_block is 2:
+            string_blocks += twoEight
+        elif partial_block is 3:
+            string_blocks += threeEight
+        elif partial_block is 4:
+            string_blocks += fourEight
+        elif partial_block is 5:
+            string_blocks += fiveEight
+        elif partial_block is 6:
+            string_blocks += sixEight
+        elif partial_block is 7:
+            string_blocks += sevenEight
+        points_pillars_message += "{0:<20}{1:<4}{2}\n".format(row[2], row[4], string_blocks)
 
     out_message += "\n{0}\n".format(get_response(cursor, "points_user", personality_id))
     out_message += "{0:<20}{1:<20}\n".format("POSITION", "POINTS")
@@ -949,7 +969,7 @@ def block_test(message):
     out_message = setup[0]
     conn = setup[1]
     cursor = setup[2]
-    
+
     out_message += oneEight + "\n"
     out_message += twoEight + "\n"
     out_message += threeEight + "\n"
