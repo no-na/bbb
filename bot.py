@@ -976,14 +976,7 @@ def block_test(message):
     conn = setup[1]
     cursor = setup[2]
 
-    out_message += oneEight + "\n"
-    out_message += twoEight + "\n"
-    out_message += threeEight + "\n"
-    out_message += fourEight + "\n"
-    out_message += fiveEight + "\n"
-    out_message += sixEight + "\n"
-    out_message += sevenEight + "\n"
-    out_message += eightEight + "\n"
+    out_message+="\n\n⠀　⠀⠀⠀　:hatched_chick:\n⠀　⠀⠀ʙɪɢ cʜɪcκ ɪs\n⠀　𝗪𝗔𝗧𝗖𝗛𝗜𝗡𝗚 𝗬𝗢𝗨\n\n"
     return (end_response(out_message, conn, cursor), )
 
 
