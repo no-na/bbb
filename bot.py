@@ -844,19 +844,19 @@ def points(message):
         string_blocks = ""
         for i in range(0, full_blocks):
             string_blocks += eightEight
-        if partial_block is 1:
+        if partial_block == 1:
             string_blocks += oneEight
-        elif partial_block is 2:
+        elif partial_block == 2:
             string_blocks += twoEight
-        elif partial_block is 3:
+        elif partial_block == 3:
             string_blocks += threeEight
-        elif partial_block is 4:
+        elif partial_block == 4:
             string_blocks += fourEight
-        elif partial_block is 5:
+        elif partial_block == 5:
             string_blocks += fiveEight
-        elif partial_block is 6:
+        elif partial_block == 6:
             string_blocks += sixEight
-        elif partial_block is 7:
+        elif partial_block == 7:
             string_blocks += sevenEight
         points_pillars_message += "{0:<20}{1:<4}{2}\n".format(row[2], row[4], string_blocks)
 
