@@ -947,6 +947,9 @@ def timeoffset(message):
 def block_test(message):
     setup = setup_response(message.author.id)
     out_message = setup[0]
+    conn = setup[1]
+    cursor = setup[2]
+    
     out_message += oneEight + "\n"
     out_message += twoEight + "\n"
     out_message += threeEight + "\n"
