@@ -861,7 +861,10 @@ def points(message):
     cursor.execute(query, data)
     rows = cursor.fetchall()
     for row in rows:
-        points_pillars_message += "{0:<20}{1:<4}{2}\n".format(row[2], row[4], build_int_block(int(row[4])))
+        name = row[2]
+        if row[3] == 1:
+            name += " (*)"
+        points_pillars_message += "{0:<20}{1:<4}{2}\n".format(name, row[4], build_int_block(int(row[4])))
 
     out_message += "\n{0}\n".format(get_response(cursor, "points_user", personality_id))
     out_message += "{0:<20}{1:<20}\n".format("POSITION", "POINTS")
