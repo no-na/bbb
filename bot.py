@@ -16,6 +16,15 @@ OFFSET_MIN_HOUR = -12
 OFFSET_MAX_MIN = 59
 OFFSET_MIN_MIN = 0
 
+oneEight = "\u258f"
+twoEight = "\u258E"
+threeEight = "\u258D"
+fourEight = "\u258C"
+fiveEight = "\u258B"
+sixEight = "\u258A"
+sevenEight = "\u2589"
+eightEight = "\u2588"
+
 
 def connect():
     conn = mysql.connector.connect(database='bbb',
@@ -935,6 +944,20 @@ def timeoffset(message):
     return (end_response(out_message, conn, cursor), )
 
 
+block_test(message):
+    setup = setup_response(message.author.id)
+    out_message = setup[0]
+    out_message += oneEight + "\n"
+    out_message += twoEight + "\n"
+    out_message += threeEight + "\n"
+    out_message += fourEight + "\n"
+    out_message += fiveEight + "\n"
+    out_message += sixEight + "\n"
+    out_message += sevenEight + "\n"
+    out_message += eightEight + "\n"
+    return (end_response(out_message, conn, cursor), )
+
+
 response_options = {
     "!help": ("List commands.", helpp),
     "!bounty": ("Create and view bounties.", bounty),
@@ -943,7 +966,8 @@ response_options = {
     "!pillar": ("Create and view your pillars.", pillar),
     "!points": ("View your points and the leaderboard.", points),
     "!personality": ("Change bot personality.", personality),
-    "!timezone": ("Change displayed timezone.", timeoffset)
+    "!timezone": ("Change displayed timezone.", timeoffset),
+    "!blocktest": ("test appearance of unicode blocks in discord.", block_test)
 }
 
 
