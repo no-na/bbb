@@ -96,6 +96,29 @@ def apply_time_offset(cursor, time, user_id):
     return (time + timedelta(hours=hours, minutes=minutes), row_ti[0][:-2], row_ti[0][-2:])
 
 
+def build_int_block(pp):
+    full_blocks = pp // 8
+    partial_block = pp % 8
+    string_blocks = ""
+    for i in range(0, full_blocks):
+        string_blocks += eightEight
+    if partial_block == 1:
+        string_blocks += oneEight
+    elif partial_block == 2:
+        string_blocks += twoEight
+    elif partial_block == 3:
+        string_blocks += threeEight
+    elif partial_block == 4:
+        string_blocks += fourEight
+    elif partial_block == 5:
+        string_blocks += fiveEight
+    elif partial_block == 6:
+        string_blocks += sixEight
+    elif partial_block == 7:
+        string_blocks += sevenEight
+    return string_blocks
+
+
 def format_command(command, description):
     return "{0:<60} {1}\n".format(command, description)
 
@@ -831,34 +854,14 @@ def points(message):
         previous_points = row[3]
         if row[0] == message.author.id:
             points_user_message += "{0:<20}{1:<20}\n".format("{0}{1}".format(place, place_suffix), row[3])
-        points_board_message += "{0:<20}{1:<20}{2:<20}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3])
+        points_board_message += "{0:<20}{1:<20}{2:<4}{3}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3], , build_int_block(int(row[3])))
 
     query = ("SELECT * FROM pillars WHERE pillar_user = %s ORDER BY pillar_points DESC")
     data = (message.author.id, )
     cursor.execute(query, data)
     rows = cursor.fetchall()
     for row in rows:
-        pp = int(row[4])
-        full_blocks = pp // 8
-        partial_block = pp % 8
-        string_blocks = ""
-        for i in range(0, full_blocks):
-            string_blocks += eightEight
-        if partial_block == 1:
-            string_blocks += oneEight
-        elif partial_block == 2:
-            string_blocks += twoEight
-        elif partial_block == 3:
-            string_blocks += threeEight
-        elif partial_block == 4:
-            string_blocks += fourEight
-        elif partial_block == 5:
-            string_blocks += fiveEight
-        elif partial_block == 6:
-            string_blocks += sixEight
-        elif partial_block == 7:
-            string_blocks += sevenEight
-        points_pillars_message += "{0:<20}{1:<4}{2}\n".format(row[2], row[4], string_blocks)
+        points_pillars_message += "{0:<20}{1:<4}{2}\n".format(row[2], row[4], build_int_block(int(row[4])))
 
     out_message += "\n{0}\n".format(get_response(cursor, "points_user", personality_id))
     out_message += "{0:<20}{1:<20}\n".format("POSITION", "POINTS")
