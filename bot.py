@@ -854,7 +854,7 @@ def points(message):
         previous_points = row[3]
         if row[0] == message.author.id:
             points_user_message += "{0:<20}{1:<20}\n".format("{0}{1}".format(place, place_suffix), row[3])
-        points_board_message += "{0:<20}{1:<20}{2:<4}{3}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3], , build_int_block(int(row[3])))
+        points_board_message += "{0:<20}{1:<20}{2:<4}{3}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3], build_int_block(int(row[3])))
 
     query = ("SELECT * FROM pillars WHERE pillar_user = %s ORDER BY pillar_points DESC")
     data = (message.author.id, )
