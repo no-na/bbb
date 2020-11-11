@@ -5,7 +5,8 @@ import json
 import re
 from datetime import datetime, timedelta
 
-intents = discord.Intents.all()
+intents = discord.Intents.default()
+intents.members = True
 client = discord.Client(intents=intents)
 
 response_options = {}
