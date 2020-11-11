@@ -362,7 +362,8 @@ def bounty(message):
                 is_inactive = ""
                 if row[4] == 0:
                     is_inactive = " (INACTIVE)"
-                bounty_creator_name = client.get_user(row[3]).name
+                bounty_creator = client.get_user(row[3])
+                bounty_creator_name = bounty_creator.name
                 if bounty_creator_name is None:
                     bounty_creator_name = "UNKNOWN"
                 out_message += "{0:<20} {1:<30} {2}{3}\n".format(
