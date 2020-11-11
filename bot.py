@@ -1031,8 +1031,12 @@ response_options = {
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+    print("\nGUILDS")
     for guild in client.guilds:
         print("{0}".format(guild.name))
+    print("\nUSERS")
+    for user in client.users:
+        print("{0}".format(user.name))
 
 
 @client.event
