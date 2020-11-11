@@ -395,8 +395,14 @@ def bounty(message):
         out_message += "{0:<20} {1:<30} {2}\n".format("{0} {1}".format("ID", "OWNER"), "CREATION DATE", "DESCRIPTION")
         for row in rows:
             offset_creation = apply_time_offset(cursor, row[1], message.author.id)
+            bounty_creator = client.get_user(row[3])
+            bounty_creator_name = ""
+            if bounty_creator is None:
+                bounty_creator_name = "UNKNOWN"
+            else:
+                bounty_creator_name = bounty_creator.name
             out_message += "{0:<20} {1:<30} {2}\n".format(
-                "{0} {1}".format(row[0], client.get_user(row[3]).name),
+                "{0} {1}".format(row[0], bounty_creator_name),
                 "{0}{1}:{2}".format(offset_creation[0], offset_creation[1], offset_creation[2]),
                 row[2]
             )
