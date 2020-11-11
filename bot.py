@@ -39,7 +39,7 @@ def setup_response(user_id=None):
     personality_id = None
     conn = connect()
     cursor = conn.cursor()
-    if(user_id is not None):
+    if user_id is not None:
         query = (
             "SELECT user_personality FROM users WHERE user_id = %s"
         )
@@ -50,7 +50,7 @@ def setup_response(user_id=None):
             personality_id = row[0]
         else:
             personality_id = 1
-    return (out_message, conn, cursor, personality_id)
+    return out_message, conn, cursor, personality_id
 
 
 # Boilerplate code that runs at the end of every response function.
@@ -84,7 +84,7 @@ def clean_cursor(cursor):
 
 
 def apply_time_offset(cursor, time, user_id):
-    query = ("SELECT user_time_offset FROM users WHERE user_id = %s")
+    query = "SELECT user_time_offset FROM users WHERE user_id = %s"
     data = (user_id, )
     cursor.execute(query, data)
     row_ti = cursor.fetchone()
@@ -93,7 +93,7 @@ def apply_time_offset(cursor, time, user_id):
     if row_ti is not None:
         hours = int(row_ti[0][:-2])
         minutes = int(row_ti[0][-2:])
-    return (time + timedelta(hours=hours, minutes=minutes), row_ti[0][:-2], row_ti[0][-2:])
+    return time + timedelta(hours=hours, minutes=minutes), row_ti[0][:-2], row_ti[0][-2:]
 
 
 def build_int_block(pp):
@@ -123,7 +123,7 @@ def format_command(command, description):
     return "{0:<60} {1}\n".format(command, description)
 
 
-def checkJoin(member):
+def check_join(member):
     conn = connect()
     cursor = conn.cursor()
     query = (
@@ -134,7 +134,7 @@ def checkJoin(member):
     row = cursor.fetchone()
     cursor.close()
     conn.close()
-    if(row[0] == 1):
+    if row[0] == 1:
         return True
     return False
 
@@ -145,7 +145,7 @@ def join(message):
     conn = setup[1]
     cursor = setup[2]
 
-    if(checkJoin(message.author) is False):
+    if check_join(message.author) is False:
         query = (
             "INSERT INTO users(user_id, user_personality)"
             "VALUES (%s,%s)"
@@ -163,7 +163,7 @@ def join(message):
         row = cursor.fetchone()
         personality_id = row[0]
         out_message += "{0}\n".format(get_response(cursor, "joined_true", personality_id))
-    return (end_response(out_message, conn, cursor), )
+    return end_response(out_message, conn, cursor),
 
 
 def command_bad(message):
@@ -175,7 +175,7 @@ def command_bad(message):
 
     out_message += "{0}\n".format(get_response(cursor, "command_invalid", personality_id))
 
-    return (end_response(out_message, conn, cursor), )
+    return end_response(out_message, conn, cursor),
 
 
 def helpp(message):
@@ -189,7 +189,7 @@ def helpp(message):
     for key in response_options:
         out_message += "{0:<20} {1}\n".format(key, response_options[key][0])
 
-    return (end_response(out_message, conn, cursor), )
+    return end_response(out_message, conn, cursor),
 
 
 def personality(message):
@@ -209,7 +209,7 @@ def personality(message):
         data = (new_personality_id, )
         cursor.execute(query, data)
         row = cursor.fetchone()
-        if(row[0] == 1):
+        if row[0] == 1:
             query = (
                 "UPDATE users SET user_personality = %s WHERE user_id = %s"
             )
@@ -223,13 +223,13 @@ def personality(message):
         # Display help and available personalities.
         out_message += "{0}\n".format(get_response(cursor, "personality", personality_id))
         out_message += format_command("# !personality [PERSONALITY ID]", "Sets your assistant's personality.")
-        query = ("SELECT * FROM personalities")
+        query = "SELECT * FROM personalities"
         cursor.execute(query)
         rows = cursor.fetchall()
         for row in rows:
             out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[1]), row[2])
 
-    return (end_response(out_message, conn, cursor), )
+    return end_response(out_message, conn, cursor),
 
 
 def bounty(message):
@@ -262,7 +262,7 @@ def bounty(message):
             data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
-            if(row[0] == 1):
+            if row[0] == 1:
                 query = (
                     "UPDATE bounties SET bounty_text = %s WHERE bounty_id = %s"
                 )
@@ -281,7 +281,7 @@ def bounty(message):
             data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
-            if(row[0] == 1):
+            if row[0] == 1:
                 # Send DM to claimees.
                 query = (
                     "SELECT * FROM claims WHERE claim_bounty_id = %s"
@@ -290,7 +290,8 @@ def bounty(message):
                 cursor.execute(query, data)
                 rows = cursor.fetchall()
                 for row in rows:
-                    dms.append((row[3], "{0} deleted a bounty you had a claim on. Your claim has also been removed. The bounty was: {1}".format(row[4], "PUT DESCRIPTION HERE")))
+                    dms.append((row[3], "{0} deleted a bounty you had a claim on. Your claim has also been removed. "
+                                        "The bounty was: {1}".format(row[4], "PUT DESCRIPTION HERE")))
 
                 # Delete claims on bounty.
                 query = (
@@ -319,7 +320,7 @@ def bounty(message):
             data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
-            if(row[0] == 1):
+            if row[0] == 1:
                 # Send DM to claimees.
                 query = (
                     "SELECT * FROM claims WHERE claim_bounty_id = %s"
@@ -328,7 +329,8 @@ def bounty(message):
                 cursor.execute(query, data)
                 rows = cursor.fetchall()
                 for row in rows:
-                    dms.append((row[3], "{0} closed a bounty you had a claim on. Your claim has also been removed. The bounty was: {1}".format(row[4], "PUT DESCRIPTION HERE")))
+                    dms.append((row[3], "{0} closed a bounty you had a claim on. Your claim has also been removed. "
+                                        "The bounty was: {1}".format(row[4], "PUT DESCRIPTION HERE")))
 
                 # Delete claims on bounty.
                 query = (
@@ -350,7 +352,7 @@ def bounty(message):
             else:
                 out_message += "{0}\n".format(get_response(cursor, "bounty_close_invalid", personality_id))
         elif split_message[1] == "-v":
-            query = ("SELECT * FROM bounties ORDER BY bounty_creation DESC")
+            query = "SELECT * FROM bounties ORDER BY bounty_creation DESC"
             cursor.execute(query)
             rows = cursor.fetchall()
 
@@ -358,7 +360,7 @@ def bounty(message):
             for row in rows:
                 offset_creation = apply_time_offset(cursor, row[1], message.author.id)
                 is_inactive = ""
-                if(row[4] == 0):
+                if row[4] == 0:
                     is_inactive = " (INACTIVE)"
                 out_message += "{0:<20} {1:<30} {2}{3}\n".format(
                     "{0} {1}".format(row[0], client.get_user(row[3]).name),
@@ -372,11 +374,15 @@ def bounty(message):
         # Display help and existing bounties.
         out_message += "{0}\n".format(get_response(cursor, "bounty", personality_id))
         out_message += format_command("# !bounty -new [BOUNTY DESCRIPTION]", "Creates a new bounty.")
-        out_message += format_command("# !bounty -close [BOUNTY ID]", "Rejects any pending claims on a bounty and removes it from the bounty list.")
-        out_message += format_command("# !bounty -edit [BOUNTY ID] [BOUNTY DESCRIPTION]", "Rewrites the description of a bounty.")
-        out_message += format_command("# !bounty -delete [BOUNTY ID]", "Rejects any pending claims on a bounty and obliterates it from memory.")
-        out_message += format_command("# !bounty -v", "\"Verbose\" bounty listing, displays bounties that have closed too.")
-        query = ("SELECT * FROM bounties WHERE bounty_active = TRUE ORDER BY bounty_creation DESC")
+        out_message += format_command("# !bounty -close [BOUNTY ID]", "Rejects any pending claims on a bounty and "
+                                                                      "removes it from the bounty list.")
+        out_message += format_command("# !bounty -edit [BOUNTY ID] [BOUNTY DESCRIPTION]", "Rewrites the description "
+                                                                                          "of a bounty.")
+        out_message += format_command("# !bounty -delete [BOUNTY ID]", "Rejects any pending claims on a bounty and "
+                                                                       "obliterates it from memory.")
+        out_message += format_command("# !bounty -v", "\"Verbose\" bounty listing, displays bounties that have closed "
+                                                      "too.")
+        query = "SELECT * FROM bounties WHERE bounty_active = TRUE ORDER BY bounty_creation DESC"
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -389,7 +395,7 @@ def bounty(message):
                 row[2]
             )
 
-    return (end_response(out_message, conn, cursor), dms)
+    return end_response(out_message, conn, cursor), dms
 
 
 def claim(message):
@@ -406,7 +412,8 @@ def claim(message):
             # Create new claim if the bounty exists, the user is not the creator, and the bounty is active.
             # And the user hasn't already made a claim on this bounty, and the user hasn't already been accepted.
             query = (
-                "SELECT EXISTS(SELECT * FROM bounties WHERE bounty_creator != %s AND bounty_id = %s AND JSON_CONTAINS(bounty_accepted,'%s') = 0 AND bounty_active = 1)"
+                "SELECT EXISTS(SELECT * FROM bounties WHERE bounty_creator != %s AND bounty_id = %s AND "
+                "JSON_CONTAINS(bounty_accepted,'%s') = 0 AND bounty_active = 1) "
             )
             data = (message.author.id, split_message[2], message.author.id)
             cursor.execute(query, data)
@@ -418,8 +425,8 @@ def claim(message):
             data = (split_message[2], message.author.id)
             cursor.execute(query, data)
             roww = cursor.fetchone()
-            if(row[0] == 1 and roww[0] == 0):
-                query = ("SELECT bounty_creator FROM bounties WHERE bounty_id = %s")
+            if row[0] == 1 and roww[0] == 0:
+                query = "SELECT bounty_creator FROM bounties WHERE bounty_id = %s"
                 data = (split_message[2], )
                 cursor.execute(query, data)
                 bounty_creator = cursor.fetchone()[0]
@@ -440,14 +447,15 @@ def claim(message):
                             pillars.append(row_p[0])
                         else:
                             out_message += "{0}\n".format(get_response(cursor, "claim_new_invalid_pillar", personality_id))
-                            return (end_response(out_message, conn, cursor), dms)
+                            return end_response(out_message, conn, cursor), dms
 
                 pillar_string = ""
                 for pillar in pillars:
                     pillar_string += "{0}, ".format(pillar)
                 pillar_string = pillar_string[:-2]
                 query = (
-                    "INSERT INTO claims(claim_bounty_id, claim_creation, claim_claimee, claim_bounty_creator, claim_pillars)"
+                    "INSERT INTO claims(claim_bounty_id, claim_creation, claim_claimee, claim_bounty_creator, "
+                    "claim_pillars) "
                     "VALUES (%s,%s,%s,%s,JSON_ARRAY({0}))".format(pillar_string)
                 )
                 now = datetime.utcnow()
@@ -458,7 +466,8 @@ def claim(message):
                 out_message += "{0}\n".format(get_response(cursor, "claim_new_valid", personality_id))
 
                 # Send DM to bounty creator.
-                dms.append((bounty_creator, "{0} submitted a claim to a bounty you created. Please respond to it before the bounty period ends.".format(message.author.name)))
+                dms.append((bounty_creator, "{0} submitted a claim to a bounty you created. Please respond to it "
+                                            "before the bounty period ends.".format(message.author.name)))
             else:
                 out_message += "{0}\n".format(get_response(cursor, "claim_new_invalid", personality_id))
         elif split_message[1] == "-cancel":
@@ -469,7 +478,7 @@ def claim(message):
             data = (split_message[2], message.author.id)
             cursor.execute(query, data)
             row = cursor.fetchone()
-            if(row[0] == 1):
+            if row[0] == 1:
                 query = (
                     "DELETE FROM claims WHERE claim_id = %s"
                 )
@@ -486,14 +495,14 @@ def claim(message):
             # award 1 point to user, and 2 points to claimee.
             # Send DM to claimee.
 
-            query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s")
+            query = "SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s"
             data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
-            if(row is not None):
+            if row is not None:
                 # Award point to claimee. Check for pillar bonus too.
                 claimee_point_reward = CLAIMEE_POINT_INCREMENT
-                query = ("SELECT claim_pillars FROM claims WHERE claim_claimee = %s")
+                query = "SELECT claim_pillars FROM claims WHERE claim_claimee = %s"
                 data = (row[3], )
                 cursor.execute(query, data)
                 row_pi = cursor.fetchone()
@@ -508,7 +517,7 @@ def claim(message):
                     cursor.execute(query, data)
                     conn.commit()
 
-                    query = ("SELECT * FROM pillars WHERE pillar_is_favorite = TRUE AND pillar_id = %s")
+                    query = "SELECT * FROM pillars WHERE pillar_is_favorite = TRUE AND pillar_id = %s"
                     data = (pillar, )
                     cursor.execute(query, data)
                     row_pibo = cursor.fetchone()
@@ -543,7 +552,8 @@ def claim(message):
 
                 # Add claimee to bounty's list of completed users.
                 query = (
-                    "UPDATE bounties SET bounty_accepted = JSON_ARRAY_APPEND(bounty_accepted, '$', %s) WHERE bounty_id = %s"
+                    "UPDATE bounties SET bounty_accepted = JSON_ARRAY_APPEND(bounty_accepted, '$', %s) WHERE "
+                    "bounty_id = %s "
                 )
                 data = (row[3], row[1])
                 cursor.execute(query, data)
@@ -583,11 +593,11 @@ def claim(message):
             # delete claim.
             # Send DM to claimee.
 
-            query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s")
+            query = "SELECT * FROM claims WHERE claim_bounty_creator = %s AND claim_id = %s"
             data = (message.author.id, split_message[2])
             cursor.execute(query, data)
             row = cursor.fetchone()
-            if(row is not None):
+            if row is not None:
                 # Delete claim.
                 query = (
                     "DELETE FROM claims WHERE claim_id = %s"
@@ -617,21 +627,30 @@ def claim(message):
         out_message += "{0}\n".format(get_response(cursor, "claim", personality_id))
         out_message += "# BOUNTY HUNTER\n"
         out_message += format_command("# !claim -new [BOUNTY ID]", "Creates a new claim on a bounty.")
-        out_message += format_command("# !claim -new [BOUNTY ID] [PILLAR NAME]", "Creates a new claim on a bounty, with a pillar.")
-        out_message += format_command("# !claim -new [BOUNTY ID] [PILLAR NAME] [PILLAR NAME] ...", "Creates a new claim on a bounty, with multiple pillars. Add as many pillars as appropriate.")
+        out_message += format_command("# !claim -new [BOUNTY ID] [PILLAR NAME]", "Creates a new claim on a bounty, "
+                                                                                 "with a pillar.")
+        out_message += format_command("# !claim -new [BOUNTY ID] [PILLAR NAME] [PILLAR NAME] ...", "Creates a new "
+                                                                                                   "claim on a "
+                                                                                                   "bounty, "
+                                                                                                   "with multiple "
+                                                                                                   "pillars. Add as "
+                                                                                                   "many pillars as "
+                                                                                                   "appropriate.")
         out_message += format_command("# !claim -cancel [CLAIM ID]", "Rescinds a claim you've created.")
         out_message += "\n# BOUNTY CREATOR\n"
-        out_message += format_command("# !claim -accept [CLAIM ID]", "Accepts a pending claim on a bounty you've created.")
-        out_message += format_command("# !claim -reject [CLAIM ID]", "Rejects a pending claim on a bounty you've created.")
+        out_message += format_command("# !claim -accept [CLAIM ID]", "Accepts a pending claim on a bounty you've "
+                                                                     "created.")
+        out_message += format_command("# !claim -reject [CLAIM ID]", "Rejects a pending claim on a bounty you've "
+                                                                     "created.")
 
-        query = ("SELECT * FROM claims WHERE claim_bounty_creator = %s")
+        query = "SELECT * FROM claims WHERE claim_bounty_creator = %s"
         data = (message.author.id, )
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED TO YOU\n")
         out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format("ID", "CLAIMANT"), "DESCRIPTION")
         for row in rows:
-            query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
+            query = "SELECT bounty_text FROM bounties WHERE bounty_id = %s"
             data = (row[1], )
             cursor.execute(query, data)
             row_bo = cursor.fetchone()
@@ -640,7 +659,7 @@ def claim(message):
 
             out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], client.get_user(row[3]).name), desc)
 
-            query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
+            query = "SELECT claim_pillars FROM claims WHERE claim_id = %s"
             data = (row[0], )
             cursor.execute(query, data)
             row_pi = cursor.fetchone()
@@ -654,14 +673,14 @@ def claim(message):
                 row_pina = cursor.fetchone()
                 out_message += "{0:<5}-{1}\n".format("", row_pina[0])
 
-        query = ("SELECT * FROM claims WHERE claim_claimee = %s")
+        query = "SELECT * FROM claims WHERE claim_claimee = %s"
         data = (message.author.id, )
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED BY YOU\n")
         out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION")
         for row in rows:
-            query = ("SELECT bounty_text FROM bounties WHERE bounty_id = %s")
+            query = "SELECT bounty_text FROM bounties WHERE bounty_id = %s"
             data = (row[1], )
             cursor.execute(query, data)
             row_bo = cursor.fetchone()
@@ -670,7 +689,7 @@ def claim(message):
 
             out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc)
 
-            query = ("SELECT claim_pillars FROM claims WHERE claim_id = %s")
+            query = "SELECT claim_pillars FROM claims WHERE claim_id = %s"
             data = (row[0], )
             cursor.execute(query, data)
             row_pi = cursor.fetchone()
@@ -684,7 +703,7 @@ def claim(message):
                 row_pina = cursor.fetchone()
                 out_message += "{0:<5}-{1}\n".format("", row_pina[0])
 
-    return (end_response(out_message, conn, cursor), dms)
+    return end_response(out_message, conn, cursor), dms
 
 
 def pillar(message):
@@ -800,11 +819,17 @@ def pillar(message):
         # Display help and the user's existing pillars.
         out_message += "{0}\n".format(get_response(cursor, "pillar", personality_id))
         out_message += format_command("# !pillar -new [PILLAR NAME]", "Creates a new pillar.")
-        out_message += format_command("# !pillar -rename [OLD PILLAR NAME] [NEW PILLAR NAME]", "Renames a pillar. The pillar's height won't change.")
-        out_message += format_command("# !pillar -delete [PILLAR NAME]", "Deletes a pillar. Does not affect your points, but the pillar height will be lost forever.")
-        out_message += format_command("# !pillar -favorite [PILLAR NAME]", "Favorites a pillar. Completing bounties using your favorite pillar will earn you extra points.")
+        out_message += format_command("# !pillar -rename [OLD PILLAR NAME] [NEW PILLAR NAME]", "Renames a pillar. The "
+                                                                                               "pillar's height won't "
+                                                                                               "change.")
+        out_message += format_command("# !pillar -delete [PILLAR NAME]", "Deletes a pillar. Does not affect your "
+                                                                         "points, but the pillar height will be lost "
+                                                                         "forever.")
+        out_message += format_command("# !pillar -favorite [PILLAR NAME]", "Favorites a pillar. Completing bounties "
+                                                                           "using your favorite pillar will earn you "
+                                                                           "extra points.")
 
-        query = ("SELECT * FROM pillars WHERE pillar_user = %s")
+        query = "SELECT * FROM pillars WHERE pillar_user = %s"
         data = (message.author.id, )
         cursor.execute(query, data)
         rows = cursor.fetchall()
@@ -815,7 +840,7 @@ def pillar(message):
                 favorite_string = "(FAVORITE)"
             out_message += "{0:<20} {1}\n".format(row[2], favorite_string)
 
-    return (end_response(out_message, conn, cursor), )
+    return end_response(out_message, conn, cursor),
 
 
 def points(message):
@@ -835,7 +860,7 @@ def points(message):
     points_pillars_message = ""
     points_board_message = ""
 
-    query = ("SELECT * FROM users ORDER BY user_points DESC")
+    query = "SELECT * FROM users ORDER BY user_points DESC"
     cursor.execute(query)
     rows = cursor.fetchall()
 
@@ -856,7 +881,7 @@ def points(message):
             points_user_message += "{0:<20}{1:<20}\n".format("{0}{1}".format(place, place_suffix), row[3])
         points_board_message += "{0:<20}{1:<20}{2:<4}{3}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3], build_int_block(int(row[3])))
 
-    query = ("SELECT * FROM pillars WHERE pillar_user = %s ORDER BY pillar_points DESC")
+    query = "SELECT * FROM pillars WHERE pillar_user = %s ORDER BY pillar_points DESC"
     data = (message.author.id, )
     cursor.execute(query, data)
     rows = cursor.fetchall()
@@ -874,7 +899,7 @@ def points(message):
     out_message += "\n{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
     out_message += "{0:<20}{1:<20}{2:<20}\n".format("POSITION", "NAME", "POINTS")
     out_message += points_board_message
-    return (end_response(out_message, conn, cursor), )
+    return end_response(out_message, conn, cursor),
 
 
 def practice(message):
@@ -902,7 +927,7 @@ def practice(message):
                     pillars.append(row_p[0])
                 else:
                     out_message += "{0}\n".format(get_response(cursor, "practice_invalid_pillar", personality_id))
-                    return (end_response(out_message, conn, cursor), )
+                    return end_response(out_message, conn, cursor),
         for pillar in pillars:
             query = (
                 "UPDATE pillars SET pillar_points = pillar_points+%s WHERE pillar_id = %s"
@@ -916,9 +941,11 @@ def practice(message):
         # Display help and the user's existing pillars.
         out_message += "{0}\n".format(get_response(cursor, "practice", personality_id))
         out_message += format_command("# !practice [PILLAR NAME]", "Increases the height of one pillar.")
-        out_message += format_command("# !practice [PILLAR NAME] [PILLAR NAME] ...", "Increases the heights of multiple pillars. Add as many pillars as are pertinent.")
+        out_message += format_command("# !practice [PILLAR NAME] [PILLAR NAME] ...", "Increases the heights of "
+                                                                                     "multiple pillars. Add as many "
+                                                                                     "pillars as are pertinent.")
 
-    return (end_response(out_message, conn, cursor), )
+    return end_response(out_message, conn, cursor),
 
 
 def timeoffset(message):
@@ -960,20 +987,20 @@ def timeoffset(message):
         out_message += "{0}\n".format(get_response(cursor, "timezone", personality_id))
         out_message += format_command("# !timezone [NEW TIME ZONE OFFSET] (!timezone -9) (!timezone -09:00)", "Adjusts the UTC offset displayed for commands you write. Does not affect the UTC offset displayed for commands others write.")
 
-        query = ("SELECT user_time_offset FROM users WHERE user_id = %s")
+        query = "SELECT user_time_offset FROM users WHERE user_id = %s"
         data = (message.author.id, )
         cursor.execute(query, data)
         row = cursor.fetchone()
         if row is not None:
             out_message += "YOUR OFFSET: {0}\n".format(row[0])
 
-    return (end_response(out_message, conn, cursor), )
+    return end_response(out_message, conn, cursor),
 
 
 def block_test(message):
     out_message = ""
     out_message += "\u2800\n\u2800\n⠀　⠀⠀⠀　:hatched_chick:\n⠀　⠀⠀ʙɪɢ cʜɪcκ ɪs\n⠀　𝗪𝗔𝗧𝗖𝗛𝗜𝗡𝗚 𝗬𝗢𝗨\n\u2800"
-    return (out_message, )
+    return out_message,
 
 
 response_options = {
@@ -1004,7 +1031,7 @@ async def on_message(message):
     if split_message[0] == "!join":
         await message.channel.send(join(message)[0])
     elif split_message[0] in response_options:
-        if checkJoin(message.author) is True:
+        if check_join(message.author) is True:
             response = response_options[split_message[0]][1](message)
             await message.channel.send(response[0])
             if len(response) >= 2:
