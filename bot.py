@@ -121,6 +121,14 @@ def build_int_block(pp):
     return string_blocks
 
 
+def get_user_name(user_id):
+    user = client.get_user(user_id)
+    if user is None:
+        return "UNKNOWN"
+    else:
+        return user.name
+
+
 def format_command(command, description):
     return "{0:<60} {1}\n".format(command, description)
 
@@ -364,14 +372,8 @@ def bounty(message):
                 is_inactive = ""
                 if row[4] == 0:
                     is_inactive = " (INACTIVE)"
-                bounty_creator = client.get_user(row[3])
-                bounty_creator_name = ""
-                if bounty_creator is None:
-                    bounty_creator_name = "UNKNOWN"
-                else:
-                    bounty_creator_name = bounty_creator.name
                 out_message += "{0:<20} {1:<30} {2}{3}\n".format(
-                    "{0} {1}".format(row[0], bounty_creator_name),
+                    "{0} {1}".format(row[0], get_user_name(row[3])),
                     "{0}{1}:{2}".format(offset_creation[0], offset_creation[1], offset_creation[2]),
                     row[2],
                     is_inactive
@@ -397,14 +399,8 @@ def bounty(message):
         out_message += "{0:<20} {1:<30} {2}\n".format("{0} {1}".format("ID", "OWNER"), "CREATION DATE", "DESCRIPTION")
         for row in rows:
             offset_creation = apply_time_offset(cursor, row[1], message.author.id)
-            bounty_creator = client.get_user(row[3])
-            bounty_creator_name = ""
-            if bounty_creator is None:
-                bounty_creator_name = "UNKNOWN"
-            else:
-                bounty_creator_name = bounty_creator.name
             out_message += "{0:<20} {1:<30} {2}\n".format(
-                "{0} {1}".format(row[0], bounty_creator_name),
+                "{0} {1}".format(row[0], get_user_name(row[3])),
                 "{0}{1}:{2}".format(offset_creation[0], offset_creation[1], offset_creation[2]),
                 row[2]
             )
@@ -671,7 +667,7 @@ def claim(message):
             desc = row_bo[0]
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
 
-            out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], client.get_user(row[3]).name), desc)
+            out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], get_user_name(row[3])), desc)
 
             query = "SELECT claim_pillars FROM claims WHERE claim_id = %s"
             data = (row[0], )
@@ -701,7 +697,7 @@ def claim(message):
             desc = row_bo[0]
             desc = (desc[:18] + '..') if len(desc) > 20 else desc
 
-            out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], client.get_user(row[4]).name), desc)
+            out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], get_user_name(row[4])), desc)
 
             query = "SELECT claim_pillars FROM claims WHERE claim_id = %s"
             data = (row[0], )
@@ -893,7 +889,7 @@ def points(message):
         previous_points = row[3]
         if row[0] == message.author.id:
             points_user_message += "{0:<20}{1:<20}\n".format("{0}{1}".format(place, place_suffix), row[3])
-        points_board_message += "{0:<20}{1:<20}{2:<4}{3}\n".format("{0}{1}".format(place, place_suffix), client.get_user(row[0]).name, row[3], build_int_block(int(row[3])))
+        points_board_message += "{0:<20}{1:<20}{2:<4}{3}\n".format("{0}{1}".format(place, place_suffix), get_user_name(row[0]), row[3], build_int_block(int(row[3])))
 
     query = "SELECT * FROM pillars WHERE pillar_user = %s ORDER BY pillar_points DESC"
     data = (message.author.id, )
@@ -1056,7 +1052,7 @@ async def on_message(message):
             await message.channel.send(response[0])
             if len(response) >= 2:
                 for dm in response[1]:
-                    user = client.get_user(dm[0])
+                    user = get_user_name(dm[0])
                     await user.send(dm[1])
         else:
             await message.channel.send("Please subscribe to bot first by typing \"!join\"")
