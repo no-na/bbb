@@ -1013,6 +1013,12 @@ def block_test(message):
     return out_message,
 
 
+def dm_test(message):
+    dms = []
+    dms.append((message.author, "Hi."))
+    return "", dms
+
+
 response_options = {
     "!help": ("List commands.", helpp),
     "!bounty": ("Create and view bounties.", bounty),
@@ -1022,7 +1028,8 @@ response_options = {
     "!points": ("View your points and the leaderboard.", points),
     "!personality": ("Change bot personality.", personality),
     "!timezone": ("Change displayed timezone.", timeoffset),
-    "!big": ("BIG CHICK", block_test)
+    "!big": ("BIG CHICK", block_test),
+    "!dm_test": ("Bot will say 'hi' to you in a DM.", dm_test)
 }
 
 
