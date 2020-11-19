@@ -1016,7 +1016,7 @@ def block_test(message):
 def dm_test(message):
     dms = []
     dms.append((message.author, "Hi."))
-    return "", dms
+    return ":hatched_chick:", dms
 
 
 response_options = {
