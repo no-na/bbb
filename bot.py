@@ -1059,7 +1059,7 @@ async def on_message(message):
             await message.channel.send(response[0])
             if len(response) >= 2:
                 for dm in response[1]:
-                    user = get_user_name(dm[0])
+                    user = client.get_user(dm[0])
                     await user.send(dm[1])
         else:
             await message.channel.send("Please subscribe to bot first by typing \"!join\"")
