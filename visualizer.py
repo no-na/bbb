@@ -24,7 +24,7 @@ class Visualizer:
                     pixels[k][j*3+1] = g
                     pixels[k][j*3+2] = b
                 character_origin[0] = character_origin[0] + 1
-                character_origin[1] = character_origin[1] + 1
+            character_origin[1] = character_origin[1] + 1
 
     def build_text(self, pixels, font, x, y, string: str):
         type_reader = png.Reader(filename=font)
