@@ -22,9 +22,9 @@ class Visualizer:
                 g = row[character_origin[0]*4+1]
                 b = row[character_origin[0]*4+2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    pixels[k][j*3+0] = r
-                    pixels[k][j*3+1] = g
-                    pixels[k][j*3+2] = b
+                    pixels[k][j+0] = r
+                    pixels[k][j+1] = g
+                    pixels[k][j+2] = b
                 character_origin[0] = character_origin[0] + 1
             character_origin[0] = (id % 16) * x_off
             character_origin[1] = character_origin[1] + 1
