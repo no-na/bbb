@@ -14,7 +14,8 @@ class Visualizer:
         id = ord(char)
         if id < 128:
             character_origin = [(id % 16) * x_off, (id // 16) * y_off]
-        character_origin = [0, 0]
+        else:
+            character_origin = [0, 0]
 
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
@@ -47,7 +48,7 @@ class Visualizer:
         for c in string:
             self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
             wx = wx + x_off
-            if wx > WIDTH:
+            if wx+x_off > WIDTH:
                 wx = x
                 wy = wy + y_off
 
