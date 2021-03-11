@@ -1076,7 +1076,7 @@ async def on_message(message):
             response = response_options[split_message[0]][1](message)
             out_file = None
             if response.file is not None:
-                out_file = discord.File(filename=response.file)
+                out_file = discord.File(fp=response.file)
             await message.channel.send(response.text, file=out_file)
             if response.dms is not None:
                 for dm in response.dms:
