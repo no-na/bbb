@@ -17,6 +17,7 @@ class Visualizer:
         character_origin = [(id % 16) * x_off, (id // 16) * y_off]
         print(character_origin[0])
         print(character_origin[1])
+        print(type_case)
         print(type_case[character_origin[1]])
         print(type_case[character_origin[1]].length)
 
