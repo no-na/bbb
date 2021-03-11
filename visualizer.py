@@ -16,9 +16,9 @@ class Visualizer:
 
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
-                r = type_case[character_origin[1]][character_origin[0]*3+0]
-                g = type_case[character_origin[1]][character_origin[0]*3+1]
-                b = type_case[character_origin[1]][character_origin[0]*3+2]
+                r = type_case[character_origin[1]][character_origin[0]*4+0]
+                g = type_case[character_origin[1]][character_origin[0]*4+1]
+                b = type_case[character_origin[1]][character_origin[0]*4+2]
                 if r is not CHROMA_KEY[0] and g is not CHROMA_KEY[1] and b is not CHROMA_KEY[2]:
                     pixels[k][j*3+0] = r
                     pixels[k][j*3+1] = g
@@ -27,7 +27,7 @@ class Visualizer:
                 character_origin[1] = character_origin[1] + 1
 
     def build_text(self, pixels, font, x, y, string: str):
-        type_reader = png.Reader(filename=font).asRGB()
+        type_reader = png.Reader(filename=font).asRGBA()
         type_case = type_reader.read()
 
         rex = re.compile(r'\d+')
