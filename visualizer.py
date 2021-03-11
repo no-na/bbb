@@ -25,6 +25,7 @@ class Visualizer:
                     pixels[k][j+0] = r
                     pixels[k][j+1] = g
                     pixels[k][j+2] = b
+                    print(k)
                 character_origin[0] = character_origin[0] + 1
             character_origin[0] = (id % 16) * x_off
             character_origin[1] = character_origin[1] + 1
