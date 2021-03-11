@@ -13,8 +13,10 @@ class Visualizer:
     def build_character(self, pixels, type_case, char, x, y, x_off, y_off):
         id = ord(char)
         character_origin = [(id % 16) * x_off, (id // 16) * y_off]
+
         for k in range(y, y+y_off):
             print("START OF ROW")
+            print(character_origin)
             for j in range(x*3, (x+x_off)*3, 3):
                 print(character_origin)
                 row = list(type_case[character_origin[1]])
