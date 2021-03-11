@@ -17,6 +17,7 @@ class Visualizer:
 
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
+                print("Cursor: %2d,%2d" % (j, k))
                 row = list(type_case[character_origin[1]])
                 r = row[character_origin[0]*4+0]
                 g = row[character_origin[0]*4+1]
@@ -25,7 +26,7 @@ class Visualizer:
                     pixels[k][j+0] = r
                     pixels[k][j+1] = g
                     pixels[k][j+2] = b
-                    print(k)
+                    print("Painting at %2d,%2d" % (j, k))
                 character_origin[0] = character_origin[0] + 1
             character_origin[0] = (id % 16) * x_off
             character_origin[1] = character_origin[1] + 1
@@ -56,7 +57,6 @@ class Visualizer:
         w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH] * HEIGHT
         self.build_text(pixels, FONT_SIX, 2, 2, "a")
-        print(pixels[0])
         w.write(f, pixels)
 
         return f.name
