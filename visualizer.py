@@ -17,7 +17,7 @@ class Visualizer:
 
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
-                print("Cursor: %2d,%2d" % (j, k))
+                print("Cursor: %2d,%2d" % (j//2, k))
                 row = list(type_case[character_origin[1]])
                 r = row[character_origin[0]*4+0]
                 g = row[character_origin[0]*4+1]
@@ -26,7 +26,7 @@ class Visualizer:
                     pixels[k][j+0] = r
                     pixels[k][j+1] = g
                     pixels[k][j+2] = b
-                    print("Painting at %2d,%2d" % (j, k))
+                    print("Painting at %2d,%2d" % (j//2, k))
                 character_origin[0] = character_origin[0] + 1
             character_origin[0] = (id % 16) * x_off
             character_origin[1] = character_origin[1] + 1
