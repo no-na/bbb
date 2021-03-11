@@ -13,13 +13,11 @@ class Visualizer:
     def build_character(self, pixels, type_case, char, x, y, x_off, y_off):
         id = ord(char)
         character_origin = [(id % 16) * x_off, (id // 16) * y_off]
+        print(character_origin)
+        print(len(type_case))
 
         for k in range(y, y+y_off):
-            print("START OF ROW")
-            print(character_origin)
             for j in range(x*3, (x+x_off)*3, 3):
-                print(character_origin)
-                print(len(type_case))
                 row = list(type_case[character_origin[1]])
                 r = row[character_origin[0]*4+0]
                 g = row[character_origin[0]*4+1]
@@ -29,10 +27,8 @@ class Visualizer:
                     pixels[k][j*3+1] = g
                     pixels[k][j*3+2] = b
                 character_origin[0] = character_origin[0] + 1
-            print("END OF ROW")
             character_origin[0] = (id % 16) * x_off
             character_origin[1] = character_origin[1] + 1
-            print(character_origin)
 
     def build_text(self, pixels, font, x, y, string: str):
         type_reader = png.Reader(filename=font)
