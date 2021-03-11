@@ -56,7 +56,7 @@ class Visualizer:
         w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH] * HEIGHT
         self.build_text(pixels, FONT_SIX, 2, 2, "a")
-        print(pixels)
+        print(pixels[0])
         w.write(f, pixels)
 
         return f.name
