@@ -12,14 +12,7 @@ CHROMA_KEY = [0, 255, 255]
 class Visualizer:
     def build_character(self, pixels, type_case, char, x, y, x_off, y_off):
         id = ord(char)
-        print(char)
-        print(id)
         character_origin = [(id % 16) * x_off, (id // 16) * y_off]
-        print(character_origin[0])
-        print(character_origin[1])
-        print(type_case)
-        print(type_case[character_origin[1]])
-        print(type_case[character_origin[1]].length)
 
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
@@ -46,7 +39,7 @@ class Visualizer:
         wy = y
 
         for c in string:
-            self.build_character(pixels, type_case, c, wx, wy, x_off, y_off)
+            self.build_character(pixels, type_case[2], c, wx, wy, x_off, y_off)
             wx = wx + x_off
             if wx > WIDTH:
                 wx = x
