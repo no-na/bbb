@@ -27,8 +27,8 @@ class Visualizer:
                 character_origin[1] = character_origin[1] + 1
 
     def build_text(self, pixels, font, x, y, string: str):
-        type_reader = png.Reader(filename=font).asRGBA()
-        type_case = type_reader.read()
+        type_reader = png.Reader(filename=font)
+        type_case = type_reader.asRGBA()
 
         rex = re.compile(r'\d+')
         offsets = rex.findall(font)
