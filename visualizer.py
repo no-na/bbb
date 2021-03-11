@@ -6,20 +6,19 @@ FONT_SIX = 'images/text/6_12.png'
 FONT_EIGHT = 'images/text/8_16.png'
 HEIGHT = 400
 WIDTH = 640
-CHROMA_KEY = [0, 255, 255]
+CHROMA_KEY = [255, 0, 255]
 
 
 class Visualizer:
     def build_character(self, pixels, type_case, char, x, y, x_off, y_off):
         id = ord(char)
         character_origin = [(id % 16) * x_off, (id // 16) * y_off]
-        print(type_case[character_origin[1]])
-        print(list(type_case[character_origin[1]]))
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
-                r = type_case[character_origin[1]][character_origin[0]*4+0]
-                g = type_case[character_origin[1]][character_origin[0]*4+1]
-                b = type_case[character_origin[1]][character_origin[0]*4+2]
+                row = list(type_case[character_origin[1]])
+                r = row[character_origin[0]*4+0]
+                g = row[character_origin[0]*4+1]
+                b = row[character_origin[0]*4+2]
                 if r is not CHROMA_KEY[0] and g is not CHROMA_KEY[1] and b is not CHROMA_KEY[2]:
                     pixels[k][j*3+0] = r
                     pixels[k][j*3+1] = g
