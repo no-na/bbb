@@ -56,6 +56,6 @@ class Visualizer:
         w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=16)
         pixels = [[128, 128, 128] * WIDTH] * HEIGHT
         self.build_text(pixels, FONT_SIX, 2, 2, "Birch Countess")
-        w.write(f.name, pixels)
+        w.write(f, pixels)
 
         return f.name
