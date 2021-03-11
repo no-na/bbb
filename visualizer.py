@@ -19,6 +19,7 @@ class Visualizer:
             print(character_origin)
             for j in range(x*3, (x+x_off)*3, 3):
                 print(character_origin)
+                print(type_case.length)
                 row = list(type_case[character_origin[1]])
                 r = row[character_origin[0]*4+0]
                 g = row[character_origin[0]*4+1]
