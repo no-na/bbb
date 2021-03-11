@@ -46,6 +46,7 @@ class Visualizer:
         type_case_list = list(type_case[2])
 
         for c in string:
+            print(c)
             self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
             wx = wx + x_off
             if wx > WIDTH:
