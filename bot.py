@@ -1032,8 +1032,12 @@ def dm_test(message):
 
 
 def visualizer_test(message):
+    split_message = message.content.split()
     v = visualizer.Visualizer()
-    return Response(text="", file=v.build_test_text())
+    if len(split_message) > 1:
+        return Response(text="", file=v.build_test_text(message.content.split('', 1)))
+    else:
+        return Response(text="", file=v.build_test_text("TEST AaBbCc"))
 
 
 response_options = {
@@ -1085,7 +1089,7 @@ async def on_message(message):
         else:
             await message.channel.send("Please subscribe to bot first by typing \"!join\"")
     elif split_message[0][0] == '!':
-        await message.channel.send(command_bad(message)[0])
+        await message.channel.send(command_bad(message).text)
 
 
 @client.event
