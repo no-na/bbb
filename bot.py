@@ -1028,7 +1028,6 @@ def block_test(message):
 def dm_test(message):
     dms = []
     dms.append((message.author.id, "Hi."))
-    return ":hatched_chick:", dms
     return Response(text=":hatched_chick:", dms=dms)
 
 
