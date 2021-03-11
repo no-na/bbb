@@ -15,6 +15,7 @@ class Visualizer:
         character_origin = [(id % 16) * x_off, (id // 16) * y_off]
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
+                print(character_origin)
                 row = list(type_case[character_origin[1]])
                 r = row[character_origin[0]*4+0]
                 g = row[character_origin[0]*4+1]
@@ -24,6 +25,7 @@ class Visualizer:
                     pixels[k][j*3+1] = g
                     pixels[k][j*3+2] = b
                 character_origin[0] = character_origin[0] + 1
+            character_origin[0] = (id % 16) * x_off
             character_origin[1] = character_origin[1] + 1
 
     def build_text(self, pixels, font, x, y, string: str):
