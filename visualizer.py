@@ -46,7 +46,6 @@ class Visualizer:
         type_case_list = list(type_case[2])
 
         for c in string:
-            print(c)
             self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
             wx = wx + x_off
             if wx > WIDTH:
@@ -56,7 +55,8 @@ class Visualizer:
     def build_test_text(self):
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=8, greyscale=False)
-        pixels = [[128, 128, 128] * WIDTH] * HEIGHT
+        # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
+        pixels = [[128, 128, 128] * WIDTH for _ in range(HEIGHT)]
         self.build_text(pixels, FONT_SIX, 2, 2, "a")
         w.write(f, pixels)
 
