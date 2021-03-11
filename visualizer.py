@@ -50,12 +50,12 @@ class Visualizer:
                 wx = x
                 wy = wy + y_off
 
-    def build_test_text(self):
+    def build_test_text(self, text):
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         pixels = [[128, 128, 128] * WIDTH for _ in range(HEIGHT)]
-        self.build_text(pixels, FONT_SIX, 2, 2, "a")
+        self.build_text(pixels, FONT_SIX, 2, 2, text)
         w.write(f, pixels)
 
         return f.name
