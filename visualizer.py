@@ -27,21 +27,23 @@ class Visualizer:
                 character_origin[1] = character_origin[1] + 1
 
     def build_text(self, pixels, font, x, y, string: str):
-        type_reader = png.Reader(file=font).asRGB()
+        type_reader = png.Reader(filename=font).asRGB()
         type_case = type_reader.read()
 
         rex = re.compile(r'\d+')
         offsets = rex.findall(font)
+        x_off = int(offsets[0])
+        y_off = int(offsets[1])
 
         wx = x
         wy = y
 
         for c in string:
-            self.build_character(pixels, type_case, c, wx, wy, offsets[0], offsets[1])
-            wx = wx + offsets[0]
+            self.build_character(pixels, type_case, c, wx, wy, x_off, y_off)
+            wx = wx + x_off
             if wx > WIDTH:
                 wx = x
-                wy = wy + offsets[1]
+                wy = wy + y_off
 
     def build_test_text(self):
         f = open('images/output/test.png', 'wb')
