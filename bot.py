@@ -4,6 +4,7 @@ import mysql.connector
 import json
 import re
 from datetime import datetime, timedelta
+import visualizer
 
 intents = discord.Intents.default()
 intents.members = True
@@ -26,6 +27,17 @@ fiveEight = "\u258B"
 sixEight = "\u258A"
 sevenEight = "\u2589"
 eightEight = "\u2588"
+
+
+class Response:
+    text = None
+    dms = None
+    file = None
+
+    def __init__(self, text=None, dms = None, file = None):
+        self.text = text
+        self.dms = dms
+        self.file = file
 
 
 def connect():
@@ -173,7 +185,7 @@ def join(message):
         row = cursor.fetchone()
         personality_id = row[0]
         out_message += "{0}\n".format(get_response(cursor, "joined_true", personality_id))
-    return end_response(out_message, conn, cursor),
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def command_bad(message):
@@ -185,7 +197,7 @@ def command_bad(message):
 
     out_message += "{0}\n".format(get_response(cursor, "command_invalid", personality_id))
 
-    return end_response(out_message, conn, cursor),
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def helpp(message):
@@ -199,7 +211,7 @@ def helpp(message):
     for key in response_options:
         out_message += "{0:<20} {1}\n".format(key, response_options[key][0])
 
-    return end_response(out_message, conn, cursor),
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def personality(message):
@@ -239,7 +251,7 @@ def personality(message):
         for row in rows:
             out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[1]), row[2])
 
-    return end_response(out_message, conn, cursor),
+    Response(text=end_response(out_message, conn, cursor))
 
 
 def bounty(message):
@@ -405,7 +417,7 @@ def bounty(message):
                 row[2]
             )
 
-    return end_response(out_message, conn, cursor), dms
+    Response(text=end_response(out_message, conn, cursor), dms=dms)
 
 
 def claim(message):
@@ -457,7 +469,7 @@ def claim(message):
                             pillars.append(row_p[0])
                         else:
                             out_message += "{0}\n".format(get_response(cursor, "claim_new_invalid_pillar", personality_id))
-                            return end_response(out_message, conn, cursor), dms
+                            return Response(text=":hatched_chick:", dms=dms)
 
                 pillar_string = ""
                 for pillar in pillars:
@@ -713,7 +725,7 @@ def claim(message):
                 row_pina = cursor.fetchone()
                 out_message += "{0:<5}-{1}\n".format("", row_pina[0])
 
-    return end_response(out_message, conn, cursor), dms
+    return Response(text=end_response(out_message, conn, cursor), dms=dms)
 
 
 def pillar(message):
@@ -850,7 +862,7 @@ def pillar(message):
                 favorite_string = "(FAVORITE)"
             out_message += "{0:<20} {1}\n".format(row[2], favorite_string)
 
-    return end_response(out_message, conn, cursor),
+    Response(text=end_response(out_message, conn, cursor))
 
 
 def points(message):
@@ -909,7 +921,7 @@ def points(message):
     out_message += "\n{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
     out_message += "{0:<20}{1:<20}{2:<20}\n".format("POSITION", "NAME", "POINTS")
     out_message += points_board_message
-    return end_response(out_message, conn, cursor),
+    Response(text=end_response(out_message, conn, cursor))
 
 
 def practice(message):
@@ -937,7 +949,7 @@ def practice(message):
                     pillars.append(row_p[0])
                 else:
                     out_message += "{0}\n".format(get_response(cursor, "practice_invalid_pillar", personality_id))
-                    return end_response(out_message, conn, cursor),
+                    return Response(text=":hatched_chick:")
         for pillar in pillars:
             query = (
                 "UPDATE pillars SET pillar_points = pillar_points+%s WHERE pillar_id = %s"
@@ -955,7 +967,7 @@ def practice(message):
                                                                                      "multiple pillars. Add as many "
                                                                                      "pillars as are pertinent.")
 
-    return end_response(out_message, conn, cursor),
+    Response(text=end_response(out_message, conn, cursor))
 
 
 def timeoffset(message):
@@ -1004,19 +1016,25 @@ def timeoffset(message):
         if row is not None:
             out_message += "YOUR OFFSET: {0}\n".format(row[0])
 
-    return end_response(out_message, conn, cursor),
+    Response(text=end_response(out_message, conn, cursor))
 
 
 def block_test(message):
     out_message = ""
     out_message += "\u2800\n\u2800\n⠀　⠀⠀⠀　:hatched_chick:\n⠀　⠀⠀ʙɪɢ cʜɪcκ ɪs\n⠀　𝗪𝗔𝗧𝗖𝗛𝗜𝗡𝗚 𝗬𝗢𝗨\n\u2800"
-    return out_message,
+    Response(text=out_message)
 
 
 def dm_test(message):
     dms = []
     dms.append((message.author.id, "Hi."))
     return ":hatched_chick:", dms
+    return Response(text=":hatched_chick:", dms=dms)
+
+
+def visualizer_test(message):
+    v = visualizer.Visualizer()
+    return Response(text="", file = v.build_test_text())
 
 
 response_options = {
@@ -1029,7 +1047,8 @@ response_options = {
     "!personality": ("Change bot personality.", personality),
     "!timezone": ("Change displayed timezone.", timeoffset),
     "!big": ("BIG CHICK", block_test),
-    "!dm_test": ("Bot will say 'hi' to you in a DM.", dm_test)
+    "!dm_test": ("Bot will say 'hi' to you in a DM.", dm_test),
+    "!visualizer_test": ("jajaja", visualizer_test)
 }
 
 
@@ -1056,9 +1075,12 @@ async def on_message(message):
     elif split_message[0] in response_options:
         if check_join(message.author) is True:
             response = response_options[split_message[0]][1](message)
-            await message.channel.send(response[0])
-            if len(response) >= 2:
-                for dm in response[1]:
+            out_file = None
+            if response.file is not None:
+                out_file = discord.File(filename=response.file)
+            await message.channel.send(response.text, file=out_file)
+            if response.dms is not None:
+                for dm in response.dms:
                     user = client.get_user(dm[0])
                     await user.send(dm[1])
         else:
