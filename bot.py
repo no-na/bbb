@@ -251,7 +251,7 @@ def personality(message):
         for row in rows:
             out_message += "{0:<20} {1}\n".format("{0} {1}".format(row[0], row[1]), row[2])
 
-    Response(text=end_response(out_message, conn, cursor))
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def bounty(message):
@@ -417,7 +417,7 @@ def bounty(message):
                 row[2]
             )
 
-    Response(text=end_response(out_message, conn, cursor), dms=dms)
+    return Response(text=end_response(out_message, conn, cursor), dms=dms)
 
 
 def claim(message):
@@ -862,7 +862,7 @@ def pillar(message):
                 favorite_string = "(FAVORITE)"
             out_message += "{0:<20} {1}\n".format(row[2], favorite_string)
 
-    Response(text=end_response(out_message, conn, cursor))
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def points(message):
@@ -921,7 +921,7 @@ def points(message):
     out_message += "\n{0}\n".format(get_response(cursor, "points_leaderboard", personality_id))
     out_message += "{0:<20}{1:<20}{2:<20}\n".format("POSITION", "NAME", "POINTS")
     out_message += points_board_message
-    Response(text=end_response(out_message, conn, cursor))
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def practice(message):
@@ -967,7 +967,7 @@ def practice(message):
                                                                                      "multiple pillars. Add as many "
                                                                                      "pillars as are pertinent.")
 
-    Response(text=end_response(out_message, conn, cursor))
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def timeoffset(message):
@@ -1016,13 +1016,13 @@ def timeoffset(message):
         if row is not None:
             out_message += "YOUR OFFSET: {0}\n".format(row[0])
 
-    Response(text=end_response(out_message, conn, cursor))
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def block_test(message):
     out_message = ""
     out_message += "\u2800\n\u2800\n⠀　⠀⠀⠀　:hatched_chick:\n⠀　⠀⠀ʙɪɢ cʜɪcκ ɪs\n⠀　𝗪𝗔𝗧𝗖𝗛𝗜𝗡𝗚 𝗬𝗢𝗨\n\u2800"
-    Response(text=out_message)
+    return Response(text=out_message)
 
 
 def dm_test(message):
@@ -1034,7 +1034,7 @@ def dm_test(message):
 
 def visualizer_test(message):
     v = visualizer.Visualizer()
-    return Response(text="", file = v.build_test_text())
+    return Response(text="", file=v.build_test_text())
 
 
 response_options = {
