@@ -14,7 +14,6 @@ class Visualizer:
         id = ord(char)
         character_origin = [(id % 16) * x_off, (id // 16) * y_off]
         print(character_origin)
-        print(len(type_case))
 
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
@@ -53,7 +52,7 @@ class Visualizer:
 
     def build_test_text(self):
         f = open('images/output/test.png', 'wb')
-        w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=32, greyscale=False)
+        w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH] * HEIGHT
         self.build_text(pixels, FONT_SIX, 2, 2, "Birch Countess")
         w.write(f, pixels)
