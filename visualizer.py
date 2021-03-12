@@ -74,21 +74,28 @@ class Visualizer:
         back_gen = back_reader.asRGBA()[2]
         t3 = time.process_time() - t2
 
-        ref_pos_x = 0
-        for row in back_gen:
-            for y in range(0, HEIGHT * SCALE):
-                for scale_y in range(0, SCALE):
-                    for x in range(0, WIDTH * SCALE * 3, 3):
-                        for scale_x in range(0, SCALE):
-                            r = row[ref_pos_x * 4 + 0]
-                            g = row[ref_pos_x * 4 + 1]
-                            b = row[ref_pos_x * 4 + 2]
-                            if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                                pixels[y + scale_y][x + scale_x + 0] = r
-                                pixels[y + scale_y][x + scale_x + 1] = g
-                                pixels[y + scale_y][x + scale_x + 2] = b
-                    ref_pos_x = ref_pos_x + 1
-            ref_pos_x = 0
+        scale_x = 0
+        scale_y = 0
+        ref_pos = [0, 0]
+
+        for k in range(0, HEIGHT * SCALE):
+            row = next(back_gen)
+            for j in range(0, (WIDTH * SCALE) * 3, 3):
+                r = row[ref_pos[0] * 4 + 0]
+                g = row[ref_pos[0] * 4 + 1]
+                b = row[ref_pos[0] * 4 + 2]
+                if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
+                    pixels[k][j + 0] = r
+                    pixels[k][j + 1] = g
+                    pixels[k][j + 2] = b
+                scale_x = scale_x + 1
+                if scale_x >= SCALE:
+                    scale_x = 0
+                    ref_pos[0] = ref_pos[0] + 1
+            ref_pos[0] = 0
+            scale_y = scale_y + 1
+            if scale_y >= SCALE:
+                scale_y = 0
 
         t4 = time.process_time() - t3
 
