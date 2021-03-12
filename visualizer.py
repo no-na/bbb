@@ -77,6 +77,7 @@ class Visualizer:
         scale_x = 0
         scale_y = 0
         ref_pos = [0, 0]
+        DEBUG_CURRENT_ROW = 0;
         row = next(back_gen)
         for k in range(0, HEIGHT * SCALE):
             for j in range(0, (WIDTH * SCALE) * 3, 3):
@@ -95,6 +96,8 @@ class Visualizer:
             scale_y = scale_y + 1
             if scale_y >= SCALE:
                 scale_y = 0
+                DEBUG_CURRENT_ROW = DEBUG_CURRENT_ROW + 1
+                print(DEBUG_CURRENT_ROW)
                 row = next(back_gen)
 
         t4 = time.process_time() - t3
