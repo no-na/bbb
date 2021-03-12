@@ -112,7 +112,7 @@ class Visualizer:
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
         t0 = time.process_time()
-        if background is True:
+        if bool(background) is True:
             self.build_background(pixels)
         t1 = time.process_time() - t0
         self.build_text(pixels, FONT_EIGHT, x*SCALE, y*SCALE, text)
