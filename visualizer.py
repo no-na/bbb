@@ -97,7 +97,7 @@ class Visualizer:
             if scale_y >= SCALE:
                 scale_y = 0
                 DEBUG_CURRENT_ROW = DEBUG_CURRENT_ROW + 1
-                print(DEBUG_CURRENT_ROW)
+                print(DEBUG_CURRENT_ROW, k, sep=',')
                 row = next(back_gen)
 
         t4 = time.process_time() - t3
