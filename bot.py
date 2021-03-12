@@ -1040,6 +1040,12 @@ def visualizer_test(message):
         return Response(text="", file=v.build_test_text("TEST AaBbCc"))
 
 
+def visualizer_birch(message):
+    split_message = message.content.split()
+    v = visualizer.Visualizer()
+    return Response(text="", file=v.build_text("Birch Duchess", 40, 40))
+
+
 response_options = {
     "!help": ("List commands.", helpp),
     "!bounty": ("Create and view bounties.", bounty),
@@ -1051,7 +1057,8 @@ response_options = {
     "!timezone": ("Change displayed timezone.", timeoffset),
     "!big": ("BIG CHICK", block_test),
     "!dm_test": ("Bot will say 'hi' to you in a DM.", dm_test),
-    "!visualizer_test": ("jajaja", visualizer_test)
+    "!visualizer_test": ("jajaja", visualizer_test),
+    "!visualizer_birch": ("jajaja", visualizer_birch)
 }
 
 

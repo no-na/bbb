@@ -70,3 +70,12 @@ class Visualizer:
         w.write(f, pixels)
 
         return f.name
+
+    def build_text(self, text, x, y):
+        f = open('images/output/test.png', 'wb')
+        w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
+        pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
+        self.build_text(pixels, FONT_EIGHT, x*SCALE, y*SCALE, text)
+        w.write(f, pixels)
+
+        return f.name
