@@ -57,7 +57,7 @@ class Visualizer:
 
         type_case_list = list(type_case[2])  # We don't keep this as a generator because we aren't iterating.
 
-        split_string = string.split()
+        split_string = re.split(r'\s', string)
         for s in split_string:
             if wx + x_off * len(s) >= WIDTH * SCALE:
                 wx = x
