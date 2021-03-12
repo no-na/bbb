@@ -99,10 +99,18 @@ class Visualizer:
 
         t4 = time.process_time() - t3
 
+        aa = [0] * 256000
+        t5 = time.process_time()
+        for k in range(0, len(aa)):
+            aa[k] = 256
+        t6 = time.process_time() - t5
+        print(t1)
+
         print('Build Background Pick File: ', t1)
         print('Build Background Make Reader: ', t2)
         print('Build Background Make List: ', t3)
         print('Build Background Paint Pixels: ', t4)
+        print('List Work Example: ', t6)
 
 
 
