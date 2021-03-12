@@ -6,6 +6,7 @@ FONT_SIX = 'images/text/6_12.png'
 FONT_EIGHT = 'images/text/8_16.png'
 HEIGHT = 400
 WIDTH = 640
+SCALE = 2
 CHROMA_KEY = [255, 0, 255]
 
 
@@ -17,6 +18,8 @@ class Visualizer:
         else:
             character_origin = [0, 0]
 
+        scale_x = 0
+        scale_y = 0
         for k in range(y, y+y_off):
             for j in range(x*3, (x+x_off)*3, 3):
                 row = list(type_case[character_origin[1]])
@@ -27,9 +30,15 @@ class Visualizer:
                     pixels[k][j+0] = r
                     pixels[k][j+1] = g
                     pixels[k][j+2] = b
-                character_origin[0] = character_origin[0] + 1
+                scale_x = scale_x + 1
+                if scale_x >= SCALE:
+                    scale_x = 0
+                    character_origin[0] = character_origin[0] + 1
             character_origin[0] = (id % 16) * x_off
-            character_origin[1] = character_origin[1] + 1
+            scale_y = scale_y + 1
+            if scale_y >= SCALE:
+                scale_x = 0
+                character_origin[1] = character_origin[1] + 1
 
     def build_text(self, pixels, font, x, y, string: str):
         type_reader = png.Reader(filename=font)
@@ -56,7 +65,7 @@ class Visualizer:
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
-        pixels = [[128, 128, 128] * WIDTH for _ in range(HEIGHT)]
+        pixels = [[128, 128, 128] * WIDTH*SCALE for _ in range(HEIGHT*SCALE)]
         self.build_text(pixels, FONT_SIX, 2, 2, text)
         w.write(f, pixels)
 
