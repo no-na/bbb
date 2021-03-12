@@ -94,7 +94,7 @@ class Visualizer:
                     ref_pos[0] = ref_pos[0] + 1
             ref_pos[0] = 0
             scale_y = scale_y + 1
-            if scale_y >= SCALE and k is not HEIGHT*SCALE:
+            if scale_y >= SCALE and k is not HEIGHT*SCALE-1:
                 scale_y = 0
                 DEBUG_CURRENT_ROW = DEBUG_CURRENT_ROW + 1
                 print(DEBUG_CURRENT_ROW, k, sep=',')
