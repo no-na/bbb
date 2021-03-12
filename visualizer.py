@@ -111,13 +111,13 @@ class Visualizer:
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
-        t0 = time.clock()
+        t0 = time.process_time()
         self.build_background(pixels)
-        t1 = time.clock() - t0
+        t1 = time.process_time() - t0
         self.build_text(pixels, FONT_EIGHT, x*SCALE, y*SCALE, text)
-        t2 = time.clock() - t1
+        t2 = time.process_time() - t1
         w.write(f, pixels)
-        t3 = time.clock() - t2
+        t3 = time.process_time() - t2
 
         print('Build Background: ', t1)
         print('Build Text: ', t2)
