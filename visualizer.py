@@ -99,7 +99,7 @@ class Visualizer:
 
         t4 = time.process_time() - t3
 
-        aa = [0] * 256000
+        aa = [0] * WIDTH * SCALE * HEIGHT * 3
         t5 = time.process_time()
         for k in range(0, len(aa)):
             aa[k] = 256
