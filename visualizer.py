@@ -57,13 +57,13 @@ class Visualizer:
         for c in string:
             self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
             wx = wx + x_off
-            if wx+x_off > WIDTH:
+            if wx+x_off > WIDTH*SCALE:
                 wx = x
                 wy = wy + y_off
 
     def build_test_text(self, text):
         f = open('images/output/test.png', 'wb')
-        w = png.Writer(width=WIDTH, height=HEIGHT, bitdepth=8, greyscale=False)
+        w = png.Writer(width=WIDTH*SCALE, height=HEIGHT*SCALE, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         pixels = [[128, 128, 128] * WIDTH*SCALE for _ in range(HEIGHT*SCALE)]
         self.build_text(pixels, FONT_SIX, 2, 2, text)
