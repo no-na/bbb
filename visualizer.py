@@ -9,7 +9,7 @@ FONT_SIX = 'images/text/6_12.png'
 FONT_EIGHT = 'images/text/8_16.png'
 HEIGHT = 400
 WIDTH = 640
-SCALE = 1
+SCALE = 2
 CHROMA_KEY = [255, 0, 255]
 
 
@@ -24,8 +24,8 @@ class Visualizer:
         scale_x = 0
         scale_y = 0
         for k in range(y, y+y_off*SCALE):
+            row = list(type_case[ref_pos[1]])
             for j in range(x*3, (x+x_off*SCALE)*3, 3):
-                row = list(type_case[ref_pos[1]])
                 r = row[ref_pos[0]*4+0]
                 g = row[ref_pos[0]*4+1]
                 b = row[ref_pos[0]*4+2]
@@ -71,14 +71,14 @@ class Visualizer:
         t1 = time.process_time() - t0
         back_reader = png.Reader(filename='images/background/'+backgrounds[number])
         t2 = time.process_time() - t1
-        back_case = list(back_reader.asRGBA()[2])
+        back_gen = back_reader.asRGBA()[2]
         t3 = time.process_time() - t2
 
         scale_x = 0
         scale_y = 0
         ref_pos = [0, 0]
+        row = back_gen.__next__()
         for k in range(0, HEIGHT * SCALE):
-            row = list(back_case[ref_pos[1]])
             for j in range(0, (WIDTH * SCALE) * 3, 3):
                 r = row[ref_pos[0] * 4 + 0]
                 g = row[ref_pos[0] * 4 + 1]
@@ -95,7 +95,7 @@ class Visualizer:
             scale_y = scale_y + 1
             if scale_y >= SCALE:
                 scale_y = 0
-                ref_pos[1] = ref_pos[1] + 1
+                row = back_gen.__next__()
 
         t4 = time.process_time() - t3
 
