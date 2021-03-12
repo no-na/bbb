@@ -79,6 +79,8 @@ class Visualizer:
         ref_pos = [0, 0]
         row = back_gen.__next__()
         for k in range(0, HEIGHT * SCALE):
+            if scale_y is 0:
+                row = back_gen.__next__()
             for j in range(0, (WIDTH * SCALE) * 3, 3):
                 r = row[ref_pos[0] * 4 + 0]
                 g = row[ref_pos[0] * 4 + 1]
@@ -95,7 +97,6 @@ class Visualizer:
             scale_y = scale_y + 1
             if scale_y >= SCALE:
                 scale_y = 0
-                row = back_gen.__next__()
 
         t4 = time.process_time() - t3
 
