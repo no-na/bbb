@@ -2,6 +2,7 @@ import png
 import re
 import random
 import os
+import time
 import mysql.connector
 
 FONT_SIX = 'images/text/6_12.png'
@@ -101,7 +102,7 @@ class Visualizer:
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         pixels = [[128, 128, 128] * WIDTH*SCALE for _ in range(HEIGHT*SCALE)]
         self.build_background(pixels)
-        self.build_text(pixels, FONT_SIX, 2, 2, text)
+        self.build_text(pixels, FONT_SIX, 2*SCALE, 2*SCALE, text)
         w.write(f, pixels)
 
         return f.name
@@ -110,8 +111,16 @@ class Visualizer:
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
+        t0 = time.clock()
         self.build_background(pixels)
+        t1 = time.clock() - t0
         self.build_text(pixels, FONT_EIGHT, x*SCALE, y*SCALE, text)
+        t2 = time.clock() - t1
         w.write(f, pixels)
+        t3 = time.clock() - t2
+
+        print('Build Background: ', t1)
+        print('Build Text: ', t2)
+        print('Write: ', t3)
 
         return f.name
