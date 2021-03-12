@@ -65,10 +65,14 @@ class Visualizer:
                 wy = wy + y_off*SCALE
 
     def build_background(self, pixels):
+        t0 = time.process_time()
         backgrounds = os.listdir('images/background/')
         number = random.randint(0, len(backgrounds) - 1)
+        t1 = time.process_time() - t0
         back_reader = png.Reader(filename='images/background/'+backgrounds[number])
+        t2 = time.process_time() - t1
         back_case = list(back_reader.asRGBA()[2])
+        t3 = time.process_time() - t2
 
         scale_x = 0
         scale_y = 0
@@ -92,6 +96,13 @@ class Visualizer:
             if scale_y >= SCALE:
                 scale_y = 0
                 ref_pos[1] = ref_pos[1] + 1
+
+        t4 = time.process_time() - t3
+
+        print('Build Background Pick File: ', t1)
+        print('Build Background Make Reader: ', t2)
+        print('Build Background Make List: ', t3)
+        print('Build Background Paint Pixels: ', t4)
 
 
 
@@ -120,7 +131,7 @@ class Visualizer:
         w.write(f, pixels)
         t3 = time.process_time() - t2
 
-        print('Build Background: ', t1)
+        print('Build Background Total: ', t1)
         print('Build Text: ', t2)
         print('Write: ', t3)
 
