@@ -20,8 +20,8 @@ class Visualizer:
 
         scale_x = 0
         scale_y = 0
-        for k in range(y, y+y_off):
-            for j in range(x*3, (x+x_off)*3, 3):
+        for k in range(y, y+y_off*SCALE):
+            for j in range(x*3, (x+x_off*SCALE)*3, 3):
                 row = list(type_case[character_origin[1]])
                 r = row[character_origin[0]*4+0]
                 g = row[character_origin[0]*4+1]
@@ -55,7 +55,7 @@ class Visualizer:
         type_case_list = list(type_case[2])
 
         for c in string:
-            self.build_character(pixels, type_case_list, c, wx, wy, x_off*SCALE, y_off*SCALE)
+            self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
             wx = wx + x_off*SCALE
             if wx+x_off > WIDTH*SCALE:
                 wx = x
