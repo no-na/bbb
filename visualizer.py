@@ -59,7 +59,7 @@ class Visualizer:
 
         split_string = re.split(r'(\s)', string)
         for s in split_string:
-            print(wx + x_off * len(s))
+            print(wx, wx + x_off * len(s), sep=' ')
             if wx + x_off * len(s) >= WIDTH * SCALE:
                 wx = x
                 wy = wy + y_off * SCALE
