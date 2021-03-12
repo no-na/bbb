@@ -61,6 +61,7 @@ class Visualizer:
         for s in split_string:
             print(wx, wx + x_off * len(s), sep=' ')
             if wx + x_off * len(s) >= WIDTH * SCALE:
+                print("NEWLINE")
                 wx = x
                 wy = wy + y_off * SCALE
             for c in s:
