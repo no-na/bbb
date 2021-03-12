@@ -1,5 +1,7 @@
 import png
 import re
+import random
+import os
 import mysql.connector
 
 FONT_SIX = 'images/text/6_12.png'
@@ -14,18 +16,18 @@ class Visualizer:
     def build_character(self, pixels, type_case, char, x, y, x_off, y_off):
         id = ord(char)
         if id < 128:
-            character_origin = [(id % 16) * x_off, (id // 16) * y_off]
+            ref_pos = [(id % 16) * x_off, (id // 16) * y_off]
         else:
-            character_origin = [0, 0]
+            ref_pos = [0, 0]
 
         scale_x = 0
         scale_y = 0
         for k in range(y, y+y_off*SCALE):
             for j in range(x*3, (x+x_off*SCALE)*3, 3):
-                row = list(type_case[character_origin[1]])
-                r = row[character_origin[0]*4+0]
-                g = row[character_origin[0]*4+1]
-                b = row[character_origin[0]*4+2]
+                row = list(type_case[ref_pos[1]])
+                r = row[ref_pos[0]*4+0]
+                g = row[ref_pos[0]*4+1]
+                b = row[ref_pos[0]*4+2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
                     pixels[k][j+0] = r
                     pixels[k][j+1] = g
@@ -33,12 +35,12 @@ class Visualizer:
                 scale_x = scale_x + 1
                 if scale_x >= SCALE:
                     scale_x = 0
-                    character_origin[0] = character_origin[0] + 1
-            character_origin[0] = (id % 16) * x_off
+                    ref_pos[0] = ref_pos[0] + 1
+            ref_pos[0] = (id % 16) * x_off
             scale_y = scale_y + 1
             if scale_y >= SCALE:
                 scale_y = 0
-                character_origin[1] = character_origin[1] + 1
+                ref_pos[1] = ref_pos[1] + 1
 
     def build_text(self, pixels, font, x, y, string: str):
         type_reader = png.Reader(filename=font)
@@ -61,11 +63,44 @@ class Visualizer:
                 wx = x
                 wy = wy + y_off*SCALE
 
+    def build_background(self, pixels):
+        backgrounds = os.listdir('images/background')
+        number = random.randint(0, len(backgrounds) - 1)
+        back_reader = png.Reader(filename=backgrounds[number])
+        back_case = list(back_reader.asRGBA()[2])
+
+        scale_x = 0
+        scale_y = 0
+        ref_pos = [0, 0]
+        for k in range(0, HEIGHT * SCALE):
+            for j in range(0, (WIDTH * SCALE) * 3, 3):
+                row = list(back_case[ref_pos[1]])
+                r = row[ref_pos[0] * 4 + 0]
+                g = row[ref_pos[0] * 4 + 1]
+                b = row[ref_pos[0] * 4 + 2]
+                if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
+                    pixels[k][j + 0] = r
+                    pixels[k][j + 1] = g
+                    pixels[k][j + 2] = b
+                scale_x = scale_x + 1
+                if scale_x >= SCALE:
+                    scale_x = 0
+                    ref_pos[0] = ref_pos[0] + 1
+            ref_pos[0] = 0
+            scale_y = scale_y + 1
+            if scale_y >= SCALE:
+                scale_y = 0
+                ref_pos[1] = ref_pos[1] + 1
+
+
+
+
     def build_test_text(self, text):
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH*SCALE, height=HEIGHT*SCALE, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         pixels = [[128, 128, 128] * WIDTH*SCALE for _ in range(HEIGHT*SCALE)]
+        self.build_background(pixels)
         self.build_text(pixels, FONT_SIX, 2, 2, text)
         w.write(f, pixels)
 
@@ -75,6 +110,7 @@ class Visualizer:
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
+        self.build_background(pixels)
         self.build_text(pixels, FONT_EIGHT, x*SCALE, y*SCALE, text)
         w.write(f, pixels)
 

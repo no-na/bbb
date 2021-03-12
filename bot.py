@@ -469,7 +469,7 @@ def claim(message):
                             pillars.append(row_p[0])
                         else:
                             out_message += "{0}\n".format(get_response(cursor, "claim_new_invalid_pillar", personality_id))
-                            return Response(text=":hatched_chick:", dms=dms)
+                            return Response(text=end_response(out_message, conn, cursor), dms=dms)
 
                 pillar_string = ""
                 for pillar in pillars:
@@ -949,7 +949,7 @@ def practice(message):
                     pillars.append(row_p[0])
                 else:
                     out_message += "{0}\n".format(get_response(cursor, "practice_invalid_pillar", personality_id))
-                    return Response(text=":hatched_chick:")
+                    return Response(text=end_response(out_message, conn, cursor))
         for pillar in pillars:
             query = (
                 "UPDATE pillars SET pillar_points = pillar_points+%s WHERE pillar_id = %s"
