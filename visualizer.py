@@ -59,17 +59,12 @@ class Visualizer:
 
         split_string = re.split(r'(\s)', string)
         for s in split_string:
-            print(wx, wx + x_off * len(s), sep=' ')
-            if wx + x_off * len(s) >= WIDTH * SCALE:
-                print("NEWLINE")
+            if wx + x_off * len(s) * SCALE >= WIDTH * SCALE:
                 wx = x
                 wy = wy + y_off * SCALE
             for c in s:
                 self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
                 wx = wx + x_off * SCALE
-                #if wx + x_off >= WIDTH * SCALE:
-                #    wx = x
-                #    wy = wy + y_off * SCALE
 
     def build_background(self, pixels):
         backgrounds = os.listdir('images/background/')
