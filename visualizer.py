@@ -71,7 +71,7 @@ class Visualizer:
 
         return f.name
 
-    def build_text(self, text, x, y):
+    def build_text_birch(self, text, x, y):
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]

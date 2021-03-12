@@ -1043,7 +1043,7 @@ def visualizer_test(message):
 def visualizer_birch(message):
     split_message = message.content.split()
     v = visualizer.Visualizer()
-    return Response(text="", file=v.build_text("Birch Duchess", 40, 40))
+    return Response(text="", file=v.build_text_birch("Birch Duchess", 40, 40))
 
 
 response_options = {
