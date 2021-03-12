@@ -9,7 +9,7 @@ FONT_SIX = 'images/text/6_12.png'
 FONT_EIGHT = 'images/text/8_16.png'
 HEIGHT = 400
 WIDTH = 640
-SCALE = 2
+SCALE = 1
 CHROMA_KEY = [255, 0, 255]
 
 
@@ -109,7 +109,7 @@ class Visualizer:
 
     def build_text_birch(self, text, x, y, background):
         f = open('images/output/test.png', 'wb')
-        w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False, compression=0)
+        w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
         t0 = time.process_time()
         if background == 'True':
