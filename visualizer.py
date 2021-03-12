@@ -79,9 +79,11 @@ class Visualizer:
         ref_pos = [0, 0]
 
         ROW_NUM = -1
+        row = None
         for k in range(0, HEIGHT * SCALE):
-            row = next(back_gen)
-            ROW_NUM = ROW_NUM + 1
+            if scale_y is 0:
+                row = next(back_gen)
+                ROW_NUM = ROW_NUM + 1
             print(ROW_NUM)
             for j in range(0, (WIDTH * SCALE) * 3, 3):
                 r = row[ref_pos[0] * 4 + 0]
