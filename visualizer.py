@@ -37,7 +37,7 @@ class Visualizer:
             character_origin[0] = (id % 16) * x_off
             scale_y = scale_y + 1
             if scale_y >= SCALE:
-                scale_x = 0
+                scale_y = 0
                 character_origin[1] = character_origin[1] + 1
 
     def build_text(self, pixels, font, x, y, string: str):
