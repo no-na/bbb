@@ -1035,9 +1035,9 @@ def visualizer_test(message):
     split_message = message.content.split()
     v = visualizer.Visualizer()
     if len(split_message) > 1:
-        return Response(text="", file=v.build_test_text(message.content.split(' ', 1)[1]))
+        return Response(text="", file=v.build_test_text(message.content.split(' ', 1)[1], 2, 2))
     else:
-        return Response(text="", file=v.build_test_text("TEST AaBbCc"))
+        return Response(text="", file=v.build_test_text("TEST AaBbCc", 2, 2))
 
 
 def visualizer_birch(message):

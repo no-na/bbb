@@ -78,7 +78,7 @@ class Visualizer:
 
         row = None
         for k in range(0, HEIGHT * SCALE):
-            if scale_y is 0:
+            if scale_y == 0:
                 row = next(back_gen)
             for j in range(0, (WIDTH * SCALE) * 3, 3):
                 r = row[ref_pos * 4 + 0]
@@ -101,13 +101,13 @@ class Visualizer:
         # for k in range(0, len(aa)):
         #     aa[k] = 256
 
-    def build_test_text(self, text):
+    def build_test_text(self, text, x, y):
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
         self.build_background(pixels)
-        self.build_text(pixels, FONT_SIX, 2 * SCALE, 2 * SCALE, text)
+        self.build_text(pixels, FONT_SIX, x * SCALE, y * SCALE, text)
         w.write(f, pixels)
 
         return f.name
@@ -116,17 +116,8 @@ class Visualizer:
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
-        t0 = time.process_time()
-        if background == 'True':
-            self.build_background(pixels)
-        t1 = time.process_time() - t0
+        self.build_background(pixels)
         self.build_text(pixels, FONT_EIGHT, x * SCALE, y * SCALE, text)
-        t2 = time.process_time() - t1
         w.write(f, pixels)
-        t3 = time.process_time() - t2
-
-        print('Build Background Total: ', t1)
-        print('Build Text: ', t2)
-        print('Write: ', t3)
 
         return f.name
