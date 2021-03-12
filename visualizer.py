@@ -64,9 +64,9 @@ class Visualizer:
                 wy = wy + y_off*SCALE
 
     def build_background(self, pixels):
-        backgrounds = os.listdir('images/background')
+        backgrounds = os.listdir('images/background/')
         number = random.randint(0, len(backgrounds) - 1)
-        back_reader = png.Reader(filename=backgrounds[number])
+        back_reader = png.Reader(filename='images/background/'+backgrounds[number])
         back_case = list(back_reader.asRGBA()[2])
 
         scale_x = 0
