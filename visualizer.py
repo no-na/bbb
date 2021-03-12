@@ -15,16 +15,16 @@ CHROMA_KEY = [255, 0, 255]
 
 class Visualizer:
     def build_character(self, pixels, type_case, char, x, y, x_off, y_off):
-        id = ord(char)
-        if id < 128:
-            ref_pos = [(id % 16) * x_off, (id // 16) * y_off]
+        asc = ord(char)
+        if asc < 128:
+            ref_pos = [(asc % 16) * x_off, (asc // 16) * y_off]
         else:
             ref_pos = [0, 0]
 
         scale_x = 0
         scale_y = 0
         for k in range(y, y + y_off * SCALE):
-            row = list(type_case[ref_pos[1]])
+            row = type_case[ref_pos[1]]
             for j in range(x * 3, (x + x_off * SCALE) * 3, 3):
                 r = row[ref_pos[0] * 4 + 0]
                 g = row[ref_pos[0] * 4 + 1]
@@ -37,7 +37,7 @@ class Visualizer:
                 if scale_x >= SCALE:
                     scale_x = 0
                     ref_pos[0] = ref_pos[0] + 1
-            ref_pos[0] = (id % 16) * x_off
+            ref_pos[0] = (asc % 16) * x_off
             scale_y = scale_y + 1
             if scale_y >= SCALE:
                 scale_y = 0
@@ -55,40 +55,35 @@ class Visualizer:
         wx = x
         wy = y
 
-        type_case_list = list(type_case[2])
+        type_case_list = list(type_case[2])  # We don't keep this as a generator because we aren't iterating.
 
-        for c in string:
-            self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
-            wx = wx + x_off * SCALE
-            if wx + x_off >= WIDTH * SCALE:
+        split_string = string.split()
+        for s in split_string:
+            if wx + x_off * len(s) >= WIDTH * SCALE:
                 wx = x
                 wy = wy + y_off * SCALE
+            for c in s:
+                self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
+                wx = wx + x_off * SCALE
 
     def build_background(self, pixels):
-        t0 = time.process_time()
         backgrounds = os.listdir('images/background/')
         _ = random.randint(0, len(backgrounds) - 1)
-        t1 = time.process_time() - t0
-        back_reader = png.Reader(filename='images/background/' + backgrounds[_])
-        t2 = time.process_time() - t1
-        back_gen = back_reader.asRGBA()[2]
-        t3 = time.process_time() - t2
+        _ = png.Reader(filename='images/background/' + backgrounds[_])
+        back_gen = _.asRGBA()[2]
 
         scale_x = 0
         scale_y = 0
-        ref_pos = [0, 0]
+        ref_pos = 0
 
-        ROW_NUM = -1
         row = None
         for k in range(0, HEIGHT * SCALE):
             if scale_y is 0:
                 row = next(back_gen)
-                ROW_NUM = ROW_NUM + 1
-            print(ROW_NUM)
             for j in range(0, (WIDTH * SCALE) * 3, 3):
-                r = row[ref_pos[0] * 4 + 0]
-                g = row[ref_pos[0] * 4 + 1]
-                b = row[ref_pos[0] * 4 + 2]
+                r = row[ref_pos * 4 + 0]
+                g = row[ref_pos * 4 + 1]
+                b = row[ref_pos * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
                     pixels[k][j + 0] = r
                     pixels[k][j + 1] = g
@@ -96,26 +91,15 @@ class Visualizer:
                 scale_x = scale_x + 1
                 if scale_x >= SCALE:
                     scale_x = 0
-                    ref_pos[0] = ref_pos[0] + 1
-            ref_pos[0] = 0
+                    ref_pos = ref_pos + 1
+            ref_pos = 0
             scale_y = scale_y + 1
             if scale_y >= SCALE:
                 scale_y = 0
 
-        t4 = time.process_time() - t3
-
-        aa = [0] * WIDTH * SCALE * HEIGHT * 3
-        t5 = time.process_time()
-        for k in range(0, len(aa)):
-            aa[k] = 256
-        t6 = time.process_time() - t5
-        print(t1)
-
-        print('Build Background Pick File: ', t1)
-        print('Build Background Make Reader: ', t2)
-        print('Build Background Make List: ', t3)
-        print('Build Background Paint Pixels: ', t4)
-        print('List Work Example: ', t6)
+        # aa = [0] * WIDTH * SCALE * HEIGHT * 3
+        # for k in range(0, len(aa)):
+        #     aa[k] = 256
 
     def build_test_text(self, text):
         f = open('images/output/test.png', 'wb')
