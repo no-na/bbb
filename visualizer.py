@@ -67,9 +67,9 @@ class Visualizer:
     def build_background(self, pixels):
         t0 = time.process_time()
         backgrounds = os.listdir('images/background/')
-        number = random.randint(0, len(backgrounds) - 1)
+        _ = random.randint(0, len(backgrounds) - 1)
         t1 = time.process_time() - t0
-        back_reader = png.Reader(filename='images/background/'+backgrounds[number])
+        back_reader = png.Reader(filename='images/background/'+backgrounds[_])
         t2 = time.process_time() - t1
         back_gen = back_reader.asRGBA()[2]
         t3 = time.process_time() - t2
@@ -77,10 +77,8 @@ class Visualizer:
         scale_x = 0
         scale_y = 0
         ref_pos = [0, 0]
-        row = back_gen.__next__()
+        row = next(back_gen)
         for k in range(0, HEIGHT * SCALE):
-            if scale_y is 0:
-                row = back_gen.__next__()
             for j in range(0, (WIDTH * SCALE) * 3, 3):
                 r = row[ref_pos[0] * 4 + 0]
                 g = row[ref_pos[0] * 4 + 1]
@@ -97,6 +95,7 @@ class Visualizer:
             scale_y = scale_y + 1
             if scale_y >= SCALE:
                 scale_y = 0
+                row = next(back_gen)
 
         t4 = time.process_time() - t3
 
