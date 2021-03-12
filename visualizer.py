@@ -23,16 +23,16 @@ class Visualizer:
 
         scale_x = 0
         scale_y = 0
-        for k in range(y, y+y_off*SCALE):
+        for k in range(y, y + y_off * SCALE):
             row = list(type_case[ref_pos[1]])
-            for j in range(x*3, (x+x_off*SCALE)*3, 3):
-                r = row[ref_pos[0]*4+0]
-                g = row[ref_pos[0]*4+1]
-                b = row[ref_pos[0]*4+2]
+            for j in range(x * 3, (x + x_off * SCALE) * 3, 3):
+                r = row[ref_pos[0] * 4 + 0]
+                g = row[ref_pos[0] * 4 + 1]
+                b = row[ref_pos[0] * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    pixels[k][j+0] = r
-                    pixels[k][j+1] = g
-                    pixels[k][j+2] = b
+                    pixels[k][j + 0] = r
+                    pixels[k][j + 1] = g
+                    pixels[k][j + 2] = b
                 scale_x = scale_x + 1
                 if scale_x >= SCALE:
                     scale_x = 0
@@ -59,46 +59,36 @@ class Visualizer:
 
         for c in string:
             self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
-            wx = wx + x_off*SCALE
-            if wx+x_off >= WIDTH*SCALE:
+            wx = wx + x_off * SCALE
+            if wx + x_off >= WIDTH * SCALE:
                 wx = x
-                wy = wy + y_off*SCALE
+                wy = wy + y_off * SCALE
 
     def build_background(self, pixels):
         t0 = time.process_time()
         backgrounds = os.listdir('images/background/')
         _ = random.randint(0, len(backgrounds) - 1)
         t1 = time.process_time() - t0
-        back_reader = png.Reader(filename='images/background/'+backgrounds[_])
+        back_reader = png.Reader(filename='images/background/' + backgrounds[_])
         t2 = time.process_time() - t1
         back_gen = back_reader.asRGBA()[2]
         t3 = time.process_time() - t2
 
-        scale_x = 0
-        scale_y = 0
-        ref_pos = [0, 0]
-        DEBUG_CURRENT_ROW = 0;
-        row = next(back_gen)
-        for k in range(0, HEIGHT * SCALE):
-            for j in range(0, (WIDTH * SCALE) * 3, 3):
-                r = row[ref_pos[0] * 4 + 0]
-                g = row[ref_pos[0] * 4 + 1]
-                b = row[ref_pos[0] * 4 + 2]
-                if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    pixels[k][j + 0] = r
-                    pixels[k][j + 1] = g
-                    pixels[k][j + 2] = b
-                scale_x = scale_x + 1
-                if scale_x >= SCALE:
-                    scale_x = 0
-                    ref_pos[0] = ref_pos[0] + 1
-            ref_pos[0] = 0
-            scale_y = scale_y + 1
-            if scale_y >= SCALE and k is not HEIGHT*SCALE-1:
-                scale_y = 0
-                DEBUG_CURRENT_ROW = DEBUG_CURRENT_ROW + 1
-                print(DEBUG_CURRENT_ROW, k, sep=',')
-                row = next(back_gen)
+        ref_pos_x = 0
+        for row in back_gen:
+            for y in range(0, HEIGHT * SCALE):
+                for scale_y in range(0, SCALE):
+                    for x in range(0, WIDTH * SCALE * 3, 3):
+                        for scale_x in range(0, SCALE):
+                            r = row[ref_pos_x * 4 + 0]
+                            g = row[ref_pos_x * 4 + 1]
+                            b = row[ref_pos_x * 4 + 2]
+                            if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
+                                pixels[y + scale_y][x + scale_x + 0] = r
+                                pixels[y + scale_y][x + scale_x + 1] = g
+                                pixels[y + scale_y][x + scale_x + 2] = b
+                    ref_pos_x = ref_pos_x + 1
+            ref_pos_x = 0
 
         t4 = time.process_time() - t3
 
@@ -115,16 +105,13 @@ class Visualizer:
         print('Build Background Paint Pixels: ', t4)
         print('List Work Example: ', t6)
 
-
-
-
     def build_test_text(self, text):
         f = open('images/output/test.png', 'wb')
-        w = png.Writer(width=WIDTH*SCALE, height=HEIGHT*SCALE, bitdepth=8, greyscale=False)
+        w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
-        pixels = [[128, 128, 128] * WIDTH*SCALE for _ in range(HEIGHT*SCALE)]
+        pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
         self.build_background(pixels)
-        self.build_text(pixels, FONT_SIX, 2*SCALE, 2*SCALE, text)
+        self.build_text(pixels, FONT_SIX, 2 * SCALE, 2 * SCALE, text)
         w.write(f, pixels)
 
         return f.name
@@ -137,7 +124,7 @@ class Visualizer:
         if background == 'True':
             self.build_background(pixels)
         t1 = time.process_time() - t0
-        self.build_text(pixels, FONT_EIGHT, x*SCALE, y*SCALE, text)
+        self.build_text(pixels, FONT_EIGHT, x * SCALE, y * SCALE, text)
         t2 = time.process_time() - t1
         w.write(f, pixels)
         t3 = time.process_time() - t2
