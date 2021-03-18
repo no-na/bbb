@@ -79,7 +79,7 @@ class Visualizer:
 
         type_case_list = list(type_case[2])  # We don't keep this as a generator because we aren't iterating.
 
-        split_string = re.findall(r'\[\[.+?\]\]|\s|\b\w+\b', string)
+        split_string = re.findall(r'\[\[.+?\]\]|\s|\b\w+\b|\W', string)
         white_replace = [255, 255, 255]
         new_line = False
         for s in split_string:
