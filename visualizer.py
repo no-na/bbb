@@ -19,9 +19,9 @@ class Visualizer:
             rex = re.compile(r'\W')
             split = list(filter(None, re.split(rex, string)))
             if split[0] == 'C':
-                white_replace[0] = split[1]
-                white_replace[1] = split[2]
-                white_replace[2] = split[3]
+                white_replace[0] = int(split[1])
+                white_replace[1] = int(split[2])
+                white_replace[2] = int(split[3])
                 return True
             if split[0] == 'c':
                 white_replace[0] = 255
