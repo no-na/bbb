@@ -9,6 +9,7 @@ HEIGHT = 400
 WIDTH = 640
 SCALE = 2
 CHROMA_KEY = [255, 0, 255]
+WHITE = [255, 255, 255]
 
 
 class Visualizer:
@@ -21,15 +22,17 @@ class Visualizer:
                 white_replace[0] = split[1]
                 white_replace[1] = split[2]
                 white_replace[2] = split[3]
-                return
+                return True
             if split[0] == 'c':
                 white_replace[0] = 255
                 white_replace[1] = 255
                 white_replace[2] = 255
+                return True
+        return False
 
-
-
-    def build_character(self, pixels, type_case, char, x, y, x_off, y_off, white_replace=[255, 255, 255]):
+    def build_character(self, pixels, type_case, char, x, y, x_off, y_off, white_replace=None):
+        if white_replace is None:
+            white_replace = WHITE
         asc = ord(char)
         if asc < 128:
             ref_pos = [(asc % 16) * x_off, (asc // 16) * y_off]
@@ -41,14 +44,13 @@ class Visualizer:
         for k in range(y, y + y_off * SCALE):
             row = type_case[ref_pos[1]]
             for j in range(x * 3, (x + x_off * SCALE) * 3, 3):
-                if white_replace != [255, 255, 255]:
+                r = row[ref_pos[0] * 4 + 0]
+                g = row[ref_pos[0] * 4 + 1]
+                b = row[ref_pos[0] * 4 + 2]
+                if white_replace != WHITE and [r, g, b] == WHITE:
                     r = white_replace[0]
                     g = white_replace[1]
                     b = white_replace[2]
-                else:
-                    r = row[ref_pos[0] * 4 + 0]
-                    g = row[ref_pos[0] * 4 + 1]
-                    b = row[ref_pos[0] * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
                     pixels[k][j + 0] = r
                     pixels[k][j + 1] = g
@@ -81,7 +83,8 @@ class Visualizer:
         white_replace = [255, 255, 255]
         new_line = False;
         for s in split_string:
-            self.parse_tag(s, white_replace)
+            if self.parse_tag(s, white_replace) is True:
+                continue
             if wx + x_off * len(s) * SCALE >= WIDTH * SCALE:
                 wx = x
                 wy = wy + y_off * SCALE
