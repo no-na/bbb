@@ -2,8 +2,6 @@ import png
 import re
 import random
 import os
-import time
-import mysql.connector
 
 FONT_SIX = 'images/text/6_12.png'
 FONT_EIGHT = 'images/text/8_16.png'
@@ -14,7 +12,24 @@ CHROMA_KEY = [255, 0, 255]
 
 
 class Visualizer:
-    def build_character(self, pixels, type_case, char, x, y, x_off, y_off):
+    def parse_tag(self, string, white_replace):
+        rex = re.compile(r'^\[\[\D:.*\]\]$')
+        if re.match(rex, string):
+            rex = re.compile(r'\w')
+            split = re.split(rex, string)
+            if split[0] == 'C':
+                white_replace[0] = split[1]
+                white_replace[1] = split[2]
+                white_replace[2] = split[3]
+                return
+            if split[0] == 'c':
+                white_replace[0] = 255
+                white_replace[1] = 255
+                white_replace[2] = 255
+
+
+
+    def build_character(self, pixels, type_case, char, x, y, x_off, y_off, white_replace=[255, 255, 255]):
         asc = ord(char)
         if asc < 128:
             ref_pos = [(asc % 16) * x_off, (asc // 16) * y_off]
@@ -26,9 +41,14 @@ class Visualizer:
         for k in range(y, y + y_off * SCALE):
             row = type_case[ref_pos[1]]
             for j in range(x * 3, (x + x_off * SCALE) * 3, 3):
-                r = row[ref_pos[0] * 4 + 0]
-                g = row[ref_pos[0] * 4 + 1]
-                b = row[ref_pos[0] * 4 + 2]
+                if white_replace != [255, 255, 255]:
+                    r = white_replace[0]
+                    g = white_replace[1]
+                    b = white_replace[2]
+                else:
+                    r = row[ref_pos[0] * 4 + 0]
+                    g = row[ref_pos[0] * 4 + 1]
+                    b = row[ref_pos[0] * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
                     pixels[k][j + 0] = r
                     pixels[k][j + 1] = g
@@ -58,13 +78,16 @@ class Visualizer:
         type_case_list = list(type_case[2])  # We don't keep this as a generator because we aren't iterating.
 
         split_string = re.split(r'(\s)', string)
+        white_replace = [255, 255, 255]
         for s in split_string:
+            self.parse_tag(s, white_replace)
             if wx + x_off * len(s) * SCALE >= WIDTH * SCALE:
                 wx = x
                 wy = wy + y_off * SCALE
             for c in s:
-                self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
-                wx = wx + x_off * SCALE
+                if c != ' ':
+                    self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
+                    wx = wx + x_off * SCALE
 
     def build_background(self, pixels):
         backgrounds = os.listdir('images/background/')
