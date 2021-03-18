@@ -13,7 +13,7 @@ CHROMA_KEY = [255, 0, 255]
 
 class Visualizer:
     def parse_tag(self, string, white_replace):
-        rex = re.compile(r'^\[\[\D:.*\]\]$')
+        rex = re.compile(r'^[[\D:.*]]$')
         if re.match(rex, string):
             rex = re.compile(r'\w')
             split = re.split(rex, string)
@@ -79,15 +79,18 @@ class Visualizer:
 
         split_string = re.split(r'(\s)', string)
         white_replace = [255, 255, 255]
+        new_line = False;
         for s in split_string:
             self.parse_tag(s, white_replace)
             if wx + x_off * len(s) * SCALE >= WIDTH * SCALE:
                 wx = x
                 wy = wy + y_off * SCALE
+                new_line = True
             for c in s:
-                if c != ' ':
+                if c != ' ' or new_line is False:
                     self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
                     wx = wx + x_off * SCALE
+                    new_line = False
 
     def build_background(self, pixels):
         backgrounds = os.listdir('images/background/')
