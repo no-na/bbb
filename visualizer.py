@@ -13,10 +13,10 @@ CHROMA_KEY = [255, 0, 255]
 
 class Visualizer:
     def parse_tag(self, string, white_replace):
-        rex = re.compile(r'^[[\D:.*]]$')
+        rex = re.compile(r'^\[\[\D:.*\]\]$')
         if re.match(rex, string):
             rex = re.compile(r'\w')
-            split = re.split(rex, string)
+            split = list(filter(None, re.split(rex, string)))
             if split[0] == 'C':
                 white_replace[0] = split[1]
                 white_replace[1] = split[2]
