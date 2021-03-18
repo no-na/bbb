@@ -14,9 +14,9 @@ WHITE = [255, 255, 255]
 
 class Visualizer:
     def parse_tag(self, string, white_replace):
-        rex = re.compile(r'^\[\[\D:.*\]\]$')
+        rex = re.compile(r'^\[\[\D:*.*\]\]$')
         if re.match(rex, string):
-            rex = re.compile(r'\w')
+            rex = re.compile(r'\W')
             split = list(filter(None, re.split(rex, string)))
             if split[0] == 'C':
                 white_replace[0] = split[1]
@@ -79,9 +79,9 @@ class Visualizer:
 
         type_case_list = list(type_case[2])  # We don't keep this as a generator because we aren't iterating.
 
-        split_string = re.split(r'(\s)', string)
+        split_string = re.findall(r'\[\[.+?\]\]|\s|\b\w+\b', string)
         white_replace = [255, 255, 255]
-        new_line = False;
+        new_line = False
         for s in split_string:
             if self.parse_tag(s, white_replace) is True:
                 continue
