@@ -91,7 +91,7 @@ class Visualizer:
                 new_line = True
             for c in s:
                 if c != ' ' or new_line is False:
-                    self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off)
+                    self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off, white_replace=white_replace)
                     wx = wx + x_off * SCALE
                     new_line = False
 
