@@ -145,8 +145,8 @@ class Visualizer:
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
-        self.build_background(self.pixels)
-        self.build_text(self.pixels, FONT_SIX, x * SCALE, y * SCALE, end_x=320, str=text)
+        self.build_background()
+        self.build_text(FONT_SIX, x * SCALE, y * SCALE, end_x=320, str=text)
         w.write(f, self.pixels)
 
         return f.name
@@ -155,8 +155,8 @@ class Visualizer:
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
-        self.build_background(self.pixels)
-        self.build_text(self.pixels, FONT_EIGHT, x * SCALE, y * SCALE, text)
+        self.build_background()
+        self.build_text(FONT_EIGHT, x * SCALE, y * SCALE, text)
         w.write(f, self.pixels)
 
         return f.name
