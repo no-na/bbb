@@ -146,7 +146,7 @@ class Visualizer:
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
         self.build_background()
-        self.build_text(FONT_SIX, x * SCALE, y * SCALE, end_x=320, str=text)
+        self.build_text(FONT_SIX, x * SCALE, y * SCALE, end_x=320, string=text)
         w.write(f, self.pixels)
 
         return f.name
