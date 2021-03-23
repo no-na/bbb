@@ -13,6 +13,8 @@ WHITE = [255, 255, 255]
 
 
 class Visualizer:
+    pixels = []
+
     def parse_tag(self, string, white_replace):
         rex = re.compile(r'^\[\[\D:*.*\]\]$')
         if re.match(rex, string):
@@ -30,7 +32,7 @@ class Visualizer:
                 return True
         return False
 
-    def build_character(self, pixels, type_case, char, x, y, x_off, y_off, white_replace=None):
+    def build_character(self, type_case, char, x, y, x_off, y_off, white_replace=None):
         if white_replace is None:
             white_replace = WHITE
         asc = ord(char)
@@ -52,9 +54,9 @@ class Visualizer:
                     g = white_replace[1]
                     b = white_replace[2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    pixels[k][j + 0] = r
-                    pixels[k][j + 1] = g
-                    pixels[k][j + 2] = b
+                    self.pixels[k][j + 0] = r
+                    self.pixels[k][j + 1] = g
+                    self.pixels[k][j + 2] = b
                 scale_x = scale_x + 1
                 if scale_x >= SCALE:
                     scale_x = 0
@@ -65,7 +67,7 @@ class Visualizer:
                 scale_y = 0
                 ref_pos[1] = ref_pos[1] + 1
 
-    def build_text(self, pixels, font, x, y, string: str):
+    def build_text(self, font, x, y, end_x=None, end_y=None, string: str = None):
         type_reader = png.Reader(filename=font)
         type_case = type_reader.asRGBA()
 
@@ -77,6 +79,11 @@ class Visualizer:
         wx = x
         wy = y
 
+        if end_x is None:
+            end_x = WIDTH
+        if end_y is None:
+            end_y = HEIGHT
+
         type_case_list = list(type_case[2])  # We don't keep this as a generator because we aren't iterating.
 
         split_string = re.findall(r'\[\[.+?\]\]|\s|\b\w+\b|\W', string)
@@ -85,17 +92,20 @@ class Visualizer:
         for s in split_string:
             if self.parse_tag(s, white_replace) is True:
                 continue
-            if wx + x_off * len(s) * SCALE >= WIDTH * SCALE:
-                wx = x
-                wy = wy + y_off * SCALE
-                new_line = True
+            if wx + x_off * len(s) * SCALE >= end_x * SCALE:
+                if wy + y_off * SCALE < end_y * SCALE:
+                    wx = x
+                    wy = wy + y_off * SCALE
+                    new_line = True
+                else:
+                    return
             for c in s:
                 if c != ' ' or new_line is False:
-                    self.build_character(pixels, type_case_list, c, wx, wy, x_off, y_off, white_replace=white_replace)
+                    self.build_character(type_case_list, c, wx, wy, x_off, y_off, white_replace=white_replace)
                     wx = wx + x_off * SCALE
                     new_line = False
 
-    def build_background(self, pixels):
+    def build_background(self):
         backgrounds = os.listdir('images/background/')
         _ = random.randint(0, len(backgrounds) - 1)
         _ = png.Reader(filename='images/background/' + backgrounds[_])
@@ -114,9 +124,9 @@ class Visualizer:
                 g = row[ref_pos * 4 + 1]
                 b = row[ref_pos * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    pixels[k][j + 0] = r
-                    pixels[k][j + 1] = g
-                    pixels[k][j + 2] = b
+                    self.pixels[k][j + 0] = r
+                    self.pixels[k][j + 1] = g
+                    self.pixels[k][j + 2] = b
                 scale_x = scale_x + 1
                 if scale_x >= SCALE:
                     scale_x = 0
@@ -134,19 +144,19 @@ class Visualizer:
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
-        pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
-        self.build_background(pixels)
-        self.build_text(pixels, FONT_SIX, x * SCALE, y * SCALE, text)
-        w.write(f, pixels)
+        self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
+        self.build_background(self.pixels)
+        self.build_text(self.pixels, FONT_SIX, x * SCALE, y * SCALE, end_x=320, str=text)
+        w.write(f, self.pixels)
 
         return f.name
 
     def build_text_birch(self, text, x, y, background):
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
-        pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
-        self.build_background(pixels)
-        self.build_text(pixels, FONT_EIGHT, x * SCALE, y * SCALE, text)
-        w.write(f, pixels)
+        self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
+        self.build_background(self.pixels)
+        self.build_text(self.pixels, FONT_EIGHT, x * SCALE, y * SCALE, text)
+        w.write(f, self.pixels)
 
         return f.name
