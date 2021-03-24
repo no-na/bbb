@@ -118,21 +118,21 @@ class Visualizer:
                 if j < start_x * SCALE * 3 + GRAPH_DEPTH * SCALE * 3 and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
                     continue
                 if j == start_x * SCALE * 3:
-                    self.pixels[k][j + 0] = WHITE_COLOR
-                    self.pixels[k][j + 1] = WHITE_COLOR
-                    self.pixels[k][j + 2] = WHITE_COLOR
+                    self.pixels[k][j + 0] = WHITE_COLOR[0]
+                    self.pixels[k][j + 1] = WHITE_COLOR[1]
+                    self.pixels[k][j + 2] = WHITE_COLOR[2]
                 elif j < start_x * SCALE * 3 + GRAPH_DEPTH * SCALE * 3:
-                    self.pixels[k][j + 0] = GRAPH_LEFT_COLOR
-                    self.pixels[k][j + 1] = GRAPH_LEFT_COLOR
-                    self.pixels[k][j + 2] = GRAPH_LEFT_COLOR
+                    self.pixels[k][j + 0] = GRAPH_LEFT_COLOR[0]
+                    self.pixels[k][j + 1] = GRAPH_LEFT_COLOR[1]
+                    self.pixels[k][j + 2] = GRAPH_LEFT_COLOR[2]
                 elif k >= end_y * SCALE - GRAPH_DEPTH * SCALE:
-                    self.pixels[k][j + 0] = GRAPH_BOTT_COLOR
-                    self.pixels[k][j + 1] = GRAPH_BOTT_COLOR
-                    self.pixels[k][j + 2] = GRAPH_BOTT_COLOR
+                    self.pixels[k][j + 0] = GRAPH_BOTT_COLOR[0]
+                    self.pixels[k][j + 1] = GRAPH_BOTT_COLOR[1]
+                    self.pixels[k][j + 2] = GRAPH_BOTT_COLOR[2]
                 else:
-                    self.pixels[k][j + 0] = GRAPH_BACK_COLOR
-                    self.pixels[k][j + 1] = GRAPH_BACK_COLOR
-                    self.pixels[k][j + 2] = GRAPH_BACK_COLOR
+                    self.pixels[k][j + 0] = GRAPH_BACK_COLOR[0]
+                    self.pixels[k][j + 1] = GRAPH_BACK_COLOR[1]
+                    self.pixels[k][j + 2] = GRAPH_BACK_COLOR[2]
 
     def build_background(self):
         backgrounds = os.listdir('images/background/')
