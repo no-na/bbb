@@ -76,8 +76,8 @@ class Visualizer:
         x_off = int(offsets[0])
         y_off = int(offsets[1])
 
-        wx = x
-        wy = y
+        wx = x * SCALE
+        wy = y * SCALE
 
         if end_x is None:
             end_x = WIDTH
@@ -116,7 +116,7 @@ class Visualizer:
         for k in range(start_y * SCALE, end_y * SCALE):
             for j in range(start_x * SCALE * 3, (legend_x * SCALE) * 3, 3):
                 # (GRAPH_DEPTH - (j - (start_x * SCALE * 3)) // 3)
-                if j < (start_x * SCALE * 3) + (GRAPH_DEPTH - (j - (start_x * SCALE * 3)) // 3) * SCALE * 3 and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
+                if j < (start_x * SCALE * 3) + (GRAPH_DEPTH - (j - (start_y * SCALE))) * SCALE * 3 and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
                     continue
                 elif j == start_x * SCALE * 3 or k == end_y * SCALE - 1:
                     self.pixels[k][j + 0] = WHITE_COLOR[0]
@@ -177,7 +177,7 @@ class Visualizer:
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
         self.build_background()
-        self.build_text(FONT_SIX, x * SCALE, y * SCALE, end_x=320, end_y=200, string=text)
+        self.build_text(FONT_SIX, x, y, end_x=320, end_y=200, string=text)
         self.build_graph(start_x=8, start_y=208, end_x=320, end_y=HEIGHT - 8)
         w.write(f, self.pixels)
 
@@ -188,7 +188,7 @@ class Visualizer:
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
         self.build_background()
-        self.build_text(FONT_EIGHT, x * SCALE, y * SCALE, text)
+        self.build_text(FONT_EIGHT, x, y, text)
         w.write(f, self.pixels)
 
         return f.name
