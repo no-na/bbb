@@ -137,9 +137,14 @@ class Visualizer:
                     color_to_use = GRAPH_BACK_COLOR
 
                 if color_to_use is not None:
-                    self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 0] = color_to_use[0]
-                    self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 1] = color_to_use[1]
-                    self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 2] = color_to_use[2]
+                    if use_prev_pixel_y != 0 or use_prev_pixel_x != 0:
+                        self.pixels[k][j + 0] = self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 0]
+                        self.pixels[k][j + 1] = self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 1]
+                        self.pixels[k][j + 2] = self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 2]
+                    else:
+                        self.pixels[k][j + 0] = color_to_use[0]
+                        self.pixels[k][j + 1] = color_to_use[0]
+                        self.pixels[k][j + 2] = color_to_use[0]
 
                 scale_x = scale_x + 1
                 if scale_x >= SCALE:
