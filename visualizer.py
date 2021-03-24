@@ -132,7 +132,7 @@ class Visualizer:
                     color_to_use = WHITE
                 elif j < start_x * SCALE * RGB_OFFSET + GRAPH_DEPTH * SCALE * RGB_OFFSET:
                     color_to_use = GRAPH_LEFT_COLOR
-                elif j < (start_x * SCALE * RGB_OFFSET) + (GRAPH_DEPTH - (k - (end_y * SCALE - GRAPH_DEPTH * SCALE))) * SCALE * RGB_OFFSET and k >= end_y * SCALE - GRAPH_DEPTH * SCALE:
+                elif j < (start_x * SCALE * RGB_OFFSET) + (GRAPH_DEPTH - (k - ((end_y - GRAPH_DEPTH) * SCALE))//SCALE) * SCALE * RGB_OFFSET and k >= end_y * SCALE - GRAPH_DEPTH * SCALE:
                     color_to_use = GRAPH_BOTT_COLOR
                 else:
                     color_to_use = GRAPH_BACK_COLOR
