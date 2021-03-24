@@ -111,7 +111,7 @@ class Visualizer:
         GRAPH_BOTT_COLOR = [133, 133, 133]
         WHITE_COLOR = [255, 255, 255]
         GRAPH_DEPTH = 6
-        legend_x = (end_x - start_x) * 0.8 + start_x
+        legend_x = int((end_x - start_x) * 0.8 + start_x)
 
         for k in range(start_y * SCALE, end_y * SCALE):
             for j in range(start_x * SCALE * 3, (legend_x * SCALE) * 3, 3):
@@ -133,7 +133,6 @@ class Visualizer:
                     self.pixels[k][j + 0] = GRAPH_BACK_COLOR
                     self.pixels[k][j + 1] = GRAPH_BACK_COLOR
                     self.pixels[k][j + 2] = GRAPH_BACK_COLOR
-
 
     def build_background(self):
         backgrounds = os.listdir('images/background/')
