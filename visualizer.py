@@ -10,6 +10,7 @@ WIDTH = 640
 SCALE = 2
 CHROMA_KEY = [255, 0, 255]
 WHITE = [255, 255, 255]
+RGB_OFFSET = 3
 
 
 class Visualizer:
@@ -45,7 +46,7 @@ class Visualizer:
         scale_y = 0
         for k in range(y, y + y_off * SCALE):
             row = type_case[ref_pos[1]]
-            for j in range(x * 3, (x + x_off * SCALE) * 3, 3):
+            for j in range(x * RGB_OFFSET, (x + x_off * SCALE) * RGB_OFFSET, RGB_OFFSET):
                 r = row[ref_pos[0] * 4 + 0]
                 g = row[ref_pos[0] * 4 + 1]
                 b = row[ref_pos[0] * 4 + 2]
@@ -115,23 +116,23 @@ class Visualizer:
         scale_x = 0
         scale_y = 0
         for k in range(start_y * SCALE, end_y * SCALE):
-            for j in range(start_x * SCALE * 3, (legend_x * SCALE) * 3, 3):
-                # (GRAPH_DEPTH - (j - (start_x * SCALE * 3)) // 3)
+            for j in range(start_x * SCALE * RGB_OFFSET, (legend_x * SCALE) * RGB_OFFSET, RGB_OFFSET):
+                # (GRAPH_DEPTH - (j - (start_x * SCALE * RGB_OFFSET)) // RGB_OFFSET)
                 use_prev_pixel_x = 0
                 use_prev_pixel_y = 0
                 color_to_use = None
                 if scale_x != 0:
-                    use_prev_pixel_x = 3
+                    use_prev_pixel_x = RGB_OFFSET
                 if scale_y != 0:
                     use_prev_pixel_y = 1
 
-                if j < (start_x * SCALE * 3) + (GRAPH_DEPTH - (k - (start_y * SCALE))) * SCALE * 3 and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
+                if j < (start_x * SCALE * RGB_OFFSET) + (GRAPH_DEPTH - (k - (start_y * SCALE))//SCALE) * SCALE * RGB_OFFSET and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
                     color_to_use = None
-                elif j == start_x * SCALE * 3 or k == end_y * SCALE - 1:
+                elif j == start_x * SCALE * RGB_OFFSET or k == end_y * SCALE - 1 * SCALE:
                     color_to_use = WHITE
-                elif j < start_x * SCALE * 3 + GRAPH_DEPTH * SCALE * 3:
+                elif j < start_x * SCALE * RGB_OFFSET + GRAPH_DEPTH * SCALE * RGB_OFFSET:
                     color_to_use = GRAPH_LEFT_COLOR
-                elif j < (start_x * SCALE * 3) + (GRAPH_DEPTH - (k - (end_y * SCALE - GRAPH_DEPTH * SCALE))) * SCALE * 3 and k >= end_y * SCALE - GRAPH_DEPTH * SCALE:
+                elif j < (start_x * SCALE * RGB_OFFSET) + (GRAPH_DEPTH - (k - (end_y * SCALE - GRAPH_DEPTH * SCALE))) * SCALE * RGB_OFFSET and k >= end_y * SCALE - GRAPH_DEPTH * SCALE:
                     color_to_use = GRAPH_BOTT_COLOR
                 else:
                     color_to_use = GRAPH_BACK_COLOR
@@ -168,7 +169,7 @@ class Visualizer:
         for k in range(0, HEIGHT * SCALE):
             if scale_y == 0:
                 row = next(back_gen)
-            for j in range(0, (WIDTH * SCALE) * 3, 3):
+            for j in range(0, (WIDTH * SCALE) * RGB_OFFSET, RGB_OFFSET):
                 r = row[ref_pos * 4 + 0]
                 g = row[ref_pos * 4 + 1]
                 b = row[ref_pos * 4 + 2]
@@ -185,7 +186,7 @@ class Visualizer:
             if scale_y >= SCALE:
                 scale_y = 0
 
-        # aa = [0] * WIDTH * SCALE * HEIGHT * 3
+        # aa = [0] * WIDTH * SCALE * HEIGHT * RGB_OFFSET
         # for k in range(0, len(aa)):
         #     aa[k] = 256
 
