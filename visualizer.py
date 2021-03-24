@@ -140,11 +140,12 @@ class Visualizer:
                     self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 0] = color_to_use[0]
                     self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 1] = color_to_use[1]
                     self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 2] = color_to_use[2]
+
                 scale_x = scale_x + 1
-                if scale_x > SCALE:
+                if scale_x >= SCALE:
                     scale_x = 0;
             scale_y = scale_y + 1
-            if scale_y > SCALE:
+            if scale_y >= SCALE:
                 scale_y = 0;
 
         self.build_text(FONT_SIX, legend_x+2, start_y+2, end_x=end_x, end_y=end_y, string="LEGEND")
