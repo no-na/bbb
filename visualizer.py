@@ -116,7 +116,7 @@ class Visualizer:
         for k in range(start_y * SCALE, end_y * SCALE):
             for j in range(start_x * SCALE * 3, (legend_x * SCALE) * 3, 3):
                 # (GRAPH_DEPTH - (j - (start_x * SCALE * 3)) // 3)
-                if j < (start_x * SCALE * 3) + (GRAPH_DEPTH - (k - (start_y * SCALE))) * SCALE * 3 and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
+                if j < (start_x * SCALE * 3) + (GRAPH_DEPTH * SCALE - (k - (start_y * SCALE))) * SCALE * 3 and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
                     continue
                 elif j == start_x * SCALE * 3 or k == end_y * SCALE - 1:
                     self.pixels[k][j + 0] = WHITE_COLOR[0]
@@ -126,7 +126,7 @@ class Visualizer:
                     self.pixels[k][j + 0] = GRAPH_LEFT_COLOR[0]
                     self.pixels[k][j + 1] = GRAPH_LEFT_COLOR[1]
                     self.pixels[k][j + 2] = GRAPH_LEFT_COLOR[2]
-                elif k >= end_y * SCALE - GRAPH_DEPTH * SCALE:
+                elif k >= end_y * SCALE - GRAPH_DEPTH * SCALE and j < (start_x * SCALE * 3) + (GRAPH_DEPTH * SCALE - (k - (end_y * SCALE - GRAPH_DEPTH * SCALE * SCALE))) * SCALE * 3:
                     self.pixels[k][j + 0] = GRAPH_BOTT_COLOR[0]
                     self.pixels[k][j + 1] = GRAPH_BOTT_COLOR[1]
                     self.pixels[k][j + 2] = GRAPH_BOTT_COLOR[2]
