@@ -94,7 +94,7 @@ class Visualizer:
                 continue
             if wx + x_off * len(s) * SCALE >= end_x * SCALE:
                 if wy + y_off * SCALE < end_y * SCALE:
-                    wx = x
+                    wx = x * SCALE
                     wy = wy + y_off * SCALE
                     new_line = True
                 else:
@@ -116,7 +116,7 @@ class Visualizer:
         for k in range(start_y * SCALE, end_y * SCALE):
             for j in range(start_x * SCALE * 3, (legend_x * SCALE) * 3, 3):
                 # (GRAPH_DEPTH - (j - (start_x * SCALE * 3)) // 3)
-                if j < (start_x * SCALE * 3) + (GRAPH_DEPTH - (j - (start_y * SCALE))) * SCALE * 3 and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
+                if j < (start_x * SCALE * 3) + (GRAPH_DEPTH - (k - (start_y * SCALE))) * SCALE * 3 and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
                     continue
                 elif j == start_x * SCALE * 3 or k == end_y * SCALE - 1:
                     self.pixels[k][j + 0] = WHITE_COLOR[0]
@@ -135,7 +135,7 @@ class Visualizer:
                     self.pixels[k][j + 1] = GRAPH_BACK_COLOR[1]
                     self.pixels[k][j + 2] = GRAPH_BACK_COLOR[2]
 
-        self.build_text(FONT_SIX, legend_x, start_y, end_x=end_x, end_y=end_y, string="LEGEND")
+        self.build_text(FONT_SIX, legend_x+2, start_y+2, end_x=end_x, end_y=end_y, string="LEGEND")
 
     def build_background(self):
         backgrounds = os.listdir('images/background/')
