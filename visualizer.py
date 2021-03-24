@@ -7,7 +7,7 @@ FONT_SIX = 'images/text/6_12.png'
 FONT_EIGHT = 'images/text/8_16.png'
 HEIGHT = 400
 WIDTH = 640
-SCALE = 2
+SCALE = 1
 CHROMA_KEY = [255, 0, 255]
 WHITE = [255, 255, 255]
 
