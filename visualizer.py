@@ -31,7 +31,9 @@ class Visualizer:
                 white_replace[2] = int(split[3])
                 return True
             if split[0] == 'c':
-                white_replace = WHITE
+                white_replace[0] = WHITE[0]
+                white_replace[1] = WHITE[1]
+                white_replace[2] = WHITE[2]
                 return True
         return False
 
