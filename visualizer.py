@@ -11,6 +11,10 @@ SCALE = 2
 CHROMA_KEY = [255, 0, 255]
 WHITE = [255, 255, 255]
 RGB_OFFSET = 3
+GRAPH_BACK_COLOR = [164, 164, 164]
+GRAPH_LEFT_COLOR = [44, 44, 44]
+GRAPH_BOTT_COLOR = [133, 133, 133]
+GRAPH_DEPTH = 6
 
 
 class Visualizer:
@@ -32,6 +36,13 @@ class Visualizer:
                 white_replace[2] = 255
                 return True
         return False
+
+    def draw_pixel(self, x, y, color):
+        for k in range(0, SCALE):
+            for j in range(0, SCALE):
+                self.pixels[y * SCALE + k][x * SCALE * RGB_OFFSET + j + 0] = color[0]
+                self.pixels[y * SCALE + k][x * SCALE * RGB_OFFSET + j + 1] = color[1]
+                self.pixels[y * SCALE + k][x * SCALE * RGB_OFFSET + j + 2] = color[2]
 
     def build_character(self, type_case, char, x, y, x_off, y_off, white_replace=None):
         if white_replace is None:
@@ -107,54 +118,27 @@ class Visualizer:
                     new_line = False
 
     def build_graph(self, start_x=None, start_y=None, end_x=None, end_y=None, data=None):
-        GRAPH_BACK_COLOR = [164, 164, 164]
-        GRAPH_LEFT_COLOR = [44, 44, 44]
-        GRAPH_BOTT_COLOR = [133, 133, 133]
-        GRAPH_DEPTH = 6
         legend_x = int((end_x - start_x) * 0.8 + start_x)
 
-        scale_x = 0
-        scale_y = 0
-        for k in range(start_y * SCALE, end_y * SCALE):
-            for j in range(start_x * SCALE * RGB_OFFSET, (legend_x * SCALE) * RGB_OFFSET, RGB_OFFSET):
-                # (GRAPH_DEPTH - (j - (start_x * SCALE * RGB_OFFSET)) // RGB_OFFSET)
-                use_prev_pixel_x = 0
-                use_prev_pixel_y = 0
+        for k in range(start_y, end_y):
+            for j in range(start_x, legend_x):
                 color_to_use = None
-                if scale_x != 0:
-                    use_prev_pixel_x = RGB_OFFSET
-                if scale_y != 0:
-                    use_prev_pixel_y = 1
 
-                if j < (start_x * SCALE * RGB_OFFSET) + (GRAPH_DEPTH - (k - (start_y * SCALE))//SCALE) * SCALE * RGB_OFFSET and k < start_y * SCALE + GRAPH_DEPTH * SCALE:
+                if j < start_x + (GRAPH_DEPTH - (k - start_y)) and k < start_y + GRAPH_DEPTH:
                     color_to_use = None
-                elif j == start_x * SCALE * RGB_OFFSET or k == end_y * SCALE - 1 * SCALE:
+                elif j == start_x or k == end_y - 1:
                     color_to_use = WHITE
-                elif j < (start_x * SCALE * RGB_OFFSET) + (GRAPH_DEPTH - (k - ((end_y - GRAPH_DEPTH) * SCALE))//SCALE) * SCALE * RGB_OFFSET and k >= end_y * SCALE - GRAPH_DEPTH * SCALE:
+                elif j < start_x + (GRAPH_DEPTH - (k - (end_y - GRAPH_DEPTH))) and k >= end_y - GRAPH_DEPTH:
                     color_to_use = GRAPH_LEFT_COLOR
-                elif k >= end_y * SCALE - GRAPH_DEPTH * SCALE:
+                elif k >= end_y - GRAPH_DEPTH:
                     color_to_use = GRAPH_BOTT_COLOR
-                elif j < start_x * SCALE * RGB_OFFSET + GRAPH_DEPTH * SCALE * RGB_OFFSET:
+                elif j < start_x + GRAPH_DEPTH:
                     color_to_use = GRAPH_LEFT_COLOR
                 else:
                     color_to_use = GRAPH_BACK_COLOR
 
                 if color_to_use is not None:
-                    if use_prev_pixel_y != 0 or use_prev_pixel_x != 0:
-                        self.pixels[k][j + 0] = self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 0]
-                        self.pixels[k][j + 1] = self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 1]
-                        self.pixels[k][j + 2] = self.pixels[k - use_prev_pixel_y][j - use_prev_pixel_x + 2]
-                    else:
-                        self.pixels[k][j + 0] = color_to_use[0]
-                        self.pixels[k][j + 1] = color_to_use[0]
-                        self.pixels[k][j + 2] = color_to_use[0]
-
-                scale_x = scale_x + 1
-                if scale_x >= SCALE:
-                    scale_x = 0;
-            scale_y = scale_y + 1
-            if scale_y >= SCALE:
-                scale_y = 0;
+                    self.draw_pixel(j, k, color_to_use)
 
         self.build_text(FONT_SIX, legend_x+2, start_y+2, end_x=end_x, end_y=end_y, string="LEGEND")
 
