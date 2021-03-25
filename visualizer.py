@@ -31,9 +31,7 @@ class Visualizer:
                 white_replace[2] = int(split[3])
                 return True
             if split[0] == 'c':
-                white_replace[0] = 255
-                white_replace[1] = 255
-                white_replace[2] = 255
+                white_replace = WHITE
                 return True
         return False
 
@@ -53,11 +51,9 @@ class Visualizer:
         else:
             ref_pos = [0, 0]
 
-        scale_x = 0
-        scale_y = 0
-        for k in range(y, y + y_off * SCALE):
+        for k in range(y, y + y_off):
             row = type_case[ref_pos[1]]
-            for j in range(x * RGB_OFFSET, (x + x_off * SCALE) * RGB_OFFSET, RGB_OFFSET):
+            for j in range(x, x + x_off):
                 r = row[ref_pos[0] * 4 + 0]
                 g = row[ref_pos[0] * 4 + 1]
                 b = row[ref_pos[0] * 4 + 2]
@@ -66,18 +62,10 @@ class Visualizer:
                     g = white_replace[1]
                     b = white_replace[2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    self.pixels[k][j + 0] = r
-                    self.pixels[k][j + 1] = g
-                    self.pixels[k][j + 2] = b
-                scale_x = scale_x + 1
-                if scale_x >= SCALE:
-                    scale_x = 0
-                    ref_pos[0] = ref_pos[0] + 1
+                    self.draw_pixel(j, k, [r, g, b])
+                ref_pos[0] = ref_pos[0] + 1
             ref_pos[0] = (asc % 16) * x_off
-            scale_y = scale_y + 1
-            if scale_y >= SCALE:
-                scale_y = 0
-                ref_pos[1] = ref_pos[1] + 1
+            ref_pos[1] = ref_pos[1] + 1
 
     def build_text(self, font, x, y, end_x=None, end_y=None, string: str = None):
         type_reader = png.Reader(filename=font)
@@ -88,8 +76,8 @@ class Visualizer:
         x_off = int(offsets[0])
         y_off = int(offsets[1])
 
-        wx = x * SCALE
-        wy = y * SCALE
+        wx = x
+        wy = y
 
         if end_x is None:
             end_x = WIDTH
@@ -104,17 +92,17 @@ class Visualizer:
         for s in split_string:
             if self.parse_tag(s, white_replace) is True:
                 continue
-            if wx + x_off * len(s) * SCALE >= end_x * SCALE:
-                if wy + y_off * SCALE < end_y * SCALE:
-                    wx = x * SCALE
-                    wy = wy + y_off * SCALE
+            if wx + x_off * len(s) >= end_x:
+                if wy + y_off < end_y:
+                    wx = x
+                    wy = wy + y_off
                     new_line = True
                 else:
                     return
             for c in s:
                 if c != ' ' or new_line is False:
                     self.build_character(type_case_list, c, wx, wy, x_off, y_off, white_replace=white_replace)
-                    wx = wx + x_off * SCALE
+                    wx = wx + x_off
                     new_line = False
 
     def build_graph(self, start_x=None, start_y=None, end_x=None, end_y=None, data=None):
@@ -157,10 +145,6 @@ class Visualizer:
                 b = row[j * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
                     self.draw_pixel(j, k, [r, g, b])
-
-        # aa = [0] * WIDTH * SCALE * HEIGHT * RGB_OFFSET
-        # for k in range(0, len(aa)):
-        #     aa[k] = 256
 
     def build_test_text(self, text, x, y):
         f = open('images/output/test.png', 'wb')
