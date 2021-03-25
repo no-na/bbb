@@ -147,30 +147,16 @@ class Visualizer:
         _ = random.randint(0, len(backgrounds) - 1)
         _ = png.Reader(filename='images/background/' + backgrounds[_])
         back_gen = _.asRGBA()[2]
-
-        scale_x = 0
-        scale_y = 0
-        ref_pos = 0
         row = None
-        for k in range(0, HEIGHT * SCALE):
-            if scale_y == 0:
-                row = next(back_gen)
-            for j in range(0, (WIDTH * SCALE) * RGB_OFFSET, RGB_OFFSET):
-                r = row[ref_pos * 4 + 0]
-                g = row[ref_pos * 4 + 1]
-                b = row[ref_pos * 4 + 2]
+
+        for k in range(0, HEIGHT):
+            row = next(back_gen)
+            for j in range(0, WIDTH):
+                r = row[j * 4 + 0]
+                g = row[j * 4 + 1]
+                b = row[j * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    self.pixels[k][j + 0] = r
-                    self.pixels[k][j + 1] = g
-                    self.pixels[k][j + 2] = b
-                scale_x = scale_x + 1
-                if scale_x >= SCALE:
-                    scale_x = 0
-                    ref_pos = ref_pos + 1
-            ref_pos = 0
-            scale_y = scale_y + 1
-            if scale_y >= SCALE:
-                scale_y = 0
+                    self.draw_pixel(j, k, [r, g, b])
 
         # aa = [0] * WIDTH * SCALE * HEIGHT * RGB_OFFSET
         # for k in range(0, len(aa)):
