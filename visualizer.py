@@ -38,11 +38,11 @@ class Visualizer:
         return False
 
     def draw_pixel(self, x, y, color):
-        for k in range(0, SCALE):
-            for j in range(0, SCALE):
-                self.pixels[y * SCALE + k][x * SCALE * (RGB_OFFSET + j) + 0] = color[0]
-                self.pixels[y * SCALE + k][x * SCALE * (RGB_OFFSET + j) + 1] = color[1]
-                self.pixels[y * SCALE + k][x * SCALE * (RGB_OFFSET + j) + 2] = color[2]
+        for k in range(y, y + SCALE):
+            for j in range(x, x + SCALE):
+                self.pixels[k * SCALE][j * SCALE * RGB_OFFSET + 0] = color[0]
+                self.pixels[k * SCALE][j * SCALE * RGB_OFFSET + 1] = color[1]
+                self.pixels[k * SCALE][j * SCALE * RGB_OFFSET + 2] = color[2]
 
     def build_character(self, type_case, char, x, y, x_off, y_off, white_replace=None):
         if white_replace is None:
