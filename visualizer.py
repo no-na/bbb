@@ -2,6 +2,7 @@ import png
 import re
 import random
 import os
+import colorsys
 
 FONT_SIX = 'images/text/6_12.png'
 FONT_EIGHT = 'images/text/8_16.png'
@@ -14,6 +15,10 @@ RGB_OFFSET = 3
 GRAPH_BACK_COLOR = [164, 164, 164]
 GRAPH_LEFT_COLOR = [44, 44, 44]
 GRAPH_BOTT_COLOR = [133, 133, 133]
+GRAPH_BAR_TOP_HLV = [0, 50, 100]
+GRAPH_BAR_FRONT_HLV = [0, 26, 100]
+GRAPH_BAR_SIDE_HLV = [0, 17, 100]
+GRAPH_BAR_MAX_WIDTH = 20
 SYSTEM_MID_COLOR = [84, 84, 152]
 SYSTEM_SDW_COLOR = [57, 57, 113]
 SYSTEM_HLT_COLOR = [118, 118, 171]
@@ -135,6 +140,49 @@ class Visualizer:
 
                 if color_to_use is not None:
                     self.draw_pixel(j, k, color_to_use)
+
+        graph_bar_hues = []
+        graph_bar_top_rgb = []
+        graph_bar_front_rgb = []
+        graph_bar_side_rgb = []
+        hue_offset = random.randint(0, 360)
+        for i in range(0, len(data[0])):
+            graph_bar_hues.append(i * 360//len(data[0]) + hue_offset)
+            if graph_bar_hues[i] >= 360:
+                graph_bar_hues[i] = graph_bar_hues[i] - 360
+            graph_bar_top_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] // 360, GRAPH_BAR_TOP_HLV[1] // 100, GRAPH_BAR_TOP_HLV[2] // 100))
+            graph_bar_front_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] // 360, GRAPH_BAR_FRONT_HLV[1] // 100, GRAPH_BAR_FRONT_HLV[2] // 100))
+            graph_bar_side_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i // 360], GRAPH_BAR_SIDE_HLV[1] // 100, GRAPH_BAR_SIDE_HLV[2] // 100))
+            for p in range(0, 3):
+                graph_bar_top_rgb[i][p] = int(graph_bar_top_rgb[i][p] * 255)
+                graph_bar_front_rgb[i][p] = int(graph_bar_front_rgb[i][p] * 255)
+                graph_bar_side_rgb[i][p] = int(graph_bar_side_rgb[i][p] * 255)
+
+            # noinspection PyTypeChecker
+            bar_start_y = end_y-1 - data[1][i]
+            bar_end_y = end_y-1
+            bar_depth = GRAPH_DEPTH-1
+            for k in range(bar_start_y, bar_end_y):
+                bar_start_x = start_x+1+bar_depth+i*GRAPH_BAR_MAX_WIDTH
+                bar_end_x = bar_start_x + GRAPH_BAR_MAX_WIDTH+bar_depth
+                for j in range(bar_start_x, bar_end_x):
+                    color_to_use = None
+
+                    if j < bar_start_x + (bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
+                        color_to_use = None
+                    elif j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (bar_depth - (k - (bar_end_y - bar_depth))) and k >= bar_end_y - bar_depth:
+                        color_to_use = graph_bar_side_rgb[i]
+                    elif k >= end_y - bar_depth:
+                        color_to_use = GRAPH_BOTT_COLOR
+                    elif j < start_x + bar_depth:
+                        color_to_use = graph_bar_side_rgb[i]
+                    elif k < bar_start_y + bar_depth:
+                        color_to_use = graph_bar_top_rgb[i]
+                    else:
+                        color_to_use = graph_bar_front_rgb[i]
+
+                    if color_to_use is not None:
+                        self.draw_pixel(j, k, color_to_use)
 
         self.build_text(FONT_SIX, legend_x+2, start_y+2, end_x=end_x, end_y=end_y, string="LEGEND")
 
