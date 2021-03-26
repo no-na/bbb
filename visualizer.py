@@ -162,18 +162,20 @@ class Visualizer:
             bar_start_y = end_y-1 - data[1][i] - bar_depth
             bar_end_y = end_y-1
             for k in range(bar_start_y, bar_end_y):
-                bar_start_x = start_x+1+bar_depth+i*GRAPH_BAR_MAX_WIDTH
+                bar_start_x = start_x+1+bar_depth+i*GRAPH_BAR_MAX_WIDTH + i*GRAPH_BAR_MAX_WIDTH
                 bar_end_x = bar_start_x + GRAPH_BAR_MAX_WIDTH+bar_depth
                 for j in range(bar_start_x, bar_end_x):
                     color_to_use = None
 
                     if j < bar_start_x + (bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
                         color_to_use = None
-                    elif j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (bar_depth - (k - (bar_end_y - bar_depth))) and k >= bar_end_y - bar_depth:
+                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
+                        color_to_use = graph_bar_top_rgb[i]
+                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (bar_depth - (k - (bar_end_y - GRAPH_BAR_MAX_WIDTH))) and k >= bar_end_y - bar_depth:
                         color_to_use = graph_bar_side_rgb[i]
                     elif k >= end_y - bar_depth:
                         color_to_use = GRAPH_BOTT_COLOR
-                    elif j < start_x + bar_depth:
+                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH:
                         color_to_use = graph_bar_side_rgb[i]
                     elif k < bar_start_y + bar_depth:
                         color_to_use = graph_bar_top_rgb[i]
