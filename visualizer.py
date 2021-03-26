@@ -152,7 +152,7 @@ class Visualizer:
                 graph_bar_hues[i] = graph_bar_hues[i] - 360
             graph_bar_top_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_TOP_HLV[1] / 100, GRAPH_BAR_TOP_HLV[2] / 100))
             graph_bar_front_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_FRONT_HLV[1] / 100, GRAPH_BAR_FRONT_HLV[2] / 100))
-            graph_bar_side_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i / 360], GRAPH_BAR_SIDE_HLV[1] / 100, GRAPH_BAR_SIDE_HLV[2] / 100))
+            graph_bar_side_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_SIDE_HLV[1] / 100, GRAPH_BAR_SIDE_HLV[2] / 100))
             graph_bar_top_rgb[i] = (int(graph_bar_top_rgb[i][0]*255), int(graph_bar_top_rgb[i][1]*255), int(graph_bar_top_rgb[i][2]*255))
             graph_bar_front_rgb[i] = (int(graph_bar_front_rgb[i][0]*255), int(graph_bar_front_rgb[i][1]*255), int(graph_bar_front_rgb[i][2]*255))
             graph_bar_side_rgb[i] = (int(graph_bar_side_rgb[i][0]*255), int(graph_bar_side_rgb[i][1]*255), int(graph_bar_side_rgb[i][2]*255))
