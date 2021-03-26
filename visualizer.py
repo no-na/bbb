@@ -14,6 +14,9 @@ RGB_OFFSET = 3
 GRAPH_BACK_COLOR = [164, 164, 164]
 GRAPH_LEFT_COLOR = [44, 44, 44]
 GRAPH_BOTT_COLOR = [133, 133, 133]
+SYSTEM_MID_COLOR = [84, 84, 152]
+SYSTEM_SDW_COLOR = [57, 57, 113]
+SYSTEM_HLT_COLOR = [118, 118, 171]
 GRAPH_DEPTH = 6
 
 
@@ -110,6 +113,9 @@ class Visualizer:
     def build_graph(self, start_x=None, start_y=None, end_x=None, end_y=None, data=None):
         legend_x = int((end_x - start_x) * 0.8 + start_x)
 
+        if data is None:
+            data = [['Pillar A', 'Pillar B'], [8, 13]]
+
         for k in range(start_y, end_y):
             for j in range(start_x, legend_x):
                 color_to_use = None
@@ -132,29 +138,49 @@ class Visualizer:
 
         self.build_text(FONT_SIX, legend_x+2, start_y+2, end_x=end_x, end_y=end_y, string="LEGEND")
 
-    def build_background(self):
-        backgrounds = os.listdir('images/background/')
-        _ = random.randint(0, len(backgrounds) - 1)
-        _ = png.Reader(filename='images/background/' + backgrounds[_])
-        back_gen = _.asRGBA()[2]
+    def build_system_bar(self):
+        start_x = 0
+        end_x = WIDTH
+        start_y = 0
+        end_y = 14
+        for k in range(start_y, end_y):
+            for j in range(start_x, end_x):
+                if (k == start_y and j < end_x-1) or (j == start_x and k < end_y-1):
+                    self.draw_pixel(j, k, SYSTEM_HLT_COLOR)
+                elif (k == end_y-1 and j > start_x) or (j == end_x-1 and k > start_y):
+                    self.draw_pixel(j, k, SYSTEM_SDW_COLOR)
+                else:
+                    self.draw_pixel(j, k, SYSTEM_MID_COLOR)
+
+    def build_image(self, filename, start_x, start_y, end_x, end_y):
+        _ = png.Reader(filename=filename)
+        image_gen = _.asRGBA()[2]
         row = None
 
-        for k in range(0, HEIGHT):
-            row = next(back_gen)
-            for j in range(0, WIDTH):
+        for k in range(start_y, end_y):
+            row = next(image_gen)
+            for j in range(start_x, end_x):
                 r = row[j * 4 + 0]
                 g = row[j * 4 + 1]
                 b = row[j * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
                     self.draw_pixel(j, k, [r, g, b])
 
-    def build_test_text(self, text, x, y):
+    def build_background(self):
+        backgrounds = os.listdir('images/background/')
+        _ = random.randint(0, len(backgrounds) - 1)
+        back_name = backgrounds[_]
+        self.build_image('images/background/' + back_name, 0, 0, WIDTH, HEIGHT)
+        self.build_system_bar()
+        self.build_text(FONT_SIX, 1, 1, string=back_name)
+
+    def build_test_text(self, text):
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
         # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
         self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
         self.build_background()
-        self.build_text(FONT_SIX, x, y, end_x=320, end_y=200, string=text)
+        self.build_text(FONT_SIX, 2, 16, end_x=320, end_y=200, string=text)
         self.build_graph(start_x=8, start_y=208, end_x=320, end_y=HEIGHT - 8)
         w.write(f, self.pixels)
 
