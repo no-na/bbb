@@ -172,7 +172,7 @@ class Visualizer:
         back_name = backgrounds[_]
         self.build_image('images/background/' + back_name, 0, 0, WIDTH, HEIGHT)
         self.build_system_bar()
-        self.build_text(FONT_SIX, 1, 1, string=back_name)
+        self.build_text(FONT_SIX, 1, 1, string=back_name.split('.')[0])
 
     def build_test_text(self, text):
         f = open('images/output/test.png', 'wb')
