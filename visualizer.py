@@ -173,12 +173,12 @@ class Visualizer:
                         color_to_use = graph_bar_top_rgb[i]
                     elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (bar_depth - (k - (bar_end_y - GRAPH_BAR_MAX_WIDTH))) and k >= bar_end_y - bar_depth:
                         color_to_use = graph_bar_side_rgb[i]
-                    elif k >= end_y - bar_depth:
-                        color_to_use = GRAPH_BOTT_COLOR
                     elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH:
                         color_to_use = graph_bar_side_rgb[i]
                     elif k < bar_start_y + bar_depth:
                         color_to_use = graph_bar_top_rgb[i]
+                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and k >= end_y - bar_depth:
+                        color_to_use = GRAPH_BOTT_COLOR
                     else:
                         color_to_use = graph_bar_front_rgb[i]
 
