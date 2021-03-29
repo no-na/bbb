@@ -154,7 +154,7 @@ class Visualizer:
 
         # Test data
         if data is None:
-            data = [['Pillar A', 'Pillar B'], [8, 13]]
+            data = [['Pillar A', 'Pillar B', 'Pillar C', 'Pillar D'], [8, 13, 1, 34]]
 
         # Background
         for k in range(start_y, end_y):
