@@ -150,7 +150,7 @@ class Visualizer:
         self.draw_pixel(start_x + 3, start_y + 4, color_low)
 
     def build_graph(self, start_x=None, start_y=None, end_x=None, end_y=None, data=None):
-        legend_x = int((end_x - start_x) * 0.8 + start_x)
+        legend_x = int((end_x - start_x) * 0.7 + start_x)
 
         # Test data
         if data is None:
@@ -243,10 +243,10 @@ class Visualizer:
                         self.draw_pixel(j, k, color_to_use)
 
             legend_text = legend_text + data[0][i] + os.linesep
-            self.build_dot(start_x=legend_x + 2, start_y=start_y + 3 + 12 * i, color_high=graph_bar_top_rgb[i],
+            self.build_dot(start_x=legend_x + 2, start_y=start_y + 4 + 12 * i, color_high=graph_bar_top_rgb[i],
                            color_mid=graph_bar_front_rgb[i], color_low=graph_bar_side_rgb[i])
 
-        self.build_text(FONT_SIX, legend_x + 7, start_y + 2, end_x=end_x, end_y=end_y, string=legend_text)
+        self.build_text(FONT_SIX, legend_x + 9, start_y + 2, end_x=end_x, end_y=end_y, string=legend_text)
 
     def build_system_bar(self):
         start_x = 0
