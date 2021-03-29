@@ -183,6 +183,7 @@ class Visualizer:
         graph_bar_front_rgb = []
         graph_bar_side_rgb = []
         hue_offset = random.randint(0, 360)
+        legend_text = ""
         for i in range(0, len(data[0])):
             graph_bar_hues.append(i * 360 // len(data[0]) + hue_offset)
             if graph_bar_hues[i] >= 360:
@@ -230,10 +231,11 @@ class Visualizer:
                     if color_to_use is not None:
                         self.draw_pixel(j, k, color_to_use)
 
-        legend_text = ""
-        for i in range(0, len(data[0])):
-            legend_text = legend_text + data[0][i] + os.linesep
-        self.build_text(FONT_SIX, legend_x + 2, start_y + 2, end_x=end_x, end_y=end_y, string=legend_text)
+                legend_text = legend_text + data[0][i] + os.linesep
+
+                self.build_dot(start_x=legend_x + 4, start_y= start_y + 3 + 12 * i, color_high=graph_bar_top_rgb[i], color_mid=graph_bar_front_rgb, color_low=graph_bar_side_rgb)
+
+        self.build_text(FONT_SIX, legend_x + 12, start_y + 2, end_x=end_x, end_y=end_y, string=legend_text)
 
     def build_system_bar(self):
         start_x = 0
