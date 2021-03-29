@@ -232,7 +232,7 @@ class Visualizer:
 
         legend_text = ""
         for i in range(0, len(data[0])):
-            legend_text = legend_text + data[0] + os.linesep
+            legend_text = legend_text + data[0][i] + os.linesep
         self.build_text(FONT_SIX, legend_x + 2, start_y + 2, end_x=end_x, end_y=end_y, string=legend_text)
 
     def build_system_bar(self):
