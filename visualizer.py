@@ -56,6 +56,8 @@ class Visualizer:
         if white_replace is None:
             white_replace = WHITE
         asc = ord(char)
+        if asc == 10: #New Line
+            return 10
         if asc < 128:
             ref_pos = [(asc % 16) * x_off, (asc // 16) * y_off]
         else:
@@ -76,6 +78,7 @@ class Visualizer:
                 ref_pos[0] = ref_pos[0] + 1
             ref_pos[0] = (asc % 16) * x_off
             ref_pos[1] = ref_pos[1] + 1
+        return asc
 
     def build_text(self, font, x, y, end_x=None, end_y=None, string: str = None):
         type_reader = png.Reader(filename=font)
@@ -111,16 +114,49 @@ class Visualizer:
                     return
             for c in s:
                 if c != ' ' or new_line is False:
-                    self.build_character(type_case_list, c, wx, wy, x_off, y_off, white_replace=white_replace)
-                    wx = wx + x_off
-                    new_line = False
+                    if self.build_character(type_case_list, c, wx, wy, x_off, y_off, white_replace=white_replace) == 10:
+                        wx = x
+                        wy = wy + y_off
+                        new_line = True
+                    else:
+                        wx = wx + x_off
+                        new_line = False
+
+    def build_dot(self, start_x=None, start_y=None, color_high=None, color_mid=None, color_low=None):
+        self.draw_pixel(start_x + 1, start_y + 0, color_mid)
+        self.draw_pixel(start_x + 2, start_y + 0, color_mid)
+        self.draw_pixel(start_x + 3, start_y + 0, color_mid)
+
+        self.draw_pixel(start_x + 0, start_y + 1, color_mid)
+        self.draw_pixel(start_x + 1, start_y + 1, WHITE)
+        self.draw_pixel(start_x + 2, start_y + 1, color_high)
+        self.draw_pixel(start_x + 3, start_y + 1, color_mid)
+        self.draw_pixel(start_x + 4, start_y + 1, color_low)
+
+        self.draw_pixel(start_x + 0, start_y + 2, color_mid)
+        self.draw_pixel(start_x + 1, start_y + 2, color_high)
+        self.draw_pixel(start_x + 2, start_y + 2, color_high)
+        self.draw_pixel(start_x + 3, start_y + 2, color_mid)
+        self.draw_pixel(start_x + 4, start_y + 2, color_low)
+
+        self.draw_pixel(start_x + 0, start_y + 3, color_mid)
+        self.draw_pixel(start_x + 1, start_y + 3, color_mid)
+        self.draw_pixel(start_x + 2, start_y + 3, color_mid)
+        self.draw_pixel(start_x + 3, start_y + 3, color_mid)
+        self.draw_pixel(start_x + 4, start_y + 3, color_low)
+
+        self.draw_pixel(start_x + 1, start_y + 4, color_low)
+        self.draw_pixel(start_x + 2, start_y + 4, color_low)
+        self.draw_pixel(start_x + 3, start_y + 4, color_low)
 
     def build_graph(self, start_x=None, start_y=None, end_x=None, end_y=None, data=None):
         legend_x = int((end_x - start_x) * 0.8 + start_x)
 
+        # Test data
         if data is None:
             data = [['Pillar A', 'Pillar B'], [8, 13]]
 
+        # Background
         for k in range(start_y, end_y):
             for j in range(start_x, legend_x):
                 color_to_use = None
@@ -141,37 +177,46 @@ class Visualizer:
                 if color_to_use is not None:
                     self.draw_pixel(j, k, color_to_use)
 
+        # Bars
         graph_bar_hues = []
         graph_bar_top_rgb = []
         graph_bar_front_rgb = []
         graph_bar_side_rgb = []
         hue_offset = random.randint(0, 360)
         for i in range(0, len(data[0])):
-            graph_bar_hues.append(i * 360//len(data[0]) + hue_offset)
+            graph_bar_hues.append(i * 360 // len(data[0]) + hue_offset)
             if graph_bar_hues[i] >= 360:
                 graph_bar_hues[i] = graph_bar_hues[i] - 360
-            graph_bar_top_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_TOP_HLV[1] / 100, GRAPH_BAR_TOP_HLV[2] / 100))
-            graph_bar_front_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_FRONT_HLV[1] / 100, GRAPH_BAR_FRONT_HLV[2] / 100))
-            graph_bar_side_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_SIDE_HLV[1] / 100, GRAPH_BAR_SIDE_HLV[2] / 100))
-            graph_bar_top_rgb[i] = (int(graph_bar_top_rgb[i][0]*255), int(graph_bar_top_rgb[i][1]*255), int(graph_bar_top_rgb[i][2]*255))
-            graph_bar_front_rgb[i] = (int(graph_bar_front_rgb[i][0]*255), int(graph_bar_front_rgb[i][1]*255), int(graph_bar_front_rgb[i][2]*255))
-            graph_bar_side_rgb[i] = (int(graph_bar_side_rgb[i][0]*255), int(graph_bar_side_rgb[i][1]*255), int(graph_bar_side_rgb[i][2]*255))
+            graph_bar_top_rgb.append(
+                colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_TOP_HLV[1] / 100, GRAPH_BAR_TOP_HLV[2] / 100))
+            graph_bar_front_rgb.append(colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_FRONT_HLV[1] / 100,
+                                                           GRAPH_BAR_FRONT_HLV[2] / 100))
+            graph_bar_side_rgb.append(
+                colorsys.hls_to_rgb(graph_bar_hues[i] / 360, GRAPH_BAR_SIDE_HLV[1] / 100, GRAPH_BAR_SIDE_HLV[2] / 100))
+            graph_bar_top_rgb[i] = (
+            int(graph_bar_top_rgb[i][0] * 255), int(graph_bar_top_rgb[i][1] * 255), int(graph_bar_top_rgb[i][2] * 255))
+            graph_bar_front_rgb[i] = (int(graph_bar_front_rgb[i][0] * 255), int(graph_bar_front_rgb[i][1] * 255),
+                                      int(graph_bar_front_rgb[i][2] * 255))
+            graph_bar_side_rgb[i] = (int(graph_bar_side_rgb[i][0] * 255), int(graph_bar_side_rgb[i][1] * 255),
+                                     int(graph_bar_side_rgb[i][2] * 255))
 
-            bar_depth = GRAPH_DEPTH-1
+            bar_depth = GRAPH_DEPTH - 1
             # noinspection PyTypeChecker
-            bar_start_y = end_y-1 - data[1][i] - bar_depth
-            bar_end_y = end_y-1
+            bar_start_y = end_y - 1 - data[1][i] - bar_depth
+            bar_end_y = end_y - 1
             for k in range(bar_start_y, bar_end_y):
-                bar_start_x = start_x+1+bar_depth+i*GRAPH_BAR_MAX_WIDTH + i*GRAPH_BAR_MAX_WIDTH
-                bar_end_x = bar_start_x + GRAPH_BAR_MAX_WIDTH+bar_depth
+                bar_start_x = start_x + 1 + bar_depth + i * GRAPH_BAR_MAX_WIDTH + i * GRAPH_BAR_MAX_WIDTH
+                bar_end_x = bar_start_x + GRAPH_BAR_MAX_WIDTH + bar_depth
                 for j in range(bar_start_x, bar_end_x):
                     color_to_use = None
 
                     if j < bar_start_x + (bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
                         color_to_use = None
-                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
+                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (
+                            bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
                         color_to_use = graph_bar_top_rgb[i]
-                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (bar_depth - (k - (bar_end_y - bar_depth))) and k >= bar_end_y - bar_depth:
+                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (
+                            bar_depth - (k - (bar_end_y - bar_depth))) and k >= bar_end_y - bar_depth:
                         color_to_use = graph_bar_side_rgb[i]
                     elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and k >= end_y - bar_depth:
                         color_to_use = GRAPH_BOTT_COLOR
@@ -185,7 +230,10 @@ class Visualizer:
                     if color_to_use is not None:
                         self.draw_pixel(j, k, color_to_use)
 
-        self.build_text(FONT_SIX, legend_x+2, start_y+2, end_x=end_x, end_y=end_y, string="LEGEND")
+        legend_text = ""
+        for i in range(0, len(data[0])):
+            legend_text = legend_text + data[0] + os.linesep
+        self.build_text(FONT_SIX, legend_x + 2, start_y + 2, end_x=end_x, end_y=end_y, string=legend_text)
 
     def build_system_bar(self):
         start_x = 0
@@ -194,9 +242,9 @@ class Visualizer:
         end_y = 14
         for k in range(start_y, end_y):
             for j in range(start_x, end_x):
-                if (k == start_y and j < end_x-1) or (j == start_x and k < end_y-1):
+                if (k == start_y and j < end_x - 1) or (j == start_x and k < end_y - 1):
                     self.draw_pixel(j, k, SYSTEM_HLT_COLOR)
-                elif (k == end_y-1 and j > start_x) or (j == end_x-1 and k > start_y):
+                elif (k == end_y - 1 and j > start_x) or (j == end_x - 1 and k > start_y):
                     self.draw_pixel(j, k, SYSTEM_SDW_COLOR)
                 else:
                     self.draw_pixel(j, k, SYSTEM_MID_COLOR)
