@@ -1048,12 +1048,26 @@ def visualizer_overview(message):
         graph_data[0].append(row[2])
         graph_data[1].append(int(row[4]))
 
+    query = "SELECT * FROM claims WHERE claim_bounty_creator = %s"
+    data = (message.author.id,)
+    cursor.execute(query, data)
+    rows = cursor.fetchall()
+    claim_text = "OPEN CLAIMS\n"
+    for row in rows:
+        query = "SELECT bounty_text FROM bounties WHERE bounty_id = %s"
+        data = (row[1],)
+        cursor.execute(query, data)
+        row_bo = cursor.fetchone()
+        desc = row_bo[0]
+        desc = (desc[:16-2] + '..') if len(desc) > 16 else desc
+        claim_text += "{0:<3} {1:<20}\n".format("{0} {1}".format(row[0], get_user_name(row[3])), desc)
+
     v = visualizer.Visualizer()
     v.build_background()
     v.build_image('images/static/border.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT)
     v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT, string="hi " + message.author.name)
     v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208, end_y=175, string='LEADERBOARD')
-    v.build_text(visualizer.FONT_SIX, 219, 91, end_x=420, end_y=175, string='OPEN CLAIMS')
+    v.build_text(visualizer.FONT_SIX, 219, 91, end_x=420, end_y=175, string=claim_text)
     v.build_text(visualizer.FONT_SIX, 431, 91, end_x=622, end_y=175, string='COMMON COMMANDS')
     v.build_graph(start_x=41, start_y=212, end_x=302, end_y=365, data=graph_data)
     file = v.finish_image()
@@ -1062,6 +1076,7 @@ def visualizer_overview(message):
 
 response_options = {
     "!help": ("List commands.", helpp),
+    "!overview": ("Display things you should know.", visualizer_overview),
     "!bounty": ("Create and view bounties.", bounty),
     "!claim": ("Create, accept, reject, and view claims on bounties.", claim),
     "!practice": ("Record that you've practiced a pillar.", practice),
@@ -1070,8 +1085,7 @@ response_options = {
     "!personality": ("Change bot personality.", personality),
     "!timezone": ("Change displayed timezone.", timeoffset),
     "!big": ("BIG CHICK", block_test),
-    "!dm_test": ("Bot will say 'hi' to you in a DM.", dm_test),
-    "!overview": ("Display things you should know.", visualizer_overview)
+    "!dm_test": ("Bot will say 'hi' to you in a DM.", dm_test)
 }
 
 
