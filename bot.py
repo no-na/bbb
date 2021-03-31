@@ -1031,19 +1031,24 @@ def dm_test(message):
     return Response(text=":hatched_chick:", dms=dms)
 
 
-def visualizer_test(message):
+def visualizer_overview(message):
     split_message = message.content.split()
-    v = visualizer.Visualizer()
-    if len(split_message) > 1:
-        return Response(text="", file=v.build_test_text(message.content.split(' ', 1)[1]))
-    else:
-        return Response(text="", file=v.build_test_text("TEST AaBbCc"))
+    setup = setup_response(message.author.id)
+    out_message = setup[0]
+    conn = setup[1]
+    cursor = setup[2]
+    personality_id = setup[3]
 
-
-def visualizer_birch(message):
-    split_message = message.content.split()
     v = visualizer.Visualizer()
-    return Response(text="", file=v.build_text_birch("Birch Duchess", 40, 40, split_message[1]))
+    v.build_background()
+    v.build_image('images/static/border.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT)
+    v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=320, end_y=200, string="hi " + message.author.name)
+    v.build_text(visualizer.FONT_SIX, 17, 91, end_x=320, end_y=200, string='LEADERBOARD')
+    v.build_text(visualizer.FONT_SIX, 219, 91, end_x=320, end_y=200, string='OPEN CLAIMS')
+    v.build_text(visualizer.FONT_SIX, 431, 91, end_x=320, end_y=200, string='COMMON COMMANDS')
+    v.build_graph(start_x=32, start_y=212, end_x=320, end_y=visualizer.HEIGHT - 8)
+    file = v.finish_image()
+    return Response(text="", file=file)
 
 
 response_options = {
@@ -1057,8 +1062,7 @@ response_options = {
     "!timezone": ("Change displayed timezone.", timeoffset),
     "!big": ("BIG CHICK", block_test),
     "!dm_test": ("Bot will say 'hi' to you in a DM.", dm_test),
-    "!visualizer_test": ("jajaja", visualizer_test),
-    "!visualizer_birch": ("jajaja", visualizer_birch)
+    "!overview": ("Display things you should know.", visualizer_overview)
 }
 
 

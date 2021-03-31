@@ -28,6 +28,9 @@ GRAPH_DEPTH = 6
 class Visualizer:
     pixels = []
 
+    def __init__(self):
+        self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
+
     def parse_tag(self, string, white_replace):
         rex = re.compile(r'^\[\[\D:*.*\]\]$')
         if re.match(rex, string):
@@ -284,25 +287,8 @@ class Visualizer:
         self.build_system_bar()
         self.build_text(FONT_SIX, 1, 1, string=back_name.split('.')[0])
 
-    def build_test_text(self, text):
+    def finish_image(self):
         f = open('images/output/test.png', 'wb')
         w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
-        # pixels = [[128, 128, 128] * WIDTH] * HEIGHT  <-- EVIL
-        self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
-        self.build_background()
-        self.build_image('images/static/border.png', 0, 0, WIDTH, HEIGHT)
-        self.build_text(FONT_SIX, 2, 16, end_x=320, end_y=200, string=text)
-        self.build_graph(start_x=8, start_y=208, end_x=320, end_y=HEIGHT - 8)
         w.write(f, self.pixels)
-
-        return f.name
-
-    def build_text_birch(self, text, x, y, background):
-        f = open('images/output/test.png', 'wb')
-        w = png.Writer(width=WIDTH * SCALE, height=HEIGHT * SCALE, bitdepth=8, greyscale=False)
-        self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
-        self.build_background()
-        self.build_text(FONT_EIGHT, x, y, text)
-        w.write(f, self.pixels)
-
         return f.name
