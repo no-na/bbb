@@ -23,6 +23,10 @@ SYSTEM_MID_COLOR = [84, 84, 152]
 SYSTEM_SDW_COLOR = [57, 57, 113]
 SYSTEM_HLT_COLOR = [118, 118, 171]
 GRAPH_DEPTH = 6
+FONTS = {
+    FONT_SIX: list(png.Reader(filename=FONT_SIX).asRGBA()[2]),
+    FONT_EIGHT: list(png.Reader(filename=FONT_EIGHT).asRGBA()[2])
+}
 
 
 class Visualizer:
@@ -84,9 +88,6 @@ class Visualizer:
         return asc
 
     def build_text(self, font, x, y, end_x=None, end_y=None, string: str = None):
-        type_reader = png.Reader(filename=font)
-        type_case = type_reader.asRGBA()
-
         rex = re.compile(r'\d+')
         offsets = rex.findall(font)
         x_off = int(offsets[0])
@@ -99,8 +100,6 @@ class Visualizer:
             end_x = WIDTH
         if end_y is None:
             end_y = HEIGHT
-
-        type_case_list = list(type_case[2])  # We don't keep this as a generator because we aren't iterating.
 
         split_string = re.findall(r'\[\[.+?\]\]|\s|\b\w+\b|\W', string)
         white_replace = [255, 255, 255]
@@ -117,7 +116,7 @@ class Visualizer:
                     return
             for c in s:
                 if c != ' ' or new_line is False:
-                    if self.build_character(type_case_list, c, wx, wy, x_off, y_off, white_replace=white_replace) == 10:
+                    if self.build_character(FONTS[font], c, wx, wy, x_off, y_off, white_replace=white_replace) == 10:
                         wx = x
                         wy = wy + y_off
                         new_line = True
