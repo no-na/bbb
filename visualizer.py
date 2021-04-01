@@ -81,9 +81,9 @@ class Visualizer:
                     g = white_replace[1]
                     b = white_replace[2]
                 elif white_replace != WHITE and [r, g, b] == [0, 0, 0]:
-                    r = max(0, white_replace[0] - 120)
-                    g = max(0, white_replace[1] - 120)
-                    b = max(0, white_replace[2] - 120)
+                    r = max(0, white_replace[0] - 140)
+                    g = max(0, white_replace[1] - 140)
+                    b = max(0, white_replace[2] - 140)
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
                     self.draw_pixel(j, k, [r, g, b])
                 ref_pos[0] = ref_pos[0] + 1
@@ -222,8 +222,8 @@ class Visualizer:
 
             bar_depth = GRAPH_DEPTH - 1
             # noinspection PyTypeChecker
-            bar_start_y = end_y - 1 - data[1][i] - bar_depth
-            bar_end_y = end_y - 1
+            bar_start_y = end_y-1 - int((end_y-1 - start_y) * 0.9 * (data[1][i] // data[1][0])) - bar_depth
+            bar_end_y = end_y-1
             for k in range(bar_start_y, bar_end_y):
                 bar_start_x = start_x + 1 + bar_depth + i * GRAPH_BAR_MAX_WIDTH + i * GRAPH_BAR_MAX_WIDTH
                 bar_end_x = bar_start_x + GRAPH_BAR_MAX_WIDTH + bar_depth
