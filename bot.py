@@ -1052,6 +1052,8 @@ def visualizer_overview(message):
     cursor.execute(query)
     rows = cursor.fetchall()
     leaderboard_text = "LEADERBOARD\n\n"
+    leaderboard_text_names = "\n\n"
+    leaderboard_text_points = "\n\n"
     place = 0
     previous_points = -1
     for i, row in enumerate(rows):
@@ -1071,8 +1073,9 @@ def visualizer_overview(message):
         elif place > 4:
             break
         previous_points = row[3]
-        leaderboard_text += "{0}{1}{2}\n".format("{0}{1}{2}".format(place_prefix, place, place_suffix),
-                                                                   get_user_name(row[0]), row[3])
+        leaderboard_text += "{0}{1}{2}\n".format(place_prefix, place, place_suffix)
+        leaderboard_text_names += "{0}\n".format(get_user_name(row[0]))
+        leaderboard_text_points += "{0}\n".format(row[3])
 
     query = "SELECT * FROM claims WHERE claim_bounty_creator = %s"
     data = (message.author.id,)
@@ -1095,6 +1098,8 @@ def visualizer_overview(message):
     v.build_image('images/static/border.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT)
     v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT, string="hi " + message.author.name)
     v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208, end_y=175, string=leaderboard_text)
+    v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208 + 8*5, end_y=175, string=leaderboard_text_names)
+    v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208 + 8*20, end_y=175, string=leaderboard_text_points)
     v.build_text(visualizer.FONT_SIX, 219, 91, end_x=420, end_y=175, string=claim_text)
     v.build_text(visualizer.FONT_SIX, 431, 91, end_x=622, end_y=175, string='COMMON COMMANDS')
     v.build_graph(start_x=41, start_y=212, end_x=302, end_y=365, data=graph_data)
