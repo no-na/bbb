@@ -190,6 +190,7 @@ class Visualizer:
         legend_text = ""
         _ = legend_x - start_x+1
         graph_bar_width = min(_ // len(data[0]), GRAPH_BAR_MAX_WIDTH)
+        graph_bar_width = _ // len(data[0])
         graph_bar_spacing = int(graph_bar_width * 0.2)
         graph_bar_width = graph_bar_width - graph_bar_spacing
 
