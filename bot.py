@@ -1038,6 +1038,7 @@ def visualizer_overview(message):
     conn = setup[1]
     cursor = setup[2]
     personality_id = setup[3]
+    user_color = "[[C:199:255,133]]"
 
     query = "SELECT * FROM pillars WHERE pillar_user = %s ORDER BY pillar_points DESC"
     data = (message.author.id,)
@@ -1074,8 +1075,12 @@ def visualizer_overview(message):
             break
         previous_points = row[3]
         leaderboard_text += "{0}{1}{2}\n".format(place_prefix, place, place_suffix)
-        leaderboard_text_names += "{0}\n".format(get_user_name(row[0]))
-        leaderboard_text_points += "{0}\n".format(row[3])
+        if get_user_name(row[0]) == message.author.name:
+            leaderboard_text_names += "{0}{1}{2}\n".format(user_color, get_user_name(row[0]), "[[c]]")
+            leaderboard_text_points += "{0}{1}{2}\n".format(user_color, row[3], "[[c]]")
+        else:
+            leaderboard_text_names += "{0}\n".format(get_user_name(row[0]))
+            leaderboard_text_points += "{0}\n".format(row[3])
 
     query = "SELECT * FROM claims WHERE claim_bounty_creator = %s"
     data = (message.author.id,)

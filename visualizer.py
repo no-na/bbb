@@ -81,9 +81,9 @@ class Visualizer:
                     g = white_replace[1]
                     b = white_replace[2]
                 elif white_replace != WHITE and [r, g, b] == [0, 0, 0]:
-                    r = max(0, white_replace[0] - 180)
-                    g = max(0, white_replace[1] - 180)
-                    b = max(0, white_replace[2] - 180)
+                    r = max(0, white_replace[0] - 120)
+                    g = max(0, white_replace[1] - 120)
+                    b = max(0, white_replace[2] - 120)
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
                     self.draw_pixel(j, k, [r, g, b])
                 ref_pos[0] = ref_pos[0] + 1
