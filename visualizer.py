@@ -231,7 +231,7 @@ class Visualizer:
             bar_end_y = end_y-1
             for k in range(bar_start_y, bar_end_y):
                 bar_start_x = start_x + 1 + graph_bar_spacing + (graph_bar_width + graph_bar_spacing) * i
-                bar_end_x = bar_start_x + (graph_bar_width + graph_bar_spacing)
+                bar_end_x = bar_start_x + graph_bar_width
                 for j in range(bar_start_x, bar_end_x):
                     if j < bar_start_x + (bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
                         color_to_use = None
