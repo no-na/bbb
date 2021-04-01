@@ -222,7 +222,7 @@ class Visualizer:
 
             bar_depth = GRAPH_DEPTH - 1
             # noinspection PyTypeChecker
-            bar_start_y = end_y-1 - int((end_y-1 - start_y) * 0.9 * (data[1][i] // data[1][0])) - bar_depth
+            bar_start_y = end_y-1 - int((end_y-1 - start_y) * 0.9 * (data[1][i] / data[1][0])) - bar_depth
             bar_end_y = end_y-1
             for k in range(bar_start_y, bar_end_y):
                 bar_start_x = start_x + 1 + bar_depth + i * GRAPH_BAR_MAX_WIDTH + i * GRAPH_BAR_MAX_WIDTH
