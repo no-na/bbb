@@ -188,7 +188,7 @@ class Visualizer:
         graph_bar_side_rgb = []
         hue_offset = random.randint(0, 360)
         legend_text = ""
-        _ = legend_x - start_x+1
+        _ = legend_x-4 - start_x+1
         graph_bar_width = min(_ // len(data[0]), GRAPH_BAR_MAX_WIDTH)
         graph_bar_width = _ // len(data[0])
         graph_bar_spacing = int(graph_bar_width * 0.2)
