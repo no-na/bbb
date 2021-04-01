@@ -188,6 +188,11 @@ class Visualizer:
         graph_bar_side_rgb = []
         hue_offset = random.randint(0, 360)
         legend_text = ""
+        _ = legend_x - start_x+1
+        graph_bar_width = min(_ // len(data[0]), GRAPH_BAR_MAX_WIDTH)
+        graph_bar_spacing = int(graph_bar_width * 0.2)
+        graph_bar_width = graph_bar_width - graph_bar_spacing
+
         for i in range(0, len(data[0])):
             graph_bar_hues.append(i * 360 // len(data[0]) + hue_offset)
             if graph_bar_hues[i] >= 360:
@@ -221,24 +226,23 @@ class Visualizer:
                 int(graph_bar_side_rgb[i][2] * 255))
 
             bar_depth = GRAPH_DEPTH - 1
-            # noinspection PyTypeChecker
-            bar_start_y = end_y-1 - int((end_y-1 - start_y) * 0.9 * (data[1][i] / data[1][0])) - bar_depth
+            bar_start_y = end_y-1 - int((end_y-1 - start_y) * 0.8 * (data[1][i] / data[1][0])) - bar_depth
             bar_end_y = end_y-1
             for k in range(bar_start_y, bar_end_y):
-                bar_start_x = start_x + 1 + bar_depth + i * GRAPH_BAR_MAX_WIDTH + i * GRAPH_BAR_MAX_WIDTH
-                bar_end_x = bar_start_x + GRAPH_BAR_MAX_WIDTH + bar_depth
+                bar_start_x = start_x + 1 + graph_bar_spacing + (graph_bar_width + graph_bar_spacing) * i
+                bar_end_x = bar_start_x + (graph_bar_width + graph_bar_spacing)
                 for j in range(bar_start_x, bar_end_x):
                     if j < bar_start_x + (bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
                         color_to_use = None
-                    elif bar_start_x + GRAPH_BAR_MAX_WIDTH <= j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (
+                    elif bar_start_x + graph_bar_width <= j < bar_start_x + graph_bar_width + (
                             bar_depth - (k - bar_start_y)) and k < bar_start_y + bar_depth:
                         color_to_use = graph_bar_top_rgb[i]
-                    elif bar_start_x + GRAPH_BAR_MAX_WIDTH <= j < bar_start_x + GRAPH_BAR_MAX_WIDTH + (
+                    elif bar_start_x + graph_bar_width <= j < bar_start_x + graph_bar_width + (
                             bar_depth - (k - (bar_end_y - bar_depth))) and k >= bar_end_y - bar_depth:
                         color_to_use = graph_bar_side_rgb[i]
-                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH and k >= end_y - bar_depth:
+                    elif j >= bar_start_x + graph_bar_width and k >= end_y - bar_depth:
                         color_to_use = GRAPH_BOTT_COLOR
-                    elif j >= bar_start_x + GRAPH_BAR_MAX_WIDTH:
+                    elif j >= bar_start_x + graph_bar_width:
                         color_to_use = graph_bar_side_rgb[i]
                     elif k < bar_start_y + bar_depth:
                         color_to_use = graph_bar_top_rgb[i]
