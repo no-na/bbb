@@ -59,16 +59,18 @@ class Visualizer:
             return int((1 - 2 * (1 - b/255) * (1 - a/255)) * 255)
 
     def draw_pixel(self, x, y, color, mode="normal"):
+        pixels = self.pixels
+        hard_light = self.hard_light
         for k in range(0, SCALE):
             for j in range(0, SCALE):
                 if mode == "normal":
-                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = color[0]
-                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1] = color[1]
-                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2] = color[2]
+                    pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = color[0]
+                    pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1] = color[1]
+                    pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2] = color[2]
                 elif mode == "hard-light":
-                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0], color[0])
-                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1], color[1])
-                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2], color[2])
+                    pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = hard_light(pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0], color[0])
+                    pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1] = hard_light(pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1], color[1])
+                    pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2] = hard_light(pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2], color[2])
 
 
     def build_character(self, type_case, char, x, y, x_off, y_off, white_replace=None):
