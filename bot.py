@@ -1109,8 +1109,8 @@ def visualizer_overview(message):
     query = "SELECT * FROM bounties WHERE bounty_active = TRUE ORDER BY bounty_creation DESC LIMIT 1"
     cursor.execute(query)
     row = cursor.fetchone()
-    date = datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S")
-    date = date.strftime('%m/%d/%Y')
+    #date = datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S")
+    date = row[1].strftime('%m/%d/%Y')
     bounty_text = "{0}\n\n" \
                   "-{1}\n" \
                   "{2:<10}[[C:0,255,0]]ID: {3:<20}[[c]]".format(row[2], get_user_name(row[3]), date, row[0])
