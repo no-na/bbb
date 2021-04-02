@@ -1100,11 +1100,20 @@ def visualizer_overview(message):
     if len(rows) == 0:
         claim_text += "[[C:255,255,0]]No open claims for now.[[c]]"
 
-    commands_text = "COMMON COMMANDS\n" \
+    commands_text = "COMMON COMMANDS\n\n" \
                     "!claim -new [[C:180,180,180]][bounty ID] [pillar][[c]]\n" \
                     "!claim -new [[C:180,180,180]][claim ID][[c]]\n" \
                     "!practice [[C:180,180,180]][pillar][[c]]\n" \
                     "!help"
+
+    query = "SELECT * FROM bounties WHERE bounty_active = TRUE ORDER BY bounty_creation DESC LIMIT 1"
+    cursor.execute(query)
+    row = cursor.fetchone()
+    date = datetime(row[2])
+    date = date.strftime('%m/%d/%Y')
+    bounty_text = "{0}\n\n" \
+                  "-{1}\n" \
+                  "{2:<10}[[C:0,255,0]]ID: {3:<20}[[c]]".format(row[2], get_user_name(row[3]), date, row[0])
 
     v = visualizer.Visualizer()
     v.build_background()
@@ -1114,7 +1123,8 @@ def visualizer_overview(message):
     v.build_text(visualizer.FONT_SIX, 17 + 8*5, 91, end_x=208, end_y=175, string=leaderboard_text_names)
     v.build_text(visualizer.FONT_SIX, 17 + 8*20, 91, end_x=208, end_y=175, string=leaderboard_text_points)
     v.build_text(visualizer.FONT_SIX, 219, 91, end_x=420, end_y=175, string=claim_text)
-    v.build_text(visualizer.FONT_SIX, 431, 91, end_x=622, end_y=175, string=commands_text)
+    v.build_text(visualizer.FONT_SIX, 431, 91, end_x=628, end_y=175, string=commands_text)
+    v.build_text(visualizer.FONT_SIX, 336, 211, end_x=601, end_y=286, string=bounty_text)
     v.build_graph(start_x=41, start_y=212, end_x=302, end_y=365, data=graph_data)
     file = v.finish_image()
     cursor.close()
