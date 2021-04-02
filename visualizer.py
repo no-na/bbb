@@ -67,8 +67,8 @@ class Visualizer:
                     self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2] = color[2]
                 elif mode == "hard-light":
                     self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0], color[0])
-                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1], color[1])
-                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2], color[2])
+                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1], color[1])
+                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2], color[2])
 
 
     def build_character(self, type_case, char, x, y, x_off, y_off, white_replace=None):
