@@ -5,7 +5,8 @@ import json
 import re
 from datetime import datetime, timedelta
 import visualizer
-from timeit import default_timer as timer
+
+# from timeit import default_timer as timer
 
 intents = discord.Intents.default()
 intents.members = True
@@ -35,7 +36,7 @@ class Response:
     dms = None
     file = None
 
-    def __init__(self, text=None, dms = None, file = None):
+    def __init__(self, text=None, dms=None, file=None):
         self.text = text
         self.dms = dms
         self.file = file
@@ -58,7 +59,7 @@ def setup_response(user_id=None):
         query = (
             "SELECT user_personality FROM users WHERE user_id = %s"
         )
-        data = (user_id, )
+        data = (user_id,)
         cursor.execute(query, data)
         row = cursor.fetchone()
         if row is not None:
@@ -102,7 +103,7 @@ def clean_cursor(cursor):
 
 def apply_time_offset(cursor, time, user_id):
     query = "SELECT user_time_offset FROM users WHERE user_id = %s"
-    data = (user_id, )
+    data = (user_id,)
     cursor.execute(query, data)
     row_ti = cursor.fetchone()
     hours = 0
@@ -154,7 +155,7 @@ def check_join(member):
     query = (
         "SELECT EXISTS(SELECT * FROM users WHERE user_id = %s)"
     )
-    data = (member.id, )
+    data = (member.id,)
     cursor.execute(query, data)
     row = cursor.fetchone()
     cursor.close()
@@ -183,7 +184,7 @@ def join(message):
         query = (
             "SELECT user_personality FROM users WHERE user_id = %s"
         )
-        data = (message.author.id, )
+        data = (message.author.id,)
         cursor.execute(query, data)
         row = cursor.fetchone()
         personality_id = row[0]
@@ -231,7 +232,7 @@ def personality(message):
         query = (
             "SELECT EXISTS(SELECT * FROM personalities WHERE personality_id = %s)"
         )
-        data = (new_personality_id, )
+        data = (new_personality_id,)
         cursor.execute(query, data)
         row = cursor.fetchone()
         if row[0] == 1:
@@ -311,7 +312,7 @@ def bounty(message):
                 query = (
                     "SELECT * FROM claims WHERE claim_bounty_id = %s"
                 )
-                data = (split_message[2], )
+                data = (split_message[2],)
                 cursor.execute(query, data)
                 rows = cursor.fetchall()
                 for row in rows:
@@ -322,7 +323,7 @@ def bounty(message):
                 query = (
                     "DELETE FROM claims WHERE claim_bounty_id = %s"
                 )
-                data = (split_message[2], )
+                data = (split_message[2],)
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -330,7 +331,7 @@ def bounty(message):
                 query = (
                     "DELETE FROM bounties WHERE bounty_id = %s"
                 )
-                data = (split_message[2], )
+                data = (split_message[2],)
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -350,7 +351,7 @@ def bounty(message):
                 query = (
                     "SELECT * FROM claims WHERE claim_bounty_id = %s"
                 )
-                data = (split_message[2], )
+                data = (split_message[2],)
                 cursor.execute(query, data)
                 rows = cursor.fetchall()
                 for row in rows:
@@ -361,7 +362,7 @@ def bounty(message):
                 query = (
                     "DELETE FROM claims WHERE claim_bounty_id = %s"
                 )
-                data = (split_message[2], )
+                data = (split_message[2],)
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -369,7 +370,7 @@ def bounty(message):
                 query = (
                     "UPDATE bounties SET bounty_active = 0 WHERE bounty_id = %s"
                 )
-                data = (split_message[2], )
+                data = (split_message[2],)
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -381,7 +382,8 @@ def bounty(message):
             cursor.execute(query)
             rows = cursor.fetchall()
 
-            out_message += "{0:<20} {1:<30} {2}\n".format("{0} {1}".format("ID", "OWNER"), "CREATION DATE", "DESCRIPTION")
+            out_message += "{0:<20} {1:<30} {2}\n".format("{0} {1}".format("ID", "OWNER"), "CREATION DATE",
+                                                          "DESCRIPTION")
             for row in rows:
                 offset_creation = apply_time_offset(cursor, row[1], message.author.id)
                 is_inactive = ""
@@ -452,7 +454,7 @@ def claim(message):
             roww = cursor.fetchone()
             if row[0] == 1 and roww[0] == 0:
                 query = "SELECT bounty_creator FROM bounties WHERE bounty_id = %s"
-                data = (split_message[2], )
+                data = (split_message[2],)
                 cursor.execute(query, data)
                 bounty_creator = cursor.fetchone()[0]
 
@@ -471,7 +473,8 @@ def claim(message):
                         if row_p is not None:
                             pillars.append(row_p[0])
                         else:
-                            out_message += "{0}\n".format(get_response(cursor, "claim_new_invalid_pillar", personality_id))
+                            out_message += "{0}\n".format(
+                                get_response(cursor, "claim_new_invalid_pillar", personality_id))
                             return Response(text=end_response(out_message, conn, cursor), dms=dms)
 
                 pillar_string = ""
@@ -507,7 +510,7 @@ def claim(message):
                 query = (
                     "DELETE FROM claims WHERE claim_id = %s"
                 )
-                data = (split_message[2], )
+                data = (split_message[2],)
                 cursor.execute(query, data)
                 conn.commit()
                 out_message += "{0}\n".format(get_response(cursor, "claim_delete_valid", personality_id))
@@ -528,7 +531,7 @@ def claim(message):
                 # Award point to claimee. Check for pillar bonus too.
                 claimee_point_reward = CLAIMEE_POINT_INCREMENT
                 query = "SELECT claim_pillars FROM claims WHERE claim_claimee = %s"
-                data = (row[3], )
+                data = (row[3],)
                 cursor.execute(query, data)
                 row_pi = cursor.fetchone()
                 pillars = json.loads(row_pi[0])
@@ -543,7 +546,7 @@ def claim(message):
                     conn.commit()
 
                     query = "SELECT * FROM pillars WHERE pillar_is_favorite = TRUE AND pillar_id = %s"
-                    data = (pillar, )
+                    data = (pillar,)
                     cursor.execute(query, data)
                     row_pibo = cursor.fetchone()
                     if row_pibo is not None:
@@ -561,17 +564,18 @@ def claim(message):
                 query = (
                     "SELECT user_personality FROM users WHERE user_id = %s"
                 )
-                data = (row[3], )
+                data = (row[3],)
                 cursor.execute(query, data)
                 row_p = cursor.fetchone()
                 claimee_personality = row_p[0]
-                dms.append((row[3], get_response(cursor, "accept_claimee_valid", claimee_personality).format(message.author.name, claimee_point_reward)))
+                dms.append((row[3], get_response(cursor, "accept_claimee_valid", claimee_personality).format(
+                    message.author.name, claimee_point_reward)))
 
                 # Delete claim.
                 query = (
                     "DELETE FROM claims WHERE claim_id = %s"
                 )
-                data = (row[0], )
+                data = (row[0],)
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -588,7 +592,7 @@ def claim(message):
                 query = (
                     "SELECT * FROM bounties WHERE bounty_id = %s AND bounty_bonus_received = FALSE"
                 )
-                data = (row[1], )
+                data = (row[1],)
                 cursor.execute(query, data)
                 row_br = cursor.fetchone()
                 if row_br is not None:
@@ -602,7 +606,7 @@ def claim(message):
                     query = (
                         "UPDATE bounties SET bounty_bonus_received = TRUE WHERE bounty_id = %s"
                     )
-                    data = (row[1], )
+                    data = (row[1],)
                     cursor.execute(query, data)
                     conn.commit()
 
@@ -627,7 +631,7 @@ def claim(message):
                 query = (
                     "DELETE FROM claims WHERE claim_id = %s"
                 )
-                data = (row[0], )
+                data = (row[0],)
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -635,11 +639,12 @@ def claim(message):
                 query = (
                     "SELECT user_personality FROM users WHERE user_id = %s"
                 )
-                data = (row[3], )
+                data = (row[3],)
                 cursor.execute(query, data)
                 row_p = cursor.fetchone()
                 claimee_personality = row_p[0]
-                dms.append((row[3], get_response(cursor, "reject_claimee_valid", claimee_personality).format(message.author.name)))
+                dms.append((row[3], get_response(cursor, "reject_claimee_valid", claimee_personality).format(
+                    message.author.name)))
 
                 out_message += "{0}\n".format(get_response(cursor, "reject_valid", personality_id))
             else:
@@ -669,14 +674,14 @@ def claim(message):
                                                                      "created.")
 
         query = "SELECT * FROM claims WHERE claim_bounty_creator = %s"
-        data = (message.author.id, )
+        data = (message.author.id,)
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED TO YOU\n")
         out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format("ID", "CLAIMANT"), "DESCRIPTION")
         for row in rows:
             query = "SELECT bounty_text FROM bounties WHERE bounty_id = %s"
-            data = (row[1], )
+            data = (row[1],)
             cursor.execute(query, data)
             row_bo = cursor.fetchone()
             desc = row_bo[0]
@@ -685,7 +690,7 @@ def claim(message):
             out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], get_user_name(row[3])), desc)
 
             query = "SELECT claim_pillars FROM claims WHERE claim_id = %s"
-            data = (row[0], )
+            data = (row[0],)
             cursor.execute(query, data)
             row_pi = cursor.fetchone()
             pillars = json.loads(row_pi[0])
@@ -693,20 +698,20 @@ def claim(message):
                 query = (
                     "SELECT pillar_name FROM pillars where pillar_id = %s"
                 )
-                data = (pillar, )
+                data = (pillar,)
                 cursor.execute(query, data)
                 row_pina = cursor.fetchone()
                 out_message += "{0:<5}-{1}\n".format("", row_pina[0])
 
         query = "SELECT * FROM claims WHERE claim_claimee = %s"
-        data = (message.author.id, )
+        data = (message.author.id,)
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("CLAIMS SUBMITTED BY YOU\n")
         out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format("ID", "OWNER"), "DESCRIPTION")
         for row in rows:
             query = "SELECT bounty_text FROM bounties WHERE bounty_id = %s"
-            data = (row[1], )
+            data = (row[1],)
             cursor.execute(query, data)
             row_bo = cursor.fetchone()
             desc = row_bo[0]
@@ -715,7 +720,7 @@ def claim(message):
             out_message += "{0:<20} {1:<20}\n".format("{0} {1}".format(row[0], get_user_name(row[4])), desc)
 
             query = "SELECT claim_pillars FROM claims WHERE claim_id = %s"
-            data = (row[0], )
+            data = (row[0],)
             cursor.execute(query, data)
             row_pi = cursor.fetchone()
             pillars = json.loads(row_pi[0])
@@ -723,7 +728,7 @@ def claim(message):
                 query = (
                     "SELECT pillar_name FROM pillars where pillar_id = %s"
                 )
-                data = (pillar, )
+                data = (pillar,)
                 cursor.execute(query, data)
                 row_pina = cursor.fetchone()
                 out_message += "{0:<5}-{1}\n".format("", row_pina[0])
@@ -823,7 +828,7 @@ def pillar(message):
                 query = (
                     "UPDATE pillars SET pillar_is_favorite = FALSE WHERE pillar_user = %s AND pillar_is_favorite = TRUE"
                 )
-                data = (message.author.id, )
+                data = (message.author.id,)
                 cursor.execute(query, data)
                 conn.commit()
 
@@ -855,7 +860,7 @@ def pillar(message):
                                                                            "extra points.")
 
         query = "SELECT * FROM pillars WHERE pillar_user = %s"
-        data = (message.author.id, )
+        data = (message.author.id,)
         cursor.execute(query, data)
         rows = cursor.fetchall()
         out_message += "\n{0}".format("YOUR PILLARS\n")
@@ -904,10 +909,12 @@ def points(message):
         previous_points = row[3]
         if row[0] == message.author.id:
             points_user_message += "{0:<20}{1:<20}\n".format("{0}{1}".format(place, place_suffix), row[3])
-        points_board_message += "{0:<20}{1:<20}{2:<4}{3}\n".format("{0}{1}".format(place, place_suffix), get_user_name(row[0]), row[3], build_int_block(int(row[3])))
+        points_board_message += "{0:<20}{1:<20}{2:<4}{3}\n".format("{0}{1}".format(place, place_suffix),
+                                                                   get_user_name(row[0]), row[3],
+                                                                   build_int_block(int(row[3])))
 
     query = "SELECT * FROM pillars WHERE pillar_user = %s ORDER BY pillar_points DESC"
-    data = (message.author.id, )
+    data = (message.author.id,)
     cursor.execute(query, data)
     rows = cursor.fetchall()
     for row in rows:
@@ -1010,10 +1017,11 @@ def timeoffset(message):
     else:
         # Display help and the user's existing pillars.
         out_message += "{0}\n".format(get_response(cursor, "timezone", personality_id))
-        out_message += format_command("# !timezone [NEW TIME ZONE OFFSET] (!timezone -9) (!timezone -09:00)", "Adjusts the UTC offset displayed for commands you write. Does not affect the UTC offset displayed for commands others write.")
+        out_message += format_command("# !timezone [NEW TIME ZONE OFFSET] (!timezone -9) (!timezone -09:00)",
+                                      "Adjusts the UTC offset displayed for commands you write. Does not affect the UTC offset displayed for commands others write.")
 
         query = "SELECT user_time_offset FROM users WHERE user_id = %s"
-        data = (message.author.id, )
+        data = (message.author.id,)
         cursor.execute(query, data)
         row = cursor.fetchone()
         if row is not None:
@@ -1035,7 +1043,7 @@ def dm_test(message):
 
 
 def visualizer_overview(message):
-    start = timer()
+    # start = timer()
     split_message = message.content.split()
     setup = setup_response(message.author.id)
     out_message = setup[0]
@@ -1097,7 +1105,7 @@ def visualizer_overview(message):
         cursor.execute(query, data)
         row_bo = cursor.fetchone()
         desc = row_bo[0]
-        desc = (desc[:16-2] + '..') if len(desc) > 16 else desc
+        desc = (desc[:16 - 2] + '..') if len(desc) > 16 else desc
         claim_text += "{0:<3} {1:<20}\n".format("{0} {1}".format(row[0], get_user_name(row[3])), desc)
     if len(rows) == 0:
         claim_text += "[[C:255,255,0]]No open claims for now.[[c]]"
@@ -1116,42 +1124,43 @@ def visualizer_overview(message):
                   "-{1}\n" \
                   "{2:<14}[[C:0,255,0]]ID: {3}[[c]]".format(row[2], get_user_name(row[3]), date, row[0])
 
-    end = timer()
-    print("{1:<20}{0:>8.3f}".format(end - start, "MySQL + strings: "))
-    start = timer()
+    # end = timer()
+    # print("{1:<20}{0:>8.3f}".format(end - start, "MySQL + strings: "))
+    # start = timer()
     v = visualizer.Visualizer()
-    end = timer()
-    print("{1:<20}{0:>8.3f}".format(end - start, "visualizer init: "))
-    start = timer()
+    # end = timer()
+    # print("{1:<20}{0:>8.3f}".format(end - start, "visualizer init: "))
+    # start = timer()
     v.build_background()
-    end = timer()
-    print("{1:<20}{0:>8.3f}".format(end - start, "background: "))
-    start = timer()
+    # end = timer()
+    # print("{1:<20}{0:>8.3f}".format(end - start, "background: "))
+    # start = timer()
     v.build_image('images/static/screen.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT, mode="hard-light")
-    end = timer()
-    print("{1:<20}{0:>8.3f}".format(end - start, "hard light: "))
-    start = timer()
+    # end = timer()
+    # print("{1:<20}{0:>8.3f}".format(end - start, "hard light: "))
+    # start = timer()
     v.build_image('images/static/border.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT)
-    end = timer()
-    print("{1:<20}{0:>8.3f}".format(end - start, "borders: "))
-    start = timer()
-    v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT, string="hi " + user_color + message.author.name + "[[c]]")
+    # end = timer()
+    # print("{1:<20}{0:>8.3f}".format(end - start, "borders: "))
+    # start = timer()
+    v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT,
+                 string="hi " + user_color + message.author.name + "[[c]]")
     v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208, end_y=175, string=leaderboard_text)
-    v.build_text(visualizer.FONT_SIX, 17 + 8*5, 91, end_x=208, end_y=175, string=leaderboard_text_names)
-    v.build_text(visualizer.FONT_SIX, 17 + 8*20, 91, end_x=208, end_y=175, string=leaderboard_text_points)
+    v.build_text(visualizer.FONT_SIX, 17 + 8 * 5, 91, end_x=208, end_y=175, string=leaderboard_text_names)
+    v.build_text(visualizer.FONT_SIX, 17 + 8 * 20, 91, end_x=208, end_y=175, string=leaderboard_text_points)
     v.build_text(visualizer.FONT_SIX, 219, 91, end_x=420, end_y=175, string=claim_text)
     v.build_text(visualizer.FONT_SIX, 431, 91, end_x=630, end_y=175, string=commands_text)
     v.build_text(visualizer.FONT_SIX, 340, 215, end_x=597, end_y=282, string=bounty_text)
-    end = timer()
-    print("{1:<20}{0:>8.3f}".format(end - start, "text: "))
-    start = timer()
+    # end = timer()
+    # print("{1:<20}{0:>8.3f}".format(end - start, "text: "))
+    # start = timer()
     v.build_graph(start_x=41, start_y=212, end_x=302, end_y=365, data=graph_data)
-    end = timer()
-    print("{1:<20}{0:>8.3f}".format(end - start, "graph: "))
-    start = timer()
+    # end = timer()
+    # print("{1:<20}{0:>8.3f}".format(end - start, "graph: "))
+    # start = timer()
     file = v.finish_image()
-    end = timer()
-    print("{1:<20}{0:>8.3f}".format(end - start, "draw: "))
+    # end = timer()
+    # print("{1:<20}{0:>8.3f}".format(end - start, "draw: "))
     cursor.close()
     conn.close()
     return Response(text="", file=file)
