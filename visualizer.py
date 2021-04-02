@@ -297,11 +297,13 @@ class Visualizer:
         for k in range(start_y, end_y):
             row = next(image_gen)
             for j in range(start_x, end_x):
-                r = row[j * 4 + 0]
-                g = row[j * 4 + 1]
-                b = row[j * 4 + 2]
-                if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    self.draw_pixel(j, k, [r, g, b], mode=mode)
+                color = [
+                    row[j * 4 + 0],
+                    row[j * 4 + 1],
+                    row[j * 4 + 2]
+                ]
+                if color != CHROMA_KEY:
+                    self.draw_pixel(j, k, color, mode=mode)
 
     def build_background(self):
         backgrounds = os.listdir('images/background/')

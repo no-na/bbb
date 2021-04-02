@@ -1127,7 +1127,7 @@ def visualizer_overview(message):
     end = timer()
     print("{1:<20}{0:>8.3f}".format(end - start, "background: "))
     start = timer()
-    v.build_image('images/static/screen.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT, mode="normal")
+    v.build_image('images/static/screen.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT, mode="hard-light")
     end = timer()
     print("{1:<20}{0:>8.3f}".format(end - start, "hard light: "))
     start = timer()
