@@ -65,16 +65,17 @@ class Visualizer:
         offset = RGB_OFFSET
         for k in range(0, scale):
             ry = y * scale + k
+            row = pixels[ry]
             for j in range(0, scale):
                 rx = (x * scale + j) * offset
                 if mode == "normal":
-                    pixels[ry][rx + 0] = color[0]
-                    pixels[ry][rx + 1] = color[1]
-                    pixels[ry][rx + 2] = color[2]
+                    row[rx + 0] = color[0]
+                    row[rx + 1] = color[1]
+                    row[rx + 2] = color[2]
                 elif mode == "hard-light":
-                    pixels[ry][rx + 0] = hard_light(pixels[ry][rx + 0], color[0])
-                    pixels[ry][rx + 1] = hard_light(pixels[ry][rx + 1], color[1])
-                    pixels[ry][rx + 2] = hard_light(pixels[ry][rx + 2], color[2])
+                    row[rx + 0] = hard_light(row[rx + 0], color[0])
+                    row[rx + 1] = hard_light(row[rx + 1], color[1])
+                    row[rx + 2] = hard_light(row[rx + 2], color[2])
 
     def build_character(self, type_case, char, x, y, x_off, y_off, white_replace=None):
         if white_replace is None:
