@@ -52,12 +52,24 @@ class Visualizer:
                 return True
         return False
 
-    def draw_pixel(self, x, y, color):
+    def hard_light(self, a, b):
+        if b/255 < 0.5:
+            return int((2 * b/255 * a/255) * 255)
+        else:
+            return int((1 - 2 * (1 - b/255) * (1 - a/255)) * 255)
+
+    def draw_pixel(self, x, y, color, mode="normal"):
         for k in range(0, SCALE):
             for j in range(0, SCALE):
-                self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = color[0]
-                self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1] = color[1]
-                self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2] = color[2]
+                if mode == "normal":
+                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = color[0]
+                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1] = color[1]
+                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2] = color[2]
+                elif mode == "hard-light":
+                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0], color[0])
+                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 1], color[1])
+                    self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 0] = self.hard_light(self.pixels[y * SCALE + k][(x * SCALE + j) * RGB_OFFSET + 2], color[2])
+
 
     def build_character(self, type_case, char, x, y, x_off, y_off, white_replace=None):
         if white_replace is None:
@@ -273,7 +285,7 @@ class Visualizer:
                 else:
                     self.draw_pixel(j, k, SYSTEM_MID_COLOR)
 
-    def build_image(self, filename, start_x, start_y, end_x, end_y):
+    def build_image(self, filename, start_x, start_y, end_x, end_y, mode="normal"):
         _ = png.Reader(filename=filename)
         image_gen = _.asRGBA()[2]
         row = None
@@ -285,7 +297,7 @@ class Visualizer:
                 g = row[j * 4 + 1]
                 b = row[j * 4 + 2]
                 if r is not CHROMA_KEY[0] or g is not CHROMA_KEY[1] or b is not CHROMA_KEY[2]:
-                    self.draw_pixel(j, k, [r, g, b])
+                    self.draw_pixel(j, k, [r, g, b], mode=mode)
 
     def build_background(self):
         backgrounds = os.listdir('images/background/')

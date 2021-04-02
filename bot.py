@@ -1116,6 +1116,7 @@ def visualizer_overview(message):
 
     v = visualizer.Visualizer()
     v.build_background()
+    v.build_image('images/static/screen.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT, mode="hard-light")
     v.build_image('images/static/border.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT)
     v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT, string="hi " + user_color + message.author.name + "[[c]]")
     v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208, end_y=175, string=leaderboard_text)
