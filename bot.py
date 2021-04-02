@@ -71,6 +71,8 @@ def setup_response(user_id=None):
 def end_response(out_message, conn, cursor):
     cursor.close()
     conn.close()
+    if len(out_message) > 1990:
+        out_message = out_message[:1960] + "\n MESSAGE TRUNCATED TO UNDER 2000 CHARACTERS"
     out_message += "```"
     return out_message
 
