@@ -1117,7 +1117,7 @@ def visualizer_overview(message):
                   "{2:<14}[[C:0,255,0]]ID: {3}[[c]]".format(row[2], get_user_name(row[3]), date, row[0])
 
     end = timer()
-    print("{1:<20}{0:<8.3f}".format(end - start, "MySQL + strings: "))
+    print("{1:<20}{0:>8.3f}".format(end - start, "MySQL + strings: "))
     start = timer()
     v = visualizer.Visualizer()
     end = timer()
