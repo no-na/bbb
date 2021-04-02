@@ -5,6 +5,7 @@ import json
 import re
 from datetime import datetime, timedelta
 import visualizer
+from timeit import default_timer as timer
 
 intents = discord.Intents.default()
 intents.members = True
@@ -1034,6 +1035,7 @@ def dm_test(message):
 
 
 def visualizer_overview(message):
+    start = timer()
     split_message = message.content.split()
     setup = setup_response(message.author.id)
     out_message = setup[0]
@@ -1114,10 +1116,25 @@ def visualizer_overview(message):
                   "-{1}\n" \
                   "{2:<14}[[C:0,255,0]]ID: {3}[[c]]".format(row[2], get_user_name(row[3]), date, row[0])
 
+    end = timer()
+    print("MySQL + strings: {0}".format(end - start))
+    start = timer()
     v = visualizer.Visualizer()
+    end = timer()
+    print("visualizer init: {0}".format(end - start))
+    start = timer()
     v.build_background()
+    end = timer()
+    print("background: {0}".format(end - start))
+    start = timer()
     v.build_image('images/static/screen.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT, mode="hard-light")
+    end = timer()
+    print("hard light: {0}".format(end - start))
+    start = timer()
     v.build_image('images/static/border.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT)
+    end = timer()
+    print("borders: {0}".format(end - start))
+    start = timer()
     v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT, string="hi " + user_color + message.author.name + "[[c]]")
     v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208, end_y=175, string=leaderboard_text)
     v.build_text(visualizer.FONT_SIX, 17 + 8*5, 91, end_x=208, end_y=175, string=leaderboard_text_names)
@@ -1125,8 +1142,16 @@ def visualizer_overview(message):
     v.build_text(visualizer.FONT_SIX, 219, 91, end_x=420, end_y=175, string=claim_text)
     v.build_text(visualizer.FONT_SIX, 431, 91, end_x=630, end_y=175, string=commands_text)
     v.build_text(visualizer.FONT_SIX, 340, 215, end_x=597, end_y=282, string=bounty_text)
+    end = timer()
+    print("text: {0}".format(end - start))
+    start = timer()
     v.build_graph(start_x=41, start_y=212, end_x=302, end_y=365, data=graph_data)
+    end = timer()
+    print("graph: {0}".format(end - start))
+    start = timer()
     file = v.finish_image()
+    end = timer()
+    print("draw: {0}".format(end - start))
     cursor.close()
     conn.close()
     return Response(text="", file=file)
