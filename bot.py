@@ -1112,7 +1112,7 @@ def visualizer_overview(message):
 
     commands_text = "COMMON COMMANDS\n\n" \
                     "!claim -new [[C:180,180,180]][bounty ID] [pillar][[c]]\n" \
-                    "!claim -new [[C:180,180,180]][claim ID][[c]]\n" \
+                    "!claim -accept [[C:180,180,180]][claim ID][[c]]\n" \
                     "!practice [[C:180,180,180]][pillar][[c]]\n" \
                     "!help"
 
