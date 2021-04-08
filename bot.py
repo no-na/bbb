@@ -1019,9 +1019,9 @@ def order(message):
         out_message += format_command("# !order -in", "Opts in to being part of the bounty creator queue.")
         out_message += format_command("# !order -out", "Opts out of being part of the bounty creator queue.")
         if opted_in == 1:
-            out_message += "{0}\n".format(get_response(cursor, "order_in", personality_id))
+            out_message += "\n{0}\n".format(get_response(cursor, "order_in", personality_id))
         else:
-            out_message += "{0}\n".format(get_response(cursor, "order_out", personality_id))
+            out_message += "\n{0}\n".format(get_response(cursor, "order_out", personality_id))
 
     return Response(text=end_response(out_message, conn, cursor))
 
@@ -1182,6 +1182,8 @@ def visualizer_overview(message):
         for i in range(0, len(users)):
             if users[i] == current_bounty_user:
                 bounty_next_text = users[i+1 if i+1 < len(users) else 0]
+        if bounty_next_text == "":
+            bounty_next_text = users[0]
 
     v = visualizer.Visualizer()
     v.build_background()
