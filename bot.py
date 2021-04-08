@@ -980,6 +980,52 @@ def practice(message):
     return Response(text=end_response(out_message, conn, cursor))
 
 
+def order(message):
+    split_message = message.content.split()
+    setup = setup_response(message.author.id)
+    out_message = setup[0]
+    conn = setup[1]
+    cursor = setup[2]
+    personality_id = setup[3]
+
+    if len(split_message) >= 2:
+        if split_message[1] == "-in":
+            query = (
+                "UPDATE users SET user_opt_order = 1 WHERE user_id = %s"
+            )
+            data = (message.author.id, )
+            cursor.execute(query, data)
+            conn.commit()
+            out_message += "{0}\n".format(get_response(cursor, "order_in_valid", personality_id))
+        elif split_message[1] == "-out":
+            query = (
+                "UPDATE users SET user_opt_order = 0 WHERE user_id = %s"
+            )
+            data = (message.author.id, )
+            cursor.execute(query, data)
+            conn.commit()
+            out_message += "{0}\n".format(get_response(cursor, "order_out_valid", personality_id))
+        else:
+            query = (
+                "SELECT user_opt_order FROM users WHERE user_id = %s"
+            )
+            data = (message.author.id, )
+            cursor.execute(query, data)
+            row_p = cursor.fetchone()
+            if row_p is not None:
+                opted_in = row_p[0]
+
+            out_message += "{0}\n".format(get_response(cursor, "order", personality_id))
+            out_message += format_command("# !order -in", "Opts in to being part of the bounty creator queue.")
+            out_message += format_command("# !order -out", "Opts out of being part of the bounty creator queue.")
+            if opted_in == 1:
+                out_message += "{0}\n".format(get_response(cursor, "order_in", personality_id))
+            else:
+                out_message += "{0}\n".format(get_response(cursor, "order_out", personality_id))
+
+        return Response(text=end_response(out_message, conn, cursor))
+
+
 def timeoffset(message):
     split_message = message.content.split()
     setup = setup_response(message.author.id)
@@ -1043,7 +1089,6 @@ def dm_test(message):
 
 
 def visualizer_overview(message):
-    # start = timer()
     split_message = message.content.split()
     setup = setup_response(message.author.id)
     out_message = setup[0]
@@ -1120,29 +1165,28 @@ def visualizer_overview(message):
     cursor.execute(query)
     row = cursor.fetchone()
     date = row[1].strftime('%m/%d/%Y')
+    current_bounty_user = get_user_name(row[3])
     bounty_text = "{0}\n\n" \
                   "-{1}\n" \
-                  "{2:<14}[[C:0,255,0]]ID: {3}[[c]]".format(row[2], get_user_name(row[3]), date, row[0])
+                  "{2:<14}[[C:0,255,0]]ID: {3}[[c]]".format(row[2], current_bounty_user, date, row[0])
 
-    # end = timer()
-    # print("{1:<20}{0:>8.3f}".format(end - start, "MySQL + strings: "))
-    # start = timer()
+    query = "SELECT user_id FROM users WHERE user_opt_order = TRUE"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    users = []
+    bounty_next_text = ""
+    if len(rows) > 0:
+        for row in rows:
+            users.append(get_user_name(row[0]))
+        users.sort()
+        for i in range(0, len(users)):
+            if users[i] == current_bounty_user:
+                bounty_next_text = users[i+1 if i+1 < len(users) else 0]
+
     v = visualizer.Visualizer()
-    # end = timer()
-    # print("{1:<20}{0:>8.3f}".format(end - start, "visualizer init: "))
-    # start = timer()
     v.build_background()
-    # end = timer()
-    # print("{1:<20}{0:>8.3f}".format(end - start, "background: "))
-    # start = timer()
     v.build_image('images/static/screen.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT, mode="hard-light")
-    # end = timer()
-    # print("{1:<20}{0:>8.3f}".format(end - start, "hard light: "))
-    # start = timer()
     v.build_image('images/static/border.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT)
-    # end = timer()
-    # print("{1:<20}{0:>8.3f}".format(end - start, "borders: "))
-    # start = timer()
     v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT,
                  string="hi " + user_color + message.author.name + "[[c]]")
     v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208, end_y=175, string=leaderboard_text)
@@ -1151,6 +1195,7 @@ def visualizer_overview(message):
     v.build_text(visualizer.FONT_SIX, 219, 91, end_x=420, end_y=175, string=claim_text)
     v.build_text(visualizer.FONT_SIX, 431, 91, end_x=630, end_y=175, string=commands_text)
     v.build_text(visualizer.FONT_SIX, 340, 215, end_x=597, end_y=282, string=bounty_text)
+    v.build_text(visualizer.FONT_SIX, 502, 267, end_x=597, end_y=282, string=bounty_next_text)
     # end = timer()
     # print("{1:<20}{0:>8.3f}".format(end - start, "text: "))
     # start = timer()
@@ -1174,6 +1219,7 @@ response_options = {
     "!practice": ("Record that you've practiced a pillar.", practice),
     "!pillar": ("Create and view your pillars.", pillar),
     "!points": ("View your points and the leaderboard.", points),
+    "!order": ("Opt in or out of being labeled the next bounty creator.", order),
     "!personality": ("Change bot personality.", personality),
     "!timezone": ("Change displayed timezone.", timeoffset),
     "!big": ("BIG CHICK", block_test),
