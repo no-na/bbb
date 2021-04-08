@@ -1246,7 +1246,7 @@ async def on_message(message):
     if len(split_message) == 0:
         return
     if split_message[0] == "!join":
-        await message.channel.send(join(message)[0])
+        await message.channel.send(join(message).text)
     elif split_message[0] in response_options:
         if check_join(message.author) is True:
             response = response_options[split_message[0]][1](message)
