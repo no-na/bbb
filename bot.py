@@ -1005,25 +1005,25 @@ def order(message):
             cursor.execute(query, data)
             conn.commit()
             out_message += "{0}\n".format(get_response(cursor, "order_out_valid", personality_id))
+    else:
+        query = (
+            "SELECT user_opt_order FROM users WHERE user_id = %s"
+        )
+        data = (message.author.id, )
+        cursor.execute(query, data)
+        row_p = cursor.fetchone()
+        if row_p is not None:
+            opted_in = row_p[0]
+
+        out_message += "{0}\n".format(get_response(cursor, "order", personality_id))
+        out_message += format_command("# !order -in", "Opts in to being part of the bounty creator queue.")
+        out_message += format_command("# !order -out", "Opts out of being part of the bounty creator queue.")
+        if opted_in == 1:
+            out_message += "{0}\n".format(get_response(cursor, "order_in", personality_id))
         else:
-            query = (
-                "SELECT user_opt_order FROM users WHERE user_id = %s"
-            )
-            data = (message.author.id, )
-            cursor.execute(query, data)
-            row_p = cursor.fetchone()
-            if row_p is not None:
-                opted_in = row_p[0]
+            out_message += "{0}\n".format(get_response(cursor, "order_out", personality_id))
 
-            out_message += "{0}\n".format(get_response(cursor, "order", personality_id))
-            out_message += format_command("# !order -in", "Opts in to being part of the bounty creator queue.")
-            out_message += format_command("# !order -out", "Opts out of being part of the bounty creator queue.")
-            if opted_in == 1:
-                out_message += "{0}\n".format(get_response(cursor, "order_in", personality_id))
-            else:
-                out_message += "{0}\n".format(get_response(cursor, "order_out", personality_id))
-
-        return Response(text=end_response(out_message, conn, cursor))
+    return Response(text=end_response(out_message, conn, cursor))
 
 
 def timeoffset(message):
