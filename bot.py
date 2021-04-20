@@ -1156,6 +1156,7 @@ def visualizer_overview(message):
         claim_text += "[[C:255,255,0]]No open claims for now.[[c]]"
 
     commands_text = "COMMON COMMANDS\n\n" \
+                    "!bounty -new [[C:180,180,180]][bounty description][[c]]\n" \
                     "!claim -new [[C:180,180,180]][bounty ID] [pillar][[c]]\n" \
                     "!claim -accept [[C:180,180,180]][claim ID][[c]]\n" \
                     "!practice [[C:180,180,180]][pillar][[c]]\n" \
