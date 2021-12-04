@@ -134,7 +134,7 @@ class Visualizer:
         color_replaces = {}
         lines = []
         line = ""
-        replace = [0, 0, 0]
+        replace = [255, 255, 255]
         for s in split_string:
             if s == "\n":
                 lines.append(line.strip())
