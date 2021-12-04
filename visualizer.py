@@ -117,7 +117,7 @@ class Visualizer:
             ref_pos[1] = ref_pos[1] + 1
         return asc
 
-    def build_text(self, font, x, y, end_x=None, end_y=None, string: str = None, align: str = "left", overflow: str = "overflow"):
+    def build_text(self, font, x, y, end_x=WIDTH, end_y=HEIGHT, string: str = None, align: str = "left", overflow: str = "overflow"):
         rex = re.compile(r'\d+')
         offsets = rex.findall(font)
         x_off = int(offsets[0])
@@ -126,11 +126,6 @@ class Visualizer:
 
         wx = x
         wy = y
-
-        if end_x is None:
-            end_x = WIDTH
-        if end_y is None:
-            end_y = HEIGHT
 
         # Split string into lines
         split_string = re.findall(r'\[\[.+?\]\]|\s|\b\w+\b|\W', string)
