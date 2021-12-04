@@ -150,7 +150,7 @@ class Visualizer:
                 line = s
         lines.append(line.strip())
         print(color_replaces)
-
+        print((0, 10) in color_replaces)
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
             for c in range(0, len(lines[l])):
