@@ -140,9 +140,11 @@ class Visualizer:
                 lines.append(line.strip())
                 line = ""
             elif self.parse_tag(s, replace) is True:
-                print(replace)
+                print((len(lines), len(line)))
                 color_replaces[(len(lines), len(line))] = replace
             elif x_off * (len(line) + len(s)) < end_x - x:
+                if len(line) == 0 and s == " ":
+                    continue
                 line += s
             else:
                 lines.append(line.strip())
