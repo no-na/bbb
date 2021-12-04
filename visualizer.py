@@ -154,6 +154,7 @@ class Visualizer:
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
             for c in range(0, len(lines[l])):
+                print("D" + str((l, c)))
                 if (l, c) in color_replaces:
                     print("F" + str((l, c)))
                     white_replace = color_replaces[(l, c)]
