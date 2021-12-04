@@ -149,7 +149,7 @@ class Visualizer:
 
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
-            for c in range(0, len(l)):
+            for c in range(0, len(lines[l])):
                 if (l, c) in color_replaces.keys():
                     white_replace = color_replaces[(l, c)]
                 self.build_character(FONTS[font], c, wx, wy, x_off, y_off, white_replace=white_replace)
