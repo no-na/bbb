@@ -1191,7 +1191,7 @@ def visualizer_overview(message):
 
     now = datetime.utcnow()
     offset_time = apply_time_offset(cursor, now, message.author.id)
-    time_text = offset_time.strftime("%H:%M - %b %d, %Y")
+    time_text = offset_time[0].strftime("%H:%M - %b %d, %Y")
 
     v = visualizer.Visualizer()
     v.build_background()
