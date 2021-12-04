@@ -35,6 +35,12 @@ class Visualizer:
     def __init__(self):
         self.pixels = [[128, 128, 128] * WIDTH * SCALE for _ in range(HEIGHT * SCALE)]
 
+    def is_tag(self, string):
+        rex = re.compile(r'^\[\[\D:*.*\]\]$')
+        if re.match(rex, string):
+            return True
+        return False
+
     def parse_tag(self, string, white_replace):
         rex = re.compile(r'^\[\[\D:*.*\]\]$')
         if re.match(rex, string):
@@ -109,7 +115,7 @@ class Visualizer:
             ref_pos[1] = ref_pos[1] + 1
         return asc
 
-    def build_text(self, font, x, y, end_x=None, end_y=None, string: str = None):
+    def build_text(self, font, x, y, end_x=None, end_y=None, string: str = None, align: str = "left", overflow: str = "overflow"):
         rex = re.compile(r'\d+')
         offsets = rex.findall(font)
         x_off = int(offsets[0])
@@ -123,28 +129,36 @@ class Visualizer:
         if end_y is None:
             end_y = HEIGHT
 
+        # Split string into lines
         split_string = re.findall(r'\[\[.+?\]\]|\s|\b\w+\b|\W', string)
-        white_replace = [255, 255, 255]
-        new_line = False
+        color_replaces = {}
+        lines = []
+        line = ""
+        replace = None
         for s in split_string:
-            if self.parse_tag(s, white_replace) is True:
-                continue
-            if wx + x_off * len(s) >= end_x:
-                if wy + y_off < end_y:
-                    wx = x
-                    wy = wy + y_off
-                    new_line = True
-                else:
-                    return
-            for c in s:
-                if c != ' ' or new_line is False:
-                    if self.build_character(FONTS[font], c, wx, wy, x_off, y_off, white_replace=white_replace) == 10:
-                        wx = x
-                        wy = wy + y_off
-                        new_line = True
-                    else:
-                        wx = wx + x_off
-                        new_line = False
+            if s == "\n":
+                lines.append(line.strip())
+                line = ""
+            elif self.parse_tag(s, replace) is True:
+                color_replaces[(len(lines), len(line))] = color_replaces
+            elif x_off * (len(line) + len(s)) < end_x - x:
+                line += s
+            else:
+                lines.append(line.strip())
+                line = s
+
+        white_replace = [255, 255, 255]
+        for l in range(0, len(lines)):
+            for c in range(0, len(l)):
+                if (l, c) in color_replaces.keys():
+                    white_replace = color_replaces[(l, c)]
+                self.build_character(FONTS[font], c, wx, wy, x_off, y_off, white_replace=white_replace)
+                wx = wx + x_off
+            if wy + y_off < end_y:
+                wx = x
+                wy = wy + y_off
+            else:
+                return
 
     def build_dot(self, start_x=None, start_y=None, color_high=None, color_mid=None, color_low=None):
         self.draw_pixel(start_x + 1, start_y + 0, color_mid)
@@ -313,7 +327,7 @@ class Visualizer:
         back_name = backgrounds[_]
         self.build_image('images/background/' + back_name, 0, 0, WIDTH, HEIGHT)
         self.build_system_bar()
-        self.build_text(FONT_SIX, 1, 1, string=back_name.split('.')[0])
+        self.build_text(FONT_SIX, 1, 1, string=back_name[:-4])
 
     def finish_image(self):
         f = open('images/output/test.png', 'wb')
