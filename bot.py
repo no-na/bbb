@@ -3,6 +3,7 @@ import os
 import mysql.connector
 import json
 import re
+import pytz
 from datetime import datetime, timedelta
 import visualizer
 
@@ -108,6 +109,7 @@ def apply_time_offset(cursor, time, user_id):
     row_ti = cursor.fetchone()
     hours = 0
     minutes = 0
+
     if row_ti is not None:
         hours = int(row_ti[0][:-2])
         minutes = int(row_ti[0][-2:])
@@ -1188,7 +1190,9 @@ def visualizer_overview(message):
 
     now = datetime.utcnow()
     offset_time = apply_time_offset(cursor, now, message.author.id)
-    time_text = offset_time[0].strftime("%H:%M - %b %d, %Y")
+
+    time = message.created_at
+    time_text = time.strftime("%H:%M - %b %d, %Y")
 
     v = visualizer.Visualizer()
     v.build_background()
