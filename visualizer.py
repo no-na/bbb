@@ -134,8 +134,8 @@ class Visualizer:
         color_replaces = {}
         lines = []
         line = ""
-        replace = [255, 255, 255]
         for s in split_string:
+            replace = [255, 255, 255]
             if s == "\n":
                 lines.append(line.strip())
                 line = ""
@@ -146,12 +146,13 @@ class Visualizer:
             else:
                 lines.append(line.strip())
                 line = s
+        lines.append(line.strip())
 
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
             for c in range(0, len(lines[l])):
-                #if (l, c) in color_replaces.keys():
-                #    white_replace = color_replaces[(l, c)]
+                if (l, c) in color_replaces.keys():
+                    white_replace = color_replaces[(l, c)]
                 self.build_character(FONTS[font], lines[l][c], wx, wy, x_off, y_off, white_replace=white_replace)
                 wx = wx + x_off
             if wy + y_off < end_y:
