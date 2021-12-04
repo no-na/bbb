@@ -109,11 +109,12 @@ def apply_time_offset(cursor, time, user_id):
     row_ti = cursor.fetchone()
     hours = 0
     minutes = 0
-
+    la = pytz.timezone("America/Los_Angeles")
     if row_ti is not None:
         hours = int(row_ti[0][:-2])
         minutes = int(row_ti[0][-2:])
-    return time + timedelta(hours=hours, minutes=minutes), row_ti[0][:-2], row_ti[0][-2:]
+    #return time + timedelta(hours=hours, minutes=minutes), row_ti[0][:-2], row_ti[0][-2:]
+    return time.astimezone(la), row_ti[0][:-2], row_ti[0][-2:]
 
 
 def build_int_block(pp):
@@ -1190,9 +1191,7 @@ def visualizer_overview(message):
 
     now = datetime.utcnow()
     offset_time = apply_time_offset(cursor, now, message.author.id)
-
-    time = message.created_at
-    time_text = time.strftime("%H:%M - %b %d, %Y")
+    time_text = offset_time.strftime("%H:%M - %b %d, %Y")
 
     v = visualizer.Visualizer()
     v.build_background()
