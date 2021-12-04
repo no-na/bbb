@@ -169,11 +169,27 @@ class Visualizer:
             lines.append(line.strip())
 
         if align == "right":
-            for wline in lines:
-                wline = line.rjust(line_max_char)
+            temp_dict = {}
+            for l in range(0, len(lines)):
+                padding = line_max_char - len(lines[l])
+                lines[l] = lines[l].rjust(line_max_char)
+                for c in range(0, len(lines[l])):
+                    if (l, c) in color_replaces:
+                        temp_dict[(l, c + padding)] = color_replaces[(l, c)]
+                        color_replaces.pop((l, c))
+            for k in temp_dict:
+                color_replaces[k] = temp_dict[k]
         elif align == "center":
-            for wline in lines:
-                wline = line.center(line_max_char)
+            temp_dict = {}
+            for l in range(0, len(lines)):
+                lines[l] = lines[l].center(line_max_char)
+                lpadding = len(lines[l]) - len(lines[l].lstrip(" "))
+                for c in range(0, len(lines[l])):
+                    if (l, c) in color_replaces:
+                        temp_dict[(l, c + lpadding)] = color_replaces[(l, c)]
+                        color_replaces.pop((l, c))
+            for k in temp_dict:
+                color_replaces[k] = temp_dict[k]
 
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
