@@ -149,17 +149,15 @@ class Visualizer:
                 lines.append(line.strip())
                 line = s
         lines.append(line.strip())
-        print(color_replaces)
-        print((0, 10) in color_replaces)
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
             for c in range(0, len(lines[l])):
-                print("D" + str((l, c)))
                 if (l, c) in color_replaces:
-                    print("F" + str((l, c)))
                     white_replace = color_replaces[(l, c)]
                 self.build_character(FONTS[font], lines[l][c], wx, wy, x_off, y_off, white_replace=white_replace)
                 wx = wx + x_off
+            if (l, len(lines[l])) in color_replaces:
+                white_replace = color_replaces[(l, c)]
             if wy + y_off < end_y:
                 wx = x
                 wy = wy + y_off
