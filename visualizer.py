@@ -155,7 +155,8 @@ class Visualizer:
                         line += c
                     else:
                         lines.append(line.strip()[:line_max_char + 2] + "..")
-                        line = s
+                        line = ""
+                        break
             elif overflow == "overflow":
                 if len(line) == 0 and s == " ":
                     continue
