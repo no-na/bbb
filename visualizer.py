@@ -162,8 +162,10 @@ class Visualizer:
                 line += s
             else:
                 print("BAD OVERFLOW STYLE PARAMETER")
-
-        lines.append(line.strip())
+        if overflow == "truncate":
+            lines.append(line.strip()[:line_max_char + 2] + "..")
+        else:
+            lines.append(line.strip())
 
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
