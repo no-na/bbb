@@ -89,10 +89,10 @@ class Visualizer:
         asc = ord(char)
         if asc == 10:  # New Line
             return 10
-        if asc < 128:
-            ref_pos = [(asc % 16) * x_off, (asc // 16) * y_off]
         if x + x_off >= WIDTH:
             return -1
+        if asc < 128:
+            ref_pos = [(asc % 16) * x_off, (asc // 16) * y_off]
         else:
             ref_pos = [0, 0]
 
@@ -148,7 +148,7 @@ class Visualizer:
                     lines.append(line.strip())
                     line = s
             elif overflow == "truncate":
-                if len(line) < line_max_char:
+                if len(line) + len(s) < line_max_char:
                     if len(line) == 0 and s == " ":
                         continue
                     line += s
