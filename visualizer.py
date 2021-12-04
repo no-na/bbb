@@ -91,6 +91,8 @@ class Visualizer:
             return 10
         if asc < 128:
             ref_pos = [(asc % 16) * x_off, (asc // 16) * y_off]
+        if x + x_off >= WIDTH:
+            return -1
         else:
             ref_pos = [0, 0]
 
@@ -120,6 +122,7 @@ class Visualizer:
         offsets = rex.findall(font)
         x_off = int(offsets[0])
         y_off = int(offsets[1])
+        line_max_char = (end_x - x) / x_off
 
         wx = x
         wy = y
@@ -141,14 +144,31 @@ class Visualizer:
                 line = ""
             elif self.parse_tag(s, replace) is True:
                 color_replaces[(len(lines), len(line))] = replace
-            elif x_off * (len(line) + len(s)) < end_x - x:
+            elif overflow == "wrap":
+                if x_off * (len(line) + len(s)) < end_x - x:
+                    if len(line) == 0 and s == " ":
+                        continue
+                    line += s
+                else:
+                    lines.append(line.strip())
+                    line = s
+            elif overflow == "truncate":
+                if len(line) < line_max_char:
+                    if len(line) == 0 and s == " ":
+                        continue
+                    line += s
+                else:
+                    lines.append(line.strip()[:line_max_char+2] + "..")
+                    line = s
+            elif overflow == "overflow":
                 if len(line) == 0 and s == " ":
                     continue
                 line += s
             else:
-                lines.append(line.strip())
-                line = s
+                print("BAD OVERFLOW STYLE PARAMETER")
+
         lines.append(line.strip())
+
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
             for c in range(0, len(lines[l])):
@@ -293,7 +313,7 @@ class Visualizer:
             self.build_dot(start_x=legend_x + 2, start_y=start_y + 4 + 12 * i, color_high=graph_bar_top_rgb[i],
                            color_mid=graph_bar_front_rgb[i], color_low=graph_bar_side_rgb[i])
 
-        self.build_text(FONT_SIX, legend_x + 9, start_y + 2, end_x=end_x, end_y=end_y, string=legend_text)
+        self.build_text(FONT_SIX, legend_x + 9, start_y + 2, end_x=end_x, end_y=end_y, string=legend_text, overflow="truncate")
 
     def build_system_bar(self):
         start_x = 0
