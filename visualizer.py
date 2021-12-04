@@ -169,11 +169,11 @@ class Visualizer:
             lines.append(line.strip())
 
         if align == "right":
-            for line in lines:
-                line.rjust(line_max_char)
+            for wline in lines:
+                wline = line.rjust(line_max_char)
         elif align == "center":
-            for line in lines:
-                line.center(line_max_char)
+            for wline in lines:
+                wline = line.center(line_max_char)
 
         white_replace = [255, 255, 255]
         for l in range(0, len(lines)):
