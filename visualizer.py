@@ -154,8 +154,7 @@ class Visualizer:
                             continue
                         line += c
                     else:
-                        lines.append(line.strip()[:line_max_char + 2] + "..")
-                        line = ""
+                        line = (line.strip()[:line_max_char + 2] + "..")
                         break
             elif overflow == "overflow":
                 if len(line) == 0 and s == " ":
@@ -164,7 +163,8 @@ class Visualizer:
             else:
                 print("BAD OVERFLOW STYLE PARAMETER")
         if overflow == "truncate":
-            lines.append(line.strip()[:line_max_char + 2] + "..")
+            _ = line.strip()
+            lines.append(_[:line_max_char + 2] + "..") if len(_) > line_max_char else _
         else:
             lines.append(line.strip())
 
