@@ -157,7 +157,7 @@ class Visualizer:
                 self.build_character(FONTS[font], lines[l][c], wx, wy, x_off, y_off, white_replace=white_replace)
                 wx = wx + x_off
             if (l, len(lines[l])) in color_replaces:
-                white_replace = color_replaces[(l, c)]
+                white_replace = color_replaces[(l, len(lines[l]))]
             if wy + y_off < end_y:
                 wx = x
                 wy = wy + y_off
