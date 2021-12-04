@@ -148,7 +148,7 @@ class Visualizer:
                     lines.append(line.strip())
                     line = s
             elif overflow == "truncate":
-                for c in line:
+                for c in s:
                     if len(line) + 1 < line_max_char:
                         if len(line) == 0 and s == " ":
                             continue
