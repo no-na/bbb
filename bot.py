@@ -1186,17 +1186,22 @@ def visualizer_overview(message):
         if bounty_next_text == "":
             bounty_next_text = users[0]
 
+    now = datetime.utcnow()
+    offset_time = apply_time_offset(cursor, now, message.author.id)
+    time_text = offset_time[0].strftime("%H:%M - %b %d, %Y")
+
     v = visualizer.Visualizer()
     v.build_background()
     v.build_image('images/static/screen.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT, mode="hard-light")
     v.build_image('images/static/border.png', 0, 0, visualizer.WIDTH, visualizer.HEIGHT)
-    v.build_text(visualizer.FONT_EIGHT, 232, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT,
-                 string="hi " + user_color + message.author.name + "[[c]]", align="center")
+    v.build_text(visualizer.FONT_EIGHT, 0, 55, end_x=visualizer.WIDTH, end_y=visualizer.HEIGHT,
+                 string=user_color + message.author.name + "[[c]]", align="center")
+    v.build_text(visualizer.FONT_SIX, 0, 1, string=time_text, align="right")
     v.build_text(visualizer.FONT_SIX, 17, 91, end_x=208, end_y=175, string=leaderboard_text)
     v.build_text(visualizer.FONT_SIX, 17 + 8 * 5, 91, end_x=208, end_y=175, string=leaderboard_text_names)
     v.build_text(visualizer.FONT_SIX, 17 + 8 * 20, 91, end_x=208, end_y=175, string=leaderboard_text_points)
     v.build_text(visualizer.FONT_SIX, 219, 91, end_x=420, end_y=175, string=claim_text)
-    v.build_text(visualizer.FONT_SIX, 431, 91, end_x=630, end_y=175, string=commands_text, align="right")
+    v.build_text(visualizer.FONT_SIX, 431, 91, end_x=630, end_y=175, string=commands_text)
     v.build_text(visualizer.FONT_SIX, 340, 215, end_x=597, end_y=282, string=bounty_text)
     v.build_text(visualizer.FONT_SIX, 502, 267, end_x=597, end_y=282, string=bounty_next_text)
     v.build_graph(start_x=41, start_y=212, end_x=302, end_y=365, data=graph_data)
