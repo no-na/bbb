@@ -148,13 +148,14 @@ class Visualizer:
                     lines.append(line.strip())
                     line = s
             elif overflow == "truncate":
-                if len(line) + len(s) < line_max_char:
-                    if len(line) == 0 and s == " ":
-                        continue
-                    line += s
-                else:
-                    lines.append(line.strip()[:line_max_char+2] + "..")
-                    line = s
+                for c in line:
+                    if len(line) + 1 < line_max_char:
+                        if len(line) == 0 and s == " ":
+                            continue
+                        line += c
+                    else:
+                        lines.append(line.strip()[:line_max_char + 2] + "..")
+                        line = s
             elif overflow == "overflow":
                 if len(line) == 0 and s == " ":
                     continue
