@@ -122,7 +122,7 @@ class Visualizer:
         offsets = rex.findall(font)
         x_off = int(offsets[0])
         y_off = int(offsets[1])
-        line_max_char = (end_x - x) / x_off
+        line_max_char = (end_x - x) // x_off
 
         wx = x
         wy = y
@@ -140,7 +140,7 @@ class Visualizer:
             elif self.parse_tag(s, replace) is True:
                 color_replaces[(len(lines), len(line))] = replace
             elif overflow == "wrap":
-                if x_off * (len(line) + len(s)) < end_x - x:
+                if len(line) + len(s) < line_max_char:
                     if len(line) == 0 and s == " ":
                         continue
                     line += s
