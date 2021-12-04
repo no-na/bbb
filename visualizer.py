@@ -140,6 +140,7 @@ class Visualizer:
                 lines.append(line.strip())
                 line = ""
             elif self.parse_tag(s, replace) is True:
+                print(replace)
                 color_replaces[(len(lines), len(line))] = replace
             elif x_off * (len(line) + len(s)) < end_x - x:
                 line += s
@@ -152,7 +153,6 @@ class Visualizer:
         for l in range(0, len(lines)):
             for c in range(0, len(lines[l])):
                 if (l, c) in color_replaces.keys():
-                    print(color_replaces[(l, c)])
                     white_replace = color_replaces[(l, c)]
                 self.build_character(FONTS[font], lines[l][c], wx, wy, x_off, y_off, white_replace=white_replace)
                 wx = wx + x_off
